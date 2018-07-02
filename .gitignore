@@ -1,0 +1,16 @@
+*.doc
+*.docx
+*.sav
+*.spv
+*.mat
+*.pdf
+*.xlsx
+*.png
+*.fig
+*.edf
+*.asv
+*.txt
+*.dat
+*.jpg
+data/*
+results/*
