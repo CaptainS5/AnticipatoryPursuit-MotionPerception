@@ -61,6 +61,7 @@ function [frames,rseed,start_time,end_time,response,response_time] = dotsX(scree
 % CURRENTLY THERE IS AN ALMOST ONE SECOND DELAY FROM THE TIME DOTSX IS
 % CALLED UNTIL THE DOTS START ON THE SCREEN! THIS IS BECAUSE OF PRIORITY.
 % NEED TO EVALUATE WHETHER PRIORITY IS REALLY NECESSARY.
+global imgDemo demoN
 
 if nargin < 3
     targets = [];
@@ -161,6 +162,7 @@ ndots = min(dotInfo.maxDotsPerFrame, ...
 
 % Don't worry about pre-allocating, the number of dot fields should never be 
 % large enough to cause memory problems.
+% here's the location of each dot--Displacement
 for df = 1 : dotInfo.numDotField
     % dxdy is an N x 2 matrix that gives jumpsize in units on 0..1
     %   deg/sec * ap-unit/deg * sec/jump = ap-unit/jump
@@ -263,21 +265,25 @@ while continue_show
     
     % After all computations, flip to draws dots from the previous loop. For the
     % first time, this doesn't draw anything.
-    Screen('Flip', curWindow,0,dontclear);
-
+     if demoN > 0
+        imgDemo{demoN} = Screen('GetImage', curWindow, [], 'backbuffer');
+        demoN = demoN + 1;
+     end
+     Screen('Flip', curWindow,0,dontclear);
+   
     
     % Setup the mask to see only a circular aperture although dots are moving in 
     % a square aperture. Minimizes the edge effects.
     Screen('BlendFunction', curWindow, GL_ONE, GL_ZERO);
 
     % Want targets to still show up
-    Screen('FillRect', curWindow, [127 127 127 255]);
+    Screen('FillRect', curWindow, [screenInfo.bckgnd screenInfo.bckgnd screenInfo.bckgnd 255]);
     
     for df = 1 : dotInfo.numDotField
         % Square that dots do not show up in
-        Screen('FillRect', curWindow, [127 127 127 0], apRect(df,:));
+        Screen('FillRect', curWindow, [screenInfo.bckgnd screenInfo.bckgnd screenInfo.bckgnd 0], apRect(df,:));
         % Circle that dots do show up in
-        Screen('FillOval', curWindow, [127 127 127 255], apRect(df,:));
+        Screen('FillOval', curWindow, [screenInfo.bckgnd screenInfo.bckgnd screenInfo.bckgnd 255], apRect(df,:));
     end
     Screen('BlendFunction', curWindow, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
     
@@ -385,6 +391,10 @@ while continue_show
 end
 
 % Present the last frame of dots
+if demoN > 0
+    imgDemo{demoN} = Screen('GetImage', curWindow, [], 'backbuffer');
+    demoN = demoN + 1;
+end
 Screen('Flip',curWindow,0,dontclear);
 
 % Erase the last frame of dots, but leave up fixation and targets (if targets 

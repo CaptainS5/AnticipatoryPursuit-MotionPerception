@@ -33,7 +33,11 @@ screenInfo = struct('rseed',rseed);
 Screen('Preference', 'VisualDebugLevel',2);
 
 % Set the background color to the default background value - black
-screenInfo.bckgnd = 127;
+screenInfo.bckgnd = 255; %127;
+% 0-luminance
+% 60 luminance
+% 127 luminance
+% 255 luminance
 [screenInfo.curWindow, screenInfo.screenRect] = Screen('OpenWindow',curScreen,...
     screenInfo.bckgnd,[],32,2);
 
