@@ -4,9 +4,9 @@
 
 %RDK options
 directions = [0 180]; % 0 = RIGHT, 180 = LEFT
-cohLevels = [0 0.05 0.15]; % dot coherence level [0...1]
-trialsPerCohLevel = [10 20 20]; % number of test trials per coherence level
-rightProbability = 62.5/100; %probability of rightward movement for standard stimulus
+cohLevels = [0 0.05 0.1 0.15]; % dot coherence level [0...1]
+trialsPerCohLevel = [13 26 26 26]; % number of test trials per coherence level
+rightProbability = 75/100; %probability of rightward movement for standard stimulus
 NStandardTrials = 500;  % number of standard trials
 
 % number of trials for each type of stimulus
@@ -25,11 +25,15 @@ standardList = zeros(NStandardTrials,3);   %condition table for standard trials
 list = zeros(NTrials,3); % template for final condition table
 
 % create probe condition table
-for i = 1:NProbeTrials; probeList(i,2) = directions(mod(i,length(directions))+1); end 
-one = ones(20,1)*cohLevels(1);
-two = ones(40,1)*cohLevels(2);
-three = ones(40,1)*cohLevels(3);
-probeList(:,1) = [one; two; three];
+for i = 1:NProbeTrials 
+    probeList(i,2) = directions(mod(i,length(directions))+1); 
+end 
+
+temp = [];
+for ii = 1:length(cohLevels)
+    temp = [temp; ones(2*trialsPerCohLevel(ii), 1)*cohLevels(ii)];
+end
+probeList(:,1) = temp;
 
 % create standard condition table
 for i = 1:NStandardTrials
@@ -75,3 +79,5 @@ while sum(pairs(list)) > 0
         end
     end
 end
+
+save(['list', num2str(rightProbability*100), 'prob.mat'], 'list')

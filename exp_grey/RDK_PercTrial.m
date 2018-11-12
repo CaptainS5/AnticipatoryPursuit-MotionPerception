@@ -23,9 +23,9 @@ try
 %     info = getInfo;
     subj = input('Number of the subject: ');
     if isempty(subj), subj = 0; end
-    session = input('Session (a,b,c...): ', 's');
-    if isempty(session), session = 'a'; end
-    prop = input('Percentage of Right movements (default = 50): ');
+    session = input('Session (f, p...): ', 's'); % f-fixation; p-pursuit
+    if isempty(session), session = 'p'; end
+    prop = input('Percentage of Right movements (default = 75): ');
     if isempty(prop), prop = 50; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
     if isempty(eyeTracker), eyeTracker = 0; end
@@ -34,7 +34,7 @@ try
     if prop == 50
         load('UPDATEDlist50prob.mat')
     elseif prop == 75
-        load('UPDATEDlist75prob.mat')
+        load('list75prob.mat')
     elseif prop == 90
         load('UPDATEDlist90prob.mat')
     elseif prop == -1 % test trials
@@ -77,9 +77,7 @@ try
     RightKey = KbName('RightArrow');
     LeftKey = KbName('LeftArrow');
     
-    %     cuecol = [255 0 0]; % color of the central cue (it has to signal the perceptual trials and differenciate them from standard pursuit trials)
-    % ##do not use the cue for now
-    cuecol = [0 255 0];
+    cuecol = [255 0 0]; % color of the central cue (it has to signal the perceptual trials and differenciate them from standard pursuit trials)
     fix_dur = 0.3 + unifrnd(0.3,0.6); % uniformly distributed random duration of central fixation
     gap_dur=0.3; % fixed gap duration
     
@@ -124,10 +122,11 @@ try
     
     % Dynamic mask, generated before hand, just use random orders of
     % the textures
-    maskTime = 0.7; % s
+    maskTime = 0.6; % s
     maskFrameN = round(maskTime*screenInfo.monRefresh);
     for ii = 1:maskFrameN
-        noise{ii} = round(rand(600,600))*255;
+        randMask = 0.7*rand(600,600)+0.3; % range 0.3-1
+        noise{ii} = round(randMask)*255;
         noiseTexture{ii} = Screen('MakeTexture', screenInfo.curWindow, noise{ii});
     end
     
@@ -165,7 +164,7 @@ try
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%% EXPERIMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    demoN = 1;
+    demoN = 0; % 0-not saving demo images; n (positive integer)-save demo images for trial n
     for trial=1:NTrials
         WaitSecs(0.05);
         res(trial,1) = trial;
@@ -192,7 +191,7 @@ try
         Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
         
                 
-        if trial~=1
+        if trial~=demo
             demoN = 0;
         end
         if demoN > 0
@@ -257,8 +256,8 @@ try
                     diffx = abs(xeye - positionOfMainCircle(1)) - xsize/2;
                     diffy = abs(yeye - positionOfMainCircle(2)) - ysize/2;
                     if (diffx > 0 || diffy > 0)
-                        Snd('Play', beep2, freq, 16); %Plays the sound in case
-                        %of wrong fixation
+                        Snd('Play', beep2, freq, 16); % Plays the sound in case
+                        % of wrong fixation
                         Screen('Flip', screenInfo.curWindow);
                         
                         WaitSecs(0.1);
@@ -312,23 +311,27 @@ try
         
         
         %%%%%%% RDK %%%%%%%
-        
-        % update cohesion and direction from condition table
-        dotInfo.coh = list(trial,1);
-        dotInfo.dir = list(trial,2);
-        
-        %mark zero-plot time in data file
-        Eyelink('Message', 'SYNCTIME');
-        Eyelink('message', 'TargetOn');
-        
-        % make rdk
-        [frames, rseed, start_time, end_time, response, response_time] = ...
-            dotsX(screenInfo, dotInfo);
-        
-        Eyelink('message', 'TargetOff');
-        WaitSecs(0.05);
-        Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
-        Eyelink('StopRecording');
+        if strcmp(session, 'p') % pursuit trials
+            % update cohesion and direction from condition table
+            dotInfo.coh = list(trial,1);
+            dotInfo.dir = list(trial,2);
+            
+            %mark zero-plot time in data file
+            Eyelink('Message', 'SYNCTIME');
+            Eyelink('message', 'TargetOn');
+            
+            % make rdk
+            [frames, rseed, start_time, end_time, response, response_time] = ...
+                dotsX(screenInfo, dotInfo);
+            
+            Eyelink('message', 'TargetOff');
+            WaitSecs(0.05);
+            Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+            Eyelink('StopRecording');
+        elseif strcmp(session, 'f') % fixation trials, add fixation point, check fixation
+%             while
+%             end
+        end
         
         
         %%%%%%%%%%%%%%%%%%%%%%%% RESPONSE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -441,9 +444,9 @@ try
          
     end % end of while-loop on NTrials trials
     
-    for ii = 1:length(imgDemo)
-        imwrite(imgDemo{ii}, ['frame', num2str(ii), '.jpg'])
-    end
+%     for ii = 1:length(imgDemo)
+%         imwrite(imgDemo{ii}, ['frame', num2str(ii), '.jpg'])
+%     end
     
     %%%%%% Following command creates files with colimns Rmotion and Lmotion %%%%%%
     
