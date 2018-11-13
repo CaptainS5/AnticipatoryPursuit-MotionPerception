@@ -14,7 +14,11 @@ clear all; close all; clc
 global imgDemo demoN
 
 try
-    resultpath = 'D:\AnticipatoryPursuitMotionPerception\data';
+    cd ..
+    cd('data\')
+    resultpath = pwd;
+    cd ..
+    cd('exp_grey\')
     addpath(genpath(pwd))
     clear res;
 %     Screen('Preference', 'SkipSyncTests', 1);
@@ -26,9 +30,9 @@ try
     session = input('Session (f, p...): ', 's'); % f-fixation; p-pursuit
     if isempty(session), session = 'p'; end
     prop = input('Percentage of Right movements (default = 75): ');
-    if isempty(prop), prop = 50; end
+    if isempty(prop), prop = 75; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
-    if isempty(eyeTracker), eyeTracker = 0; end
+    if isempty(eyeTracker), eyeTracker = 1; end
     
     % load condition table
     if prop == 50
@@ -164,7 +168,7 @@ try
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%% EXPERIMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    demoN = 0; % 0-not saving demo images; n (positive integer)-save demo images for trial n
+    demoN = 0 % 0-not saving demo images; n (positive integer)-save demo images for trial n
     for trial=1:NTrials
         WaitSecs(0.05);
         res(trial,1) = trial;
@@ -191,7 +195,7 @@ try
         Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
         
                 
-        if trial~=demo
+        if trial~=demoN
             demoN = 0;
         end
         if demoN > 0
@@ -475,7 +479,11 @@ try
     
     Screen('CloseAll');
     
-catch
-    Screen('CloseAll')
+catch ME
+    disp('error: ')
+    rethrow(ME)
     
+    Screen('CloseAll')
+    Eyelink('StopRecording');
+    Eyelink('ShutDown');    
 end
