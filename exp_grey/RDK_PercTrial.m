@@ -26,21 +26,21 @@ try
     %%%%%% parameters to be entered with line command or GUI %%%%%%
 %     info = getInfo;
     subj = input('Number of the subject: ');
-    if isempty(subj), subj = 0; end
+    if isempty(subj), subj = 1; end
     session = input('Session (f, p...): ', 's'); % f-fixation; p-pursuit
     if isempty(session), session = 'p'; end
     prop = input('Percentage of Right movements (default = 75): ');
-    if isempty(prop), prop = 75; end
+    if isempty(prop), prop = 90; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
     if isempty(eyeTracker), eyeTracker = 1; end
     
     % load condition table
     if prop == 50
-        load('UPDATEDlist50prob.mat')
+        load('list50prob.mat')
     elseif prop == 75
         load('list75prob.mat')
     elseif prop == 90
-        load('UPDATEDlist90prob.mat')
+        load('list90prob.mat')
     elseif prop == -1 % test trials
         load('testList.mat')
     else
@@ -392,6 +392,28 @@ try
             %     Snd('Play', beep, freq_BAD, 16);
             %     Score=Score-1;
             % end
+        else % present dynamic mask if it's standard trial
+            Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+            
+            % Make an aperature
+            objCirc = floor(createTRect(dotInfo.apXYD, screenInfo));
+            aperature = Screen('OpenOffscreenwindow', screenInfo.curWindow, screenInfo.bckgnd, screenInfo.screenRect);
+            Screen('FillOval', aperature, [255 255 255 100], objCirc);
+            
+            % random order of the textures
+            maskIdx = randperm(maskFrameN);
+            for maskF = 1:maskFrameN
+                Screen('DrawTextures', screenInfo.curWindow, noiseTexture{maskIdx(maskF)});
+                Screen('DrawTexture', screenInfo.curWindow, aperature);
+                
+                if demoN > 0
+                    imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
+                    demoN = demoN + 1;
+                end
+                [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
+                
+            end
+            
         end
         
         
@@ -416,28 +438,7 @@ try
             % do a periodic driftcorrection
             EyelinkDoDriftCorrection(el);
         end
-        
-        Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-        
-        % Make an aperature
-        objCirc = floor(createTRect(dotInfo.apXYD, screenInfo));
-        aperature = Screen('OpenOffscreenwindow', screenInfo.curWindow, screenInfo.bckgnd, screenInfo.screenRect);
-        Screen('FillOval', aperature, [255 255 255 100], objCirc);
-        
-        % present dynamic mask
-        % random order of the textures
-        maskIdx = randperm(maskFrameN);
-        for maskF = 1:maskFrameN
-            Screen('DrawTextures', screenInfo.curWindow, noiseTexture{maskIdx(maskF)});
-            Screen('DrawTexture', screenInfo.curWindow, aperature);
-            
-            if demoN > 0
-                imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
-                demoN = demoN + 1;
-            end
-            [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
-            
-        end
+                
         % background
         Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);      
         if demoN > 0
@@ -461,7 +462,7 @@ try
     save(outres_filenameB,'jal');
     
     try
-        %         cd(resultpath);
+        cd(resultpath);
         
         fprintf('Receiving data file ''%s''\n', edfFile );
         status=Eyelink('ReceiveFile');
