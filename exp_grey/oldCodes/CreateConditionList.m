@@ -1,20 +1,20 @@
 %%%%%%%%% Create conditions table %%%%%%%%%
 % script to create a condition table for anticipitory smooth pursuit RDK
-% Xiuyun Wu - Nov 14 2018, slightly modifeid from Austin's version
+% Austin Rothwell - June 10 2016
 
 %RDK options
 directions = [0 180]; % 0 = RIGHT, 180 = LEFT
-cohLevels = [0 0.1 0.2 0.3]; % dot coherence level [0...1]
+cohLevels = [0 0.05 0.1 0.15]; % dot coherence level [0...1]
 trialsPerCohLevel = [13 26 26 26]; % number of test trials per coherence level
 rightProbability = 50/100; %probability of rightward movement for standard stimulus
 NStandardTrials = 500;  % number of standard trials
-varNames = {'coh', 'rdkDir', 'trialType'}; % 1-R, 2-L
 
 % number of trials for each type of stimulus
 NRightStandardTrials = NStandardTrials * rightProbability; % number of rightward standard trials
 NLeftStandardTrials = NStandardTrials - NRightStandardTrials; % number of leftward standard trials
 NProbeTrials = length(directions) * sum(trialsPerCohLevel); % number of test trials
 NTrials = NProbeTrials + NStandardTrials;  % total number of trials
+
 
 % produce un-shuffled condition tables
 % - table(:,1) = coherence level
@@ -25,9 +25,9 @@ standardList = zeros(NStandardTrials,3);   %condition table for standard trials
 list = zeros(NTrials,3); % template for final condition table
 
 % create probe condition table
-for i = 1:NProbeTrials
-    probeList(i,2) = directions(mod(i,length(directions))+1);
-end
+for i = 1:NProbeTrials 
+    probeList(i,2) = directions(mod(i,length(directions))+1); 
+end 
 
 temp = [];
 for ii = 1:length(cohLevels)
@@ -70,7 +70,7 @@ list = [list(1:50,:); temp];
 
 % look for consecutive probe trials, if found, swap row to random position
 % in condition table until no consecutive probe trials exist
-while sum(pairs(list)) > 0
+while sum(pairs(list)) > 0 
     temp = pairs(list);
     for i = 1:length(temp)
         if temp(i) == 1
@@ -79,9 +79,5 @@ while sum(pairs(list)) > 0
         end
     end
 end
-
-%% adding variable names and generate the final list table
-list = mat2cell(list, size(list, 1), ones(1, 3));
-list = table(list{:}, 'VariableNames', varNames);
 
 save(['list', num2str(rightProbability*100), 'prob.mat'], 'list')

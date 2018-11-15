@@ -22,7 +22,7 @@ try
     addpath(genpath(pwd))
     clear res;
 %     Screen('Preference', 'SkipSyncTests', 1);
-    
+
     %%%%%% parameters to be entered with line command or GUI %%%%%%
 %     info = getInfo;
     subj = input('Number of the subject: ');
@@ -33,7 +33,7 @@ try
     if isempty(prop), prop = 90; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
     if isempty(eyeTracker), eyeTracker = 1; end
-    
+
     % load condition table
     if prop == 50
         load('list50prob.mat')
@@ -46,14 +46,14 @@ try
     else
         error('ERROR: that condition table does not exist')
     end
-    
+
     % number of trials for each type of stimulus
     NTrials = length(list);
     nRem_trials = 50;   %  progress report trials (every nRem_trials)
-    
+
     % % selects the lookup table corresponding to the current p-bias value
     % % load the NTrials table wrt the proportion of right movements
-    
+
     %eval(sprintf('load list.mat'));
     % eval(sprintf('load list_%d.mat',prop)); % list contains 2 (? columns) -> this list has to specify for each trial all the information necessary to display the RDK
     %                                         % e.g. 0 = Rightward motion
@@ -62,17 +62,17 @@ try
     %                                         % 3 = Leftward motion
     %
     % list = list(1:NTrials);
-    
+
     outres_filename = ['s' num2str(subj) 'AP' session num2str(prop)]; % name of oculomotor results file
     if (size(outres_filename,2)>8)
         error('edf filename is too long!');              % Security loop against Eyelink                                    % Un-registration of data if namefile
     end                                                  % is too long
     edfFile=[outres_filename, '.edf'];
-    
+
     outres_filenameB = ['jal_' 's' num2str(subj) 'AP' session num2str(prop)]; % name of behavioural results file
-    
+
     jal.cols = {'trial' 'coherence' 'RDK-dir (1=R;2=L)' 'Response (1=R;2=L)' 'Response Time' 'Trial Type (1=std;0=test)'};
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%% TRIAL FIXED PARAMETERS for DIRECTION DISCRIMINATION TRIALS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     KbName('UnifyKeyNames');
     stopkey=KbName('ESCAPE'); % defines the keyboard command to manually stop
@@ -80,60 +80,60 @@ try
     % the experiment (after saving existing data)
     RightKey = KbName('RightArrow');
     LeftKey = KbName('LeftArrow');
-    
+
     cuecol = [255 0 0]; % color of the central cue (it has to signal the perceptual trials and differenciate them from standard pursuit trials)
     fix_dur = 0.3 + unifrnd(0.3,0.6); % uniformly distributed random duration of central fixation
     gap_dur=0.3; % fixed gap duration
-    
-    
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%% DISPLAY and EYELINK PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     nDrift = 50;
-    
+
     % Initialize the screen
     screenInfo = openExperiment(49.5,57,0);
-    
+
     %%DISPLAY center x and y coords
     [x,y] = RectCenter(screenInfo.screenRect);
-    
+
     % Initialize dots
     % Check ./ShadlenDotsX/createMinDotInfo to change parameters
     dotInfo = createDotInfo(1);
-    
-    
+
+
     %%%%%%%%%%% WARNING BEEP %%%%%%%%%%%%
-    
+
     %set beep for feedback on fix maintainance (within window)
     freq = 44100;
     beep2(1,:) = 0.9 * MakeBeep(300, 0.1, freq);
-    
+
     %Coordinates and size of two virtual boxes surrounding the fixation target and the moving
     %target (working as static gaze position tolerance window)
     %Fixation box
-    xsize = 400; % x-size in pixels 
+    xsize = 400; % x-size in pixels
     % ## (WE HAVE TO FIGURE OUT THE PIXEL TO DEGREES CONVERSION)--use
     % ## that change function here
     ysize = 400;
     FIX_BOX_COORDS = [(x-xsize/2) (y-ysize/2) (x+xsize/2) (y+ysize/2)];
-    
+
     % Size of the Motion period tolerance window
     W_MW = 1200; % Width in pixels (it can be defined relative to the size of the RDK or just "large enough")
     H_MW = 400; % Height
     MOV_BOX_COORDS = [(x-W_MW/2) (y-H_MW/2) (x+W_MW/2) (y+H_MW/2)]; % Motion period box
-    
+
     % Size of the fixation dot in pixels
     W = 10;
-    H =10;    
-    
+    H =10;
+
     % Dynamic mask, generated before hand, just use random orders of
     % the textures
     maskTime = 0.6; % s
     maskFrameN = round(maskTime*screenInfo.monRefresh);
     for ii = 1:maskFrameN
         randMask = 0.7*rand(600,600)+0.3; % range 0.3-1
-        noise{ii} = round(randMask)*255;
+        noise{ii} = randMask*255;
         noiseTexture{ii} = Screen('MakeTexture', screenInfo.curWindow, noise{ii});
     end
-    
+
     %% Initializes the connection with Eyelink
     if eyeTracker==1
         if EyelinkInit()~= 1; %
@@ -149,24 +149,24 @@ try
         if eye_used == -1
             eye_used = el.RIGHT_EYE;
         end
-        
+
         % make sure that we get gaze data from the Eyelink
         Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
-        
+
         % open file to record data to
-        
+
         Eyelink('Openfile', edfFile);
-        
+
         % STEP 4
         % Calibrate the eye tracker
         EyelinkDoTrackerSetup(el);
-        
+
         % do a final check of calibration using driftcorrection
         EyelinkDoDriftCorrection(el);
     else
         Eyelink('Initializedummy');
     end
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%% EXPERIMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     demoN = 0 % 0-not saving demo images; n (positive integer)-save demo images for trial n
     for trial=1:NTrials
@@ -179,7 +179,7 @@ try
             res(trial,3) = 2;
         end
         res(trial,6) = list(trial,3); % Trial Type (1 = Standard; 0 = Test)
-        
+
         trialInfo = sprintf('%d %d %d',trial,list(trial,1),list(trial,2));
         %
         % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -189,12 +189,12 @@ try
         WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
         Eyelink('StartRecording');
         % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         % Black screen
         %Screen('FillRect', screenInfo.curWindow, black);
         Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
-        
-                
+
+
         if trial~=demoN
             demoN = 0;
         end
@@ -205,30 +205,30 @@ try
         [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
         [x,y] = RectCenter(screenInfo.screenRect);
         positionOfMainCircle=[(x-W/2) (y-H/2) (x+W/2) (y+H/2)]; % position of the fixation target
-        
+
         if list(trial,3) == 1
             Screen('FillArc',screenInfo.curWindow, cuecol, positionOfMainCircle, 0 ,360);
         else
             Screen('FillArc',screenInfo.curWindow, [0 255 0], positionOfMainCircle, 0 ,360);
-        end        
+        end
 
         if demoN > 0
             imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
             demoN = demoN + 1;
         end
         [VBL StimulusOnsetTime]=Screen('Flip', screenInfo.curWindow);
-        
+
         % Eyelink('message', 'StimulusOn');
-        
+
         %% draw gaze position tolerance window on the operator (Eyelink host) PC
         Eyelink('command','clear_screen 0'); % clears the box from the Eyelink-operator screen
         Eyelink('command','draw_box %d %d %d %d 7', FIX_BOX_COORDS(1),FIX_BOX_COORDS(2),FIX_BOX_COORDS(3),FIX_BOX_COORDS(4));
-        
+
         FixTime = 0;
-        
+
         % %%%% Check for presence of the eye position signal within the tolerance
         % %%%% window and wait for a random interval before the Gap-screen %%%%
-        
+
         while (FixTime < fix_dur)
             CurrentTime = GetSecs; % GetSecs returns the time in seconds (based on internal clock)
             FixTime = CurrentTime - StimulusOnsetTime;
@@ -239,18 +239,18 @@ try
                 StopCommand = 1;
                 break;
             end
-            
+
             % check for presence of a new sample update
             if Eyelink( 'NewFloatSampleAvailable') > 0
                 % get the sample in the form of an event structure
                 evt = Eyelink( 'NewestFloatSample');
                 xeye = evt.gx(eye_used+1); % +1 as we're accessing MATLAB array
                 yeye = evt.gy(eye_used+1);
-                
+
                 % !!!!   CHECK WHAT IS EYE_USED DURING THE MOUSE SIMULATION    !!!
                 % [xeye, yeye, buttons]=GetMouse(screenInfo.curWindow) % It does NOT work,
                 % it checks the Display PC mouse
-                
+
                 %% do we have valid data and is the pupil visible?
                 if xeye~=el.MISSING_DATA & yeye~=el.MISSING_DATA & evt.pa(eye_used+1)>0
                     % if data is valid, compare gaze position with the
@@ -263,7 +263,7 @@ try
                         Snd('Play', beep2, freq, 16); % Plays the sound in case
                         % of wrong fixation
                         Screen('Flip', screenInfo.curWindow);
-                        
+
                         WaitSecs(0.1);
                         Screen('FillArc',screenInfo.curWindow, 255, positionOfMainCircle, 0 ,360);
                         [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
@@ -275,7 +275,7 @@ try
                     % if data is invalid (e.g. during a blink), clear display
                     Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
                     Screen('Flip', screenInfo.curWindow);
-                    
+
                     WaitSecs(0.2);
                     Screen('FillArc',screenInfo.curWindow, screenInfo.bckgnd, positionOfMainCircle, 0 ,360);
                     [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
@@ -291,43 +291,43 @@ try
                 end
             end % if sample available
         end %end of while loop on fixation
-        
+
         if StopCommand==1
             break;
         end
         %%%% GAP period %%%%
         % Grey screen
-        Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);        
-        
+        Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
+
         if demoN > 0
             imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
             demoN = demoN + 1;
         end
         [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
-        
+
         Eyelink('message', 'StimulusOff');
         WaitSecs(gap_dur);
-        
+
         Eyelink('command','draw_box %d %d %d %d 7',MOV_BOX_COORDS(1),MOV_BOX_COORDS(2),MOV_BOX_COORDS(3),MOV_BOX_COORDS(4));
-        
-        
+
+
         %%%%%%%%%%%%%%%%%%%%%%%% RDK display %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-        
+
+
         %%%%%%% RDK %%%%%%%
         if strcmp(session, 'p') % pursuit trials
             % update cohesion and direction from condition table
             dotInfo.coh = list(trial,1);
             dotInfo.dir = list(trial,2);
-            
+
             %mark zero-plot time in data file
             Eyelink('Message', 'SYNCTIME');
             Eyelink('message', 'TargetOn');
-            
+
             % make rdk
             [frames, rseed, start_time, end_time, response, response_time] = ...
                 dotsX(screenInfo, dotInfo);
-            
+
             Eyelink('message', 'TargetOff');
             WaitSecs(0.05);
             Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
@@ -336,35 +336,35 @@ try
 %             while
 %             end
         end
-        
-        
+
+
         %%%%%%%%%%%%%%%%%%%%%%%% RESPONSE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         % response iff it is a test trial
         if list(trial,3) == 0
             % Collect keyboard press for manual response: Right Landolt or Left Landolt
             % (Left Key for Left Landolt and Right Key for Right Landolt)
             while KbCheck; end % Wait until all keys are released.
-            
+
             % black=BlackIndex(screenInfo.curWindow); %value for white pixel%color value for text
-            
+
             line1 = 'LEFT or RIGHT?';
             Screen('TextSize', screenInfo.curWindow, 55);
             DrawFormattedText(screenInfo.curWindow, [line1],...
-                'center',350, [0 0 0]);            
-            
+                'center',350, [0 0 0]);
+
             if demoN > 0
                 imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
                 demoN = demoN + 1;
             end
             Screen('Flip', screenInfo.curWindow);
-            
+
             startSecs = GetSecs;
             dummy = 0;
             while (dummy==0)
                 % Check the state of the keyboard.
                 [ keyIsDown, seconds, keyCode ] = KbCheck;
-                
+
                 % If the user is pressing a key, then display its code number and name.
                 if keyIsDown
                     if (keyCode(RightKey)||keyCode(LeftKey))
@@ -375,7 +375,7 @@ try
                     end
                 end
             end
-            
+
             if strcmp(choice,'RightArrow')
                 answer=1;   %answer=1 means RIGHT
                 res(trial,4) = answer;
@@ -384,7 +384,7 @@ try
                 res(trial,4) = answer;
             end
             res(trial,5) = choice_RT;
-            
+
             % if answer==res(trial,3)
             %     Snd('Play', beep, freq_OK, 16);
             %     Score=Score+1;
@@ -394,76 +394,76 @@ try
             % end
         else % present dynamic mask if it's standard trial
             Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-            
+
             % Make an aperature
             objCirc = floor(createTRect(dotInfo.apXYD, screenInfo));
             aperature = Screen('OpenOffscreenwindow', screenInfo.curWindow, screenInfo.bckgnd, screenInfo.screenRect);
             Screen('FillOval', aperature, [255 255 255 100], objCirc);
-            
+
             % random order of the textures
             maskIdx = randperm(maskFrameN);
             for maskF = 1:maskFrameN
                 Screen('DrawTextures', screenInfo.curWindow, noiseTexture{maskIdx(maskF)});
                 Screen('DrawTexture', screenInfo.curWindow, aperature);
-                
+
                 if demoN > 0
                     imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
                     demoN = demoN + 1;
                 end
                 [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
-                
+
             end
-            
+
         end
-        
-        
+
+
         %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
         if (rem(trial,nRem_trials)==0 && (NTrials-trial>1))
             drift=0;
             %EyelinkDoDriftCorrection(el)
             nn=NTrials-trial;
             eval(sprintf('text1=''%d trials remaining''',nn));
-            Screen('DrawText', screenInfo.curWindow, text1,800,400,[0 0 0]);            
-            
+            Screen('DrawText', screenInfo.curWindow, text1,800,400,[0 0 0]);
+
             if demoN > 0
                 imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
                 demoN = demoN + 1;
             end
             Screen('Flip', screenInfo.curWindow);
-            
+
             WaitSecs(0.8);
         end
-        
+
         if (rem(trial,nDrift)==0 && (NTrials-trial>1))
             % do a periodic driftcorrection
             EyelinkDoDriftCorrection(el);
         end
-                
+
         % background
-        Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);      
+        Screen('FillRect', screenInfo.curWindow, screenInfo.bckgnd);
         if demoN > 0
         imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
         demoN = demoN + 1;
         end
         [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
-         
+
     end % end of while-loop on NTrials trials
-    
+
 %     for ii = 1:length(imgDemo)
 %         imwrite(imgDemo{ii}, ['frame', num2str(ii), '.jpg'])
 %     end
-    
+
     %%%%%% Following command creates files with colimns Rmotion and Lmotion %%%%%%
-    
+
     Eyelink('CloseFile');
-    
+
     jal.data = res;
     cd(resultpath);
     save(outres_filenameB,'jal');
-    
+
     try
         cd(resultpath);
-        
+
         fprintf('Receiving data file ''%s''\n', edfFile );
         status=Eyelink('ReceiveFile');
         if status > 0
@@ -475,16 +475,16 @@ try
     catch
         fprintf('Problem receiving data file ''%s''\n', edfFile );
     end
-    
+
     Eyelink('ShutDown');
-    
+
     Screen('CloseAll');
-    
+
 catch ME
     disp('error: ')
     rethrow(ME)
-    
+
     Screen('CloseAll')
     Eyelink('StopRecording');
-    Eyelink('ShutDown');    
+    Eyelink('ShutDown');
 end
