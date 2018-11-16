@@ -44,13 +44,13 @@ prm.beep.samplingRate = 44100;
 prm.beep.sound = 0.9 * MakeBeep(300, 0.1, prm.beep.samplingRate);
 
 %Coordinates and size of two virtual boxes surrounding the fixation target and the moving
-    %target (working as static gaze position tolerance window)
-    %Fixation box
-    prm.fixRange.radius = 1;
+%target (working as static gaze position tolerance window)
+%Fixation box
+prm.fixRange.radius = 1;
 
-    % Size of the Motion period tolerance window
-    prm.motionRange.xLength = 50; % can be defined relative to the size of the RDK or just "large enough"; can be a box
-    prm.motionRange.yLength = 50; % Height
+% Size of the Motion period tolerance window
+prm.motionRange.xLength = 50; % can be defined relative to the size of the RDK or just "large enough"; can be a box
+prm.motionRange.yLength = 50; % Height
 
 % dynamic mask
 prm.mask.duration = 0.6;
