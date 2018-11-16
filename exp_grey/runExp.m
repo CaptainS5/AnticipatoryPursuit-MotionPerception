@@ -42,6 +42,7 @@ try
     prm.trialPerBlock = size(list, 1);
     
     openScreen; % modify background color here
+    prm.rdk.colour = prm.screen.whiteColour;
     % Key
     KbCheck;
     KbName('UnifyKeyNames');
@@ -82,6 +83,38 @@ try
         trialMakeUp = [];
         makeUpN = 0;
         
+        %% Initializes the connection with Eyelink
+        if eyeTracker==1
+            if EyelinkInit()~= 1; %
+                error('Problems with Eyelink connection!');
+                return;
+            end
+            prm.eyeLink.el=EyelinkInitDefaults(prm.screen.windowPtr);
+            prm.eyeLink.el.backgroundcolour = 0;
+            prm.eyeLink.el.foregroundcolour = 255;
+            % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            % check which eye is recorded
+            prm.eyeLink.eye_used = Eyelink('EyeAvailable'); % get eye that's tracked
+            if prm.eyeLink.eye_used == -1
+                prm.eyeLink.eye_used = prm.eyeLink.el.RIGHT_EYE;
+            end
+            
+            % make sure that we get gaze data from the Eyelink
+            Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
+%             
+%             % open file to record data to            
+%             Eyelink('Openfile', edfName);
+            
+            % STEP 4
+            % Calibrate the eye tracker
+            EyelinkDoTrackerSetup(prm.eyeLink.el);
+            
+            % do a final check of calibration using driftcorrection
+            EyelinkDoDriftCorrection(prm.eyeLink.el);
+        else
+            Eyelink('Initializedummy');
+        end
+        
         % initial welcome
         textBlock = ['Block ', num2str(info.block)];
         Screen('DrawText', prm.screen.windowPtr, textBlock, prm.screen.center(1)-60, prm.screen.center(2), prm.screen.whiteColour);
@@ -103,18 +136,42 @@ try
             if tempN>prm.trialPerBlock
                 trialN = trialMakeUp(tempN-prm.trialPerBlock);
             end
-            % present the stimuli and recording response
+            % prepare eye recording
+            prm.eyeLink.edfName = [prm.fileName.folder, '\b', num2str(currentBlock), 't', num2str(trialN), '.edf'];
+            if (size(['b', num2str(currentBlock), 't', num2str(trialN)], 2)-4>8)
+                error('edf filename is too long!'); % Security loop against Eyelink
+                % Un-registration of data if namefile
+            end
+            % open file to record data to
+            Eyelink('Openfile', prm.eyeLink.edfName);
+            
+                % present the stimuli and recording response
             [key rt] = runTrial(info.block, trialN, tempN);
             % trialN is the index for looking up in list;
             % tempN is the actual trial number, including invalid trials
-            resp.trialIdx(tempN, 1) = trialN; % index for the condition used
+            
+            % eye recording output
+            Eyelink('CloseFile');
+            try                
+                fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
+                status=Eyelink('ReceiveFile');
+                if status > 0
+                    fprintf('ReceiveFile status %d\n', status);
+                end
+                if 2==exist(prm.eyeLink.edfName, 'file')
+                    fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName);
+                end
+            catch
+                fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName);
+            end
+            
+            % record responses
             if strcmp(key, 'LeftArrow')
                 resp.choice(tempN, 1) = 0;
             elseif strcmp(key, 'RightArrow') %
                 resp.choice(tempN, 1) = 1;
                 %             elseif strcmp(key, 'void') % no response
-                %                 resp{info.block}.choice(trialN, 1) = 0;
-                
+                %                 resp{info.block}.choice(trialN, 1) = 0;                
             elseif strcmp(key, 'ESCAPE') % quit
                 break
             else % wrong key
