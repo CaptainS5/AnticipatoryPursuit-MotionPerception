@@ -9,6 +9,9 @@ try
     % presented, including trials with invalid response/loss of fixation etc.
     addpath(genpath(pwd))
     AssertOpenGL;
+        % Key
+    KbCheck;
+    KbName('UnifyKeyNames');
     
     setParameters;
     cd ..
@@ -43,19 +46,18 @@ try
     
     openScreen; % modify background color here
     prm.rdk.colour = prm.screen.whiteColour;
-    % Key
-    KbCheck;
-    KbName('UnifyKeyNames');
+
     HideCursor;
     
     %     generate textures for the mask
+    maskFrameN = round(sec2frm(prm.mask.duration));
     for ii = 1:maskFrameN
         imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum)*255;
         prm.mask.tex{ii} = Screen('MakeTexture', prm.screen.windowPtr, imgMask);
     end
     
-    % allow transparency
-    Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+%     % allow transparency
+%     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
     
     if strcmp(info.subID{1}, 'luminance')
         % testing monitor luminance
@@ -146,7 +148,7 @@ try
             Eyelink('Openfile', prm.eyeLink.edfName);
             
                 % present the stimuli and recording response
-            [key rt] = runTrial(info.block, trialN, tempN);
+            [keyCode rt] = runTrial(info.block, trialN, tempN);
             % trialN is the index for looking up in list;
             % tempN is the actual trial number, including invalid trials
             
@@ -166,13 +168,11 @@ try
             end
             
             % record responses
-            if strcmp(key, 'LeftArrow')
+            if keyCode(prm.leftKey)
                 resp.choice(tempN, 1) = 0;
-            elseif strcmp(key, 'RightArrow') %
-                resp.choice(tempN, 1) = 1;
-                %             elseif strcmp(key, 'void') % no response
-                %                 resp{info.block}.choice(trialN, 1) = 0;                
-            elseif strcmp(key, 'ESCAPE') % quit
+            elseif keyCode(prm.rightKey) 
+                resp.choice(tempN, 1) = 1;               
+            elseif keyCode(prm.stopKey) % quit
                 break
             else % wrong key
                 % % repeat this trial at the end of the block
@@ -193,7 +193,6 @@ try
             tempN = tempN+1;
             
             % ITI
-            Screen('Flip', prm.screen.windowPtr);
             WaitSecs(prm.ITI);
         end
     end

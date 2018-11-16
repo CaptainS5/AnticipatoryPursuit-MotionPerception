@@ -14,7 +14,7 @@ prm.screen.monitorHeight = 27;
 % 16.5 for the laptop; 27.1 for the torsion monitor in X717
 
 % display settings
-% prm.backgroundColour = []; % background, currently set in openScreen
+% prm.screen.backgroundColour = []; % background, currently set in openScreen
 
 % fixation
 prm.fixation.dotRadius = 0.15; % in dva
@@ -30,9 +30,10 @@ prm.gap.duration = 0.3;
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
 prm.rdk.dotNumber = 150;
-prm.rdk.lifeTime = 0.016;
+prm.rdk.lifeTime = 0.05;
 prm.rdk.dotRadius = 0.15;
 prm.rdk.apetureRadius = 10;
+prm.rdk.speed = 10; % dva per sec
 % prm.rdk.colour = prm.screen.whiteColour; % currently set after openScreen
 
 % Eyelink parameters
@@ -61,5 +62,10 @@ prm.mask.matrixSize = [600, 600];
 prm.ITI = 0.05; % inter-trial interval
 prm.reminderTrialN = 50; % progress report every N trials
 prm.blockN = 6; % total number of blocks
+
+% key bindings
+prm.stopKey = KbName('ESCAPE');
+prm.rightKey = KbName('RightArrow');
+prm.leftKey = KbName('LeftArrow');
 
 % end

@@ -3,10 +3,10 @@
 % Xiuyun Wu - Nov 14 2018, slightly modifeid from Austin's version
 
 %RDK options
-directions = [0 180]; % 0 = RIGHT, 180 = LEFT
+directions = [1 -1]; % -1=left, 1=right % [0 180]; % 0 = RIGHT, 180 = LEFT
 cohLevels = [0 0.1 0.2 0.3]; % dot coherence level [0...1]
 trialsPerCohLevel = [13 26 26 26]; % number of test trials per coherence level
-rightProbability = 50/100; %probability of rightward movement for standard stimulus
+rightProbability = 90/100; %probability of rightward movement for standard stimulus
 NStandardTrials = 500;  % number of standard trials
 varNames = {'coh', 'rdkDir', 'trialType'}; % 1-R, 2-L
 
@@ -40,9 +40,9 @@ for i = 1:NStandardTrials
     standardList(i,1) = 1;
     standardList(i,3) = 1;
     if i <= NRightStandardTrials
-        standardList(i,2) = 0;
+        standardList(i,2) = 1;
     else
-        standardList(i,2) = 180;
+        standardList(i,2) = -1;
     end
 end
 

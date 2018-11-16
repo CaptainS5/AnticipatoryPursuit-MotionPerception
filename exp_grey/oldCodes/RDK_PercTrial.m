@@ -340,7 +340,7 @@ try
 
         %%%%%%%%%%%%%%%%%%%%%%%% RESPONSE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        % response iff it is a test trial
+        % response if it is a test trial
         if list(trial,3) == 0
             % Collect keyboard press for manual response: Right Landolt or Left Landolt
             % (Left Key for Left Landolt and Right Key for Right Landolt)
