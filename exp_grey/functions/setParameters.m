@@ -30,18 +30,22 @@ prm.gap.duration = 0.3;
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
 prm.rdk.dotNumber = 150;
-prm.rdk.lifeTime = 0.05;
+prm.rdk.lifeTime = 0.1;
 prm.rdk.dotRadius = 0.15;
-prm.rdk.apertureRadius = 5;
+prm.rdk.apertureRadius = 6;
 prm.rdk.speed = 10; % dva per sec
 % prm.rdk.colour = prm.screen.whiteColour; % currently set after openScreen
 
 % Eyelink parameters
-prm.eyeLink.nDrift = 50;
+prm.eyeLink.nDrift = 50; % drift correction every n trials
 
 % warning beep for feedback on fixation maintainance
 prm.beep.samplingRate = 44100;
 prm.beep.sound = 0.9 * MakeBeep(300, 0.1, prm.beep.samplingRate);
+
+% text size
+prm.textSize = 25;
+% prm.textColour = prm.screen.blackColour; % currently set after openScreen
 
 %Coordinates and size of two virtual boxes surrounding the fixation target and the moving
 %target (working as static gaze position tolerance window)
