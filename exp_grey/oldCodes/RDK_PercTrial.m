@@ -15,10 +15,11 @@ global imgDemo demoN
 
 try
     cd ..
+    cd ..
     cd('data\')
     resultpath = pwd;
     cd ..
-    cd('exp_grey\')
+    cd('exp_grey\oldCodes')
     addpath(genpath(pwd))
     clear res;
 %     Screen('Preference', 'SkipSyncTests', 1);
@@ -32,7 +33,7 @@ try
     prop = input('Percentage of Right movements (default = 75): ');
     if isempty(prop), prop = 90; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
-    if isempty(eyeTracker), eyeTracker = 1; end
+    if isempty(eyeTracker), eyeTracker = 0; end
 
     % load condition table
     if prop == 50

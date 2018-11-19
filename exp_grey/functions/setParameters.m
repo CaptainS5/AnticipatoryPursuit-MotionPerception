@@ -8,9 +8,9 @@ global prm
 
 % physical parameters, in cm
 prm.screen.viewDistance = 45; % 57.29 cm corresponds to 1cm on screen as 1 dva
-prm.screen.monitorWidth = 35.2; % horizontal dimension of viewable screen (cm)
+prm.screen.monitorWidth = 40.5; % horizontal dimension of viewable screen (cm)
 % 29.4 for the laptop; 36 for the torsion monitor in X717
-prm.screen.monitorHeight = 27;
+prm.screen.monitorHeight = 30.5;
 % 16.5 for the laptop; 27.1 for the torsion monitor in X717
 
 % display settings
@@ -32,7 +32,7 @@ prm.rdk.duration = 0.7; % display duration of the whole RDK
 prm.rdk.dotNumber = 150;
 prm.rdk.lifeTime = 0.05;
 prm.rdk.dotRadius = 0.15;
-prm.rdk.apetureRadius = 10;
+prm.rdk.apertureRadius = 5;
 prm.rdk.speed = 10; % dva per sec
 % prm.rdk.colour = prm.screen.whiteColour; % currently set after openScreen
 
@@ -56,7 +56,7 @@ prm.motionRange.yLength = 50; % Height
 prm.mask.duration = 0.6;
 prm.mask.maxLum = 0.7; % max luminance in the mask
 prm.mask.minLum = 0;
-prm.mask.matrixSize = [600, 600];
+prm.mask.matrixSize = [1600, 1600];
 
 % block conditions
 prm.ITI = 0.05; % inter-trial interval
@@ -64,8 +64,8 @@ prm.reminderTrialN = 50; % progress report every N trials
 prm.blockN = 6; % total number of blocks
 
 % key bindings
-prm.stopKey = KbName('ESCAPE');
-prm.rightKey = KbName('RightArrow');
-prm.leftKey = KbName('LeftArrow');
+prm.stopKey = 'ESCAPE';
+prm.rightKey = 'RightArrow';
+prm.leftKey = 'LeftArrow';
 
 % end
