@@ -1,7 +1,7 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
-clear all; close all; clc; currentBlock=1; eyeType = 1; prob = 75; eyeTracker=0;% debugging
+clear all; close all; clc; currentBlock=1; eyeType = 1; prob = 90; eyeTracker=0;% debugging
 try
-    global prm display resp info
+    global prm list resp info
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
@@ -9,12 +9,13 @@ try
     % presented, including trials with invalid response/loss of fixation etc.
     addpath(genpath(pwd))
     AssertOpenGL;
-        % Key
+    % Key
     KbCheck;
     KbName('UnifyKeyNames');
     
     setParameters;
     cd ..
+    
     cd('data\')
     prm.resultPath = pwd;
     cd ..
@@ -30,13 +31,9 @@ try
     save([prm.fileName.folder, '\Info', num2str(currentBlock), '_', info.fileNameTime], 'info')
     
     % load trial info for the current block
-    if info.prob == 50
-        load('list50prob.mat')
-    elseif info.prob == 75
-        load('list75prob.mat')
-    elseif info.prob == 90
-        load('list90prob.mat')
-    elseif info.prob == -1 % test trials
+    if info.prob > 0
+        load(['listNew', num2str(info.prob), 'prob.mat'])
+    elseif info.prob == -1  % test trials
         load('testList.mat')
     else
         error('ERROR: condition table does not exist')
@@ -46,18 +43,19 @@ try
     
     openScreen; % modify background color here
     prm.rdk.colour = prm.screen.whiteColour;
-
-    HideCursor;
+    prm.textColour = prm.screen.blackColour;
+    
+    %     HideCursor;
     
     %     generate textures for the mask
     maskFrameN = round(sec2frm(prm.mask.duration));
     for ii = 1:maskFrameN
-        imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum)*255;
+        imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum, prm.mask.matrixSize)*255;
         prm.mask.tex{ii} = Screen('MakeTexture', prm.screen.windowPtr, imgMask);
     end
     
-%     % allow transparency
-%     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+    %     % allow transparency
+    %     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
     
     if strcmp(info.subID{1}, 'luminance')
         % testing monitor luminance
@@ -103,9 +101,9 @@ try
             
             % make sure that we get gaze data from the Eyelink
             Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
-%             
-%             % open file to record data to            
-%             Eyelink('Openfile', edfName);
+            %
+            %             % open file to record data to
+            %             Eyelink('Openfile', edfName);
             
             % STEP 4
             % Calibrate the eye tracker
@@ -113,14 +111,15 @@ try
             
             % do a final check of calibration using driftcorrection
             EyelinkDoDriftCorrection(prm.eyeLink.el);
-        else
-            Eyelink('Initializedummy');
+            %         elseif eyeTracker==0
+            %             Eyelink('Initializedummy');
         end
         
         % initial welcome
         textBlock = ['Block ', num2str(info.block)];
-        Screen('DrawText', prm.screen.windowPtr, textBlock, prm.screen.center(1)-60, prm.screen.center(2), prm.screen.whiteColour);
-        % if info.eyeType==0
+        Screen('TextSize', prm.screen.windowPtr, prm.textSize);
+        DrawFormattedText(prm.screen.windowPtr, textBlock,...
+            'center', 'center', prm.textColour);        % if info.eyeType==0
         %     reportInstruction = 'Report LOWER';
         % elseif info.eyeType==1
         %     reportInstruction = 'Report HIGHER';
@@ -129,6 +128,7 @@ try
         % end
         %         Screen('DrawText', prm.screen.windowPtr, reportInstruction, prm.screen.center(1)-100, prm.screen.center(2)+50, prm.screen.whiteColour);
         Screen('Flip', prm.screen.windowPtr);
+        
         KbWait();
         WaitSecs(prm.ITI);
         
@@ -138,50 +138,61 @@ try
             if tempN>prm.trialPerBlock
                 trialN = trialMakeUp(tempN-prm.trialPerBlock);
             end
-            % prepare eye recording
-            prm.eyeLink.edfName = [prm.fileName.folder, '\b', num2str(currentBlock), 't', num2str(trialN), '.edf'];
-            if (size(['b', num2str(currentBlock), 't', num2str(trialN)], 2)-4>8)
-                error('edf filename is too long!'); % Security loop against Eyelink
-                % Un-registration of data if namefile
-            end
-            % open file to record data to
-            Eyelink('Openfile', prm.eyeLink.edfName);
             
-                % present the stimuli and recording response
-            [keyCode rt] = runTrial(info.block, trialN, tempN);
+            if eyeTracker==1
+                % prepare eye recording
+                prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN), '.edf'];
+                if (size(prm.eyeLink.edfName, 2)-4>8)
+                    error('edf filename is too long!'); % Security loop against Eyelink
+                    % Un-registration of data if namefile
+                end
+                % open file to record data to
+                cd([prm.fileName.folder, '\'])
+                Eyelink('Openfile', prm.eyeLink.edfName);
+            end
+            
+            % present the stimuli and recording response
+            [key rt] = runTrial(info.block, trialN, tempN);
             % trialN is the index for looking up in list;
             % tempN is the actual trial number, including invalid trials
             
-            % eye recording output
-            Eyelink('CloseFile');
-            try                
-                fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
-                status=Eyelink('ReceiveFile');
-                if status > 0
-                    fprintf('ReceiveFile status %d\n', status);
+            if eyeTracker==1
+                % eye recording output
+                Eyelink('Command', 'set_idle_mode');
+                WaitSecs(0.05);
+                Eyelink('CloseFile');
+                try
+                    fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
+                    status=Eyelink('ReceiveFile');
+                    if status > 0
+                        fprintf('ReceiveFile status %d\n', status);
+                    end
+                    if 2==exist(prm.eyeLink.edfName, 'file')
+                        fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
+                    end
+                catch
+                    fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
                 end
-                if 2==exist(prm.eyeLink.edfName, 'file')
-                    fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName);
-                end
-            catch
-                fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName);
             end
             
             % record responses
-            if keyCode(prm.leftKey)
+            if strcmp(key, prm.leftKey)
                 resp.choice(tempN, 1) = 0;
-            elseif keyCode(prm.rightKey) 
-                resp.choice(tempN, 1) = 1;               
-            elseif keyCode(prm.stopKey) % quit
+            elseif strcmp(key, prm.rightKey)
+                resp.choice(tempN, 1) = 1;
+            elseif strcmp(key, prm.stopKey) % quit
                 break
-            else % wrong key
+            elseif strcmp(key, 'std') % standard trials, no response
+                resp.choice(tempN, 1) = 999;
+            else% wrong key
                 % % repeat this trial at the end of the block
                 % makeUpN = makeUpN + 1;
                 % trialMakeUp(makeUpN) = trialN;
                 resp.choice(tempN, 1) = 999;
                 % feedback on the screen
                 respText = 'Invalid Key';
-                Screen('DrawText', prm.screen.windowPtr, respText, prm.screen.center(1)-80, prm.screen.center(2), prm.screen.whiteColour);
+                DrawFormattedText(prm.screen.windowPtr, respText,...
+                'center', 'center', prm.textColour);
                 Screen('Flip', prm.screen.windowPtr);
             end
             resp.RTms(tempN, 1) = rt*1000; % in ms
@@ -198,15 +209,18 @@ try
     end
     prm.fileName.prm = [prm.fileName.folder, '\parameters', num2str(info.block), '_', info.fileNameTime];
     save(prm.fileName.prm, 'prm');
-    
-    Eyelink('ShutDown');
+    if eyeTracker==1
+        Eyelink('ShutDown');
+    end
     Screen('CloseAll')
     
 catch expME
     disp('Error in runExp: \n');
-    disp(expME.message);
+    rethrow(expME);
     Screen('CloseAll')
-    Eyelink('StopRecording');
-    Eyelink('ShutDown');
+    if eyeTracker==1
+        Eyelink('StopRecording');
+        Eyelink('ShutDown');
+    end
 end
 % end

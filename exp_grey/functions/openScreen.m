@@ -10,6 +10,8 @@ Screen('Preference', 'SkipSyncTests', 1);
 % open window
 prm.screen.whichscreen = 1;%max(Screen('Screens'));
 [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen);
+% % for debug
+% [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen, [], [100, 100, 900, 700]);
 % Screen(prm.screen.window,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 prm.screen.blackColour = BlackIndex(prm.screen.windowPtr);
