@@ -29,8 +29,8 @@ prm.gap.duration = 0.3;
 
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
-prm.rdk.dotNumber = 150;
-prm.rdk.lifeTime = 0.1;
+prm.rdk.dotNumber = 125;
+prm.rdk.lifeTime = 0.2;
 prm.rdk.dotRadius = 0.15;
 prm.rdk.apertureRadius = 6;
 prm.rdk.speed = 10; % dva per sec
@@ -50,7 +50,7 @@ prm.textSize = 25;
 %Coordinates and size of two virtual boxes surrounding the fixation target and the moving
 %target (working as static gaze position tolerance window)
 %Fixation box
-prm.fixRange.radius = 1;
+prm.fixRange.radius = 2;
 
 % Size of the Motion period tolerance window
 prm.motionRange.xLength = 50; % can be defined relative to the size of the RDK or just "large enough"; can be a box
@@ -68,8 +68,9 @@ prm.reminderTrialN = 50; % progress report every N trials
 prm.blockN = 6; % total number of blocks
 
 % key bindings
-prm.stopKey = 'ESCAPE';
+prm.stopKey = 'q';
 prm.rightKey = 'RightArrow';
 prm.leftKey = 'LeftArrow';
+prm.calibrationKey = 'c';
 
 % end

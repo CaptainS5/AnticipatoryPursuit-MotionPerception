@@ -110,13 +110,25 @@ while frameN<=fixFrames
     [keyIsDown, secs, keyCode] = KbCheck;
     % if stopkey was pressed stop display
     if keyIsDown
-        key = KbName(keyCode)
+        key = KbName(keyCode);
         if strcmp(key, prm.stopKey)
             StopCommand = 1;
             break;
+        elseif strcmp(key, prm.calibrationKey)
+            EyelinkDoTrackerSetup(prm.eyeLink.el);
+            EyelinkDoDriftCorrection(prm.eyeLink.el);
+            Eyelink('message', 'Recalibrated');
+            WaitSecs(0.05);
+            % Before recording, we place reference graphics on the host display
+            % Must be in offline mode to transfer image to Host PC
+            Eyelink('Command', 'set_idle_mode'); %it puts the tracker into offline mode
+            WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
+            Eyelink('StartRecording');
+            frameN = 1;
+            clear KbCheck
         end
     end
-
+    
     if info.eyeTracker==1
         % check for presence of a new sample update
         if Eyelink( 'NewFloatSampleAvailable') > 0
@@ -127,12 +139,12 @@ while frameN<=fixFrames
             % !!!!   CHECK WHAT IS EYE_USED DURING THE MOUSE SIMULATION    !!!
             % [xeye, yeye, buttons]=GetMouse(screenInfo.curWindow) % It does NOT work,
             % it checks the Display PC mouse
-
+            
             %% do we have valid data and is the pupil visible?
             if xeye~=prm.eyeLink.el.MISSING_DATA & yeye~=prm.eyeLink.el.MISSING_DATA & evt.pa(prm.eyeLink.eye_used+1)>0
                 % if data is valid, compare gaze position with the limits of the tolerance window
                 diffFix = sqrt((xeye-prm.screen.center(1))^2+((yeye-prm.screen.center(2))/prm.screen.ppdY*prm.screen.ppdX)^2);
-                if diffFix <= fixRangeRadius || info.eyeTracker==0 % fixation ok
+                if diffFix <= fixRangeRadius % fixation ok
                     if trialType==1
                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.stdColour, rectFixDot);
                     elseif trialType==0
@@ -141,6 +153,7 @@ while frameN<=fixFrames
                 elseif diffFix > fixRangeRadius % fixation out of range, show warning
                     Snd('Play', prm.beep.sound, prm.beep.samplingRate, 16);
                     % Plays the sound in case of wrong fixation
+                    % show white fixation
                     Screen('FillOval', prm.screen.windowPtr, prm.screen.whiteColour, rectFixDot);
                     frameN = frameN - 1;
                 end
@@ -155,8 +168,10 @@ while frameN<=fixFrames
                 end
                 frameN = frameN + 1;
             else
-                % if data is invalid (e.g. during a blink), redo the calibration
-                EyelinkDoTrackerSetup(prm.eyeLink.el);
+                % if data is invalid (e.g. during a blink), show white
+                % fixation
+                Screen('FillOval', prm.screen.windowPtr, prm.screen.whiteColour, rectFixDot);
+                Screen('Flip', prm.screen.windowPtr);
                 frameN = 1;
             end
         else
@@ -186,7 +201,7 @@ while frameN<=fixFrames
 end
 
 if StopCommand==1
-    key='ESCAPE'; rt=0;
+    key='q'; rt=0;
     return;
 end
 % imgF = Screen('GetImage', prm.screen.windowPtr);
@@ -214,14 +229,14 @@ resp.fixationDurationTrue(tempN, 1) = fixOffTime-fixOnTime;
 % %     Screen('Flip', prm.eyeLink.el.window, [], 1); % don't erase
 % end
 
-%% RDK
-for frameN = 1:rdkFrames
-    if info.eyeTracker==1
-        %mark zero-plot time in data file
-        Eyelink('Message', 'SYNCTIME');
-        Eyelink('message', 'rdkOn');
-    end
+%% RDK   
+if info.eyeTracker==1
+    %mark zero-plot time in data file
+    Eyelink('Message', 'SYNCTIME');
+    Eyelink('message', 'rdkOn');
+end
 
+for frameN = 1:rdkFrames
     %Draw dots on screen
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
     Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position),...
@@ -232,7 +247,7 @@ for frameN = 1:rdkFrames
     else
         Screen('Flip', prm.screen.windowPtr);
     end
-
+    
     % Updated positions (similar to initial dot placement)
     dots.position = dots.position + dots.movementPerFrame;
     dotDist = dots.position(:, 1).^2 + (dots.position(:, 2)*prm.screen.ppdX/prm.screen.ppdY).^2;
@@ -244,7 +259,7 @@ for frameN = 1:rdkFrames
     % generate new positions
     dots.position(outDots, :) = dots.positionTheta(outDots, :) .* [dots.distanceToCenterX(outDots) dots.distanceToCenterX(outDots)/prm.screen.ppdX*prm.screen.ppdY];
     dots.showTime(outDots) = round(sec2frm(prm.rdk.lifeTime)) + 1;
-
+    
     % Update dot lifetime and replace dots with expired lifetime
     dots.showTime = dots.showTime-1;
     expiredDots = find(dots.showTime <=0);
@@ -254,15 +269,16 @@ for frameN = 1:rdkFrames
     % generate new positions
     dots.position(expiredDots, :) = dots.positionTheta(expiredDots, :) .* [dots.distanceToCenterX(expiredDots) dots.distanceToCenterX(expiredDots)/prm.screen.ppdX*prm.screen.ppdY];
     dots.showTime(expiredDots) = round(sec2frm(prm.rdk.lifeTime));
-
-    if info.eyeTracker==1
-        Eyelink('message', 'rdkOff');
-        WaitSecs(0.05);
-        Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
-        Eyelink('StopRecording');
-    end
 end
 
+if info.eyeTracker==1
+    Eyelink('message', 'rdkOff');
+    WaitSecs(0.05);
+    Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+    Eyelink('Command', 'set_idle_mode');
+    WaitSecs(0.05);
+    Eyelink('StopRecording');
+end
 % rdkOffsetTime = GetSecs; % here is actually the offset time
 
 if trialType==1 % present dynamic mask if it's standard trial
@@ -272,7 +288,7 @@ if trialType==1 % present dynamic mask if it's standard trial
     for maskF = 1:maskFrameN
         Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
         Screen('DrawTexture', prm.screen.windowPtr, aperature);
-
+        
         % if demoN > 0
         %     imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
         %     demoN = demoN + 1;
@@ -287,9 +303,9 @@ elseif trialType==0 % record response in test trials
     textResp = ['LEFT or RIGHT?'];
     Screen('TextSize', prm.screen.windowPtr, 55);
     DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 350, prm.screen.blackColour);
-
+    
     [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
-
+    
     % record response, won't continue until a response is recorded
     recordFlag=0;
     startSecs = GetSecs;

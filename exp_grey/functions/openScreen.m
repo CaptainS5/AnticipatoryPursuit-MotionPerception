@@ -8,7 +8,7 @@ global prm
 Screen('Preference', 'SkipSyncTests', 1);
 
 % open window
-prm.screen.whichscreen = 1;%max(Screen('Screens'));
+prm.screen.whichscreen = max(Screen('Screens'));
 [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen);
 % % for debug
 % [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen, [], [100, 100, 900, 700]);
