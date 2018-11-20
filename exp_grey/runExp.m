@@ -1,7 +1,7 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; currentBlock=1; eyeType = 1; prob = 90; eyeTracker=0;% debugging
 try
-    global prm list resp info
+    global prm list resp info dots
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
@@ -237,7 +237,7 @@ try
         end
     end
     prm.fileName.prm = [prm.fileName.folder, '\parameters', num2str(info.block), '_', info.fileNameTime];
-    save(prm.fileName.prm, 'prm');
+    save(prm.fileName.prm, 'prm', 'dots');
     if eyeTracker==1
         Eyelink('ShutDown');
     end

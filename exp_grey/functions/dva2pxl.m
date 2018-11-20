@@ -3,7 +3,7 @@ function [lengthPixelX lengthPixelY] = dva2pxl(lengthX, lengthY)
 
 global prm
 lengthPixelX = lengthX*prm.screen.ppdX;
-lengthPixelY = lengthY*prm.screen.ppdX;
+lengthPixelY = lengthY*prm.screen.ppdY;
 % lengthPixelY = lengthY*prm.screen.ppdY;
 
 end
