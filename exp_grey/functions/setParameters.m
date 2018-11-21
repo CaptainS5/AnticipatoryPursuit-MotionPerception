@@ -9,9 +9,11 @@ global prm
 % physical parameters, in cm
 prm.screen.viewDistance = 45; % 57.29 cm corresponds to 1cm on screen as 1 dva
 prm.screen.monitorWidth = 40.5; % horizontal dimension of viewable screen (cm)
-% 29.4 for the laptop; 36 for the torsion monitor in X717
+% 29.4 for the laptop; 36 for the torsion monitor in X717; 40.5 for
+% the backroom monitor in X715
 prm.screen.monitorHeight = 30.5;
-% 16.5 for the laptop; 27.1 for the torsion monitor in X717
+% 16.5 for the laptop; 27.1 for the torsion monitor in X717; 30.5 for
+% the backroom monitor in X715
 
 % display settings
 % prm.screen.backgroundColour = []; % background, currently set in openScreen

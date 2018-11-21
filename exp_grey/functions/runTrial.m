@@ -120,12 +120,12 @@ while frameN<=fixFrames
             EyelinkDoTrackerSetup(prm.eyeLink.el);
             EyelinkDoDriftCorrection(prm.eyeLink.el);
             Eyelink('message', 'Recalibrated');
-            WaitSecs(0.05);
-            % Before recording, we place reference graphics on the host display
-            % Must be in offline mode to transfer image to Host PC
-            Eyelink('Command', 'set_idle_mode'); %it puts the tracker into offline mode
-            WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
-            Eyelink('StartRecording');
+%             WaitSecs(0.05);
+%             % Before recording, we place reference graphics on the host display
+%             % Must be in offline mode to transfer image to Host PC
+%             Eyelink('Command', 'set_idle_mode'); %it puts the tracker into offline mode
+%             WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
+%             Eyelink('StartRecording');
             frameN = 1;
             clear KbCheck
         end
