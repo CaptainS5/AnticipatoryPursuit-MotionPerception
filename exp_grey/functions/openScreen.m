@@ -29,11 +29,13 @@ prm.screen.resolution = Screen(prm.screen.windowPtr,'Resolution');
 prm.screen.refreshRate = 1/Screen('GetFlipInterval', prm.screen.windowPtr); % refresh rate of the monitor
 % in Hz (frames per second: fps)
 
+% for a pixel, the ration of its physical width to its height
+prm.screen.pixelRatioWidthPerHeight = (prm.screen.monitorWidth/(prm.screen.size(3)-prm.screen.size(1)))/(prm.screen.monitorHeight/(prm.screen.size(4)-prm.screen.size(2)));
+
 % pixels per degree, calculated horizontally
 prm.screen.ppdX = pi * (prm.screen.size(3)-prm.screen.size(1)) / atan(prm.screen.monitorWidth/2/prm.screen.viewDistance) / 360;
 % pixels per degree, calculated vertically
-prm.screen.ppdY = pi * (prm.screen.size(4)-prm.screen.size(2)) / atan(prm.screen.monitorHeight/2/prm.screen.viewDistance) / 360;
-
-prm.screen.pixelRationWidthPerHeight = (prm.screen.monitorWidth/(prm.screen.size(3)-prm.screen.size(1)))/(prm.screen.monitorHeight/(prm.screen.size(4)-prm.screen.size(2)));
+prm.screen.ppdY = prm.screen.ppdX*prm.screen.pixelRatioWidthPerHeight;
+% prm.screen.ppdY = pi * (prm.screen.size(4)-prm.screen.size(2)) / atan(prm.screen.monitorHeight/2/prm.screen.viewDistance) / 360; % not accurate at all......
 
 end

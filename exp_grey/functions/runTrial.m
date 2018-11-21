@@ -40,7 +40,7 @@ dots.distanceToCenterX{1, trialN} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumb
 dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0); % make sure that dots do not overlap outer border
 theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
 dots.positionTheta{1, trialN} = [cos(theta) sin(theta)];  % values between -1 and 1
-dots.position{1, trialN} = dots.positionTheta{1, trialN} .* [dots.distanceToCenterX{1, trialN} dots.distanceToCenterX{1, trialN}/prm.screen.ppdX*prm.screen.ppdY];
+dots.position{1, trialN} = dots.positionTheta{1, trialN} .* [dots.distanceToCenterX{1, trialN} dots.distanceToCenterX{1, trialN}*prm.screen.pixelRatioWidthPerHeight];
 % initialize dot presentation time
 dots.showTime{1, trialN} = round(rand(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
 
@@ -53,7 +53,8 @@ moveTheta(1:targetDotsN, 1) = 0; % assign the dots to be coherently moving right
 moveTheta = [cos(moveTheta) sin(moveTheta)];
 
 [moveDistanceToCenterX, ] = dva2pxl(prm.rdk.speed, prm.rdk.speed);
-dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistanceToCenterX moveDistanceToCenterX/prm.screen.ppdX*prm.screen.ppdY];
+moveDistanceToCenterX = repmat(moveDistanceToCenterX, prm.rdk.dotNumber, 1);
+dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistanceToCenterX moveDistanceToCenterX*prm.screen.pixelRatioWidthPerHeight];
 
 % set up mask
 maskFrameN = round(sec2frm(prm.mask.duration));
@@ -145,7 +146,7 @@ while frameN<=fixFrames
             %% do we have valid data and is the pupil visible?
             if xeye~=prm.eyeLink.el.MISSING_DATA & yeye~=prm.eyeLink.el.MISSING_DATA & evt.pa(prm.eyeLink.eye_used+1)>0
                 % if data is valid, compare gaze position with the limits of the tolerance window
-                diffFix = sqrt((xeye-prm.screen.center(1))^2+((yeye-prm.screen.center(2))/prm.screen.ppdY*prm.screen.ppdX)^2);
+                diffFix = sqrt((xeye-prm.screen.center(1))^2+((yeye-prm.screen.center(2))/prm.screen.pixelRatioWidthPerHeight)^2);
                 if diffFix <= fixRangeRadius % fixation ok
                     if trialType==1
                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.stdColour, rectFixDot);
@@ -264,27 +265,31 @@ for frameN = 1:rdkFrames
     dots.position{frameN+1, trialN} = dots.position{frameN, trialN} + dots.movementNextFrame{frameN, trialN};
     
     % Replace dots out of the aperture    
-    dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)*prm.screen.ppdX/prm.screen.ppdY).^2;
+    dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
     outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
     dots.distanceToCenterX{frameN+1, trialN}(outDots) = apertureRadiusX * sqrt((rand(length(outDots),1)));
     dots.distanceToCenterX{frameN+1, trialN}(outDots) = max(dots.distanceToCenterX{frameN+1, trialN}(outDots)-dots.diameterX/2, 0); % new distance to the center   
     % generate new positions and update lifetime
-    dots.position{frameN+1, trialN}(outDots, :) = dots.positionTheta{frameN+1, trialN}(outDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(outDots) dots.distanceToCenterX{frameN+1, trialN}(outDots)/prm.screen.ppdX*prm.screen.ppdY];
+    dots.position{frameN+1, trialN}(outDots, :) = dots.positionTheta{frameN+1, trialN}(outDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(outDots) dots.distanceToCenterX{frameN+1, trialN}(outDots)*prm.screen.pixelRatioWidthPerHeight];
     dots.showTime{frameN+1, trialN}(outDots) = round(sec2frm(prm.rdk.lifeTime));
     % update new direction for noise dots out of the aperture
     outNoiseDots = find(dots.label{1, trialN}==0 & dotDist>apertureRadiusX^2); % noise dots out of the aperture
-    dots.movementNextFrame{frameN+1, trialN}(outNoiseDots) = moveTheta(outNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX moveDistanceToCenterX/prm.screen.ppdX*prm.screen.ppdY]; % new random direction for noise dots    
+    if outNoiseDots
+        dots.movementNextFrame{frameN+1, trialN}(outNoiseDots, :) = moveTheta(outNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX(outNoiseDots) moveDistanceToCenterX(outNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
+    end
     
     % Replace dots with expired lifetime
     expiredDots = find(dots.showTime{frameN+1, trialN} <= 0);
     dots.distanceToCenterX{frameN+1, trialN}(expiredDots) = apertureRadiusX * sqrt((rand(length(expiredDots),1)));
     dots.distanceToCenterX{frameN+1, trialN}(expiredDots) = max(dots.distanceToCenterX{frameN+1, trialN}(expiredDots)-dots.diameterX/2, 0);
     % generate new positions and update lifetime
-    dots.position{frameN+1, trialN}(expiredDots, :) = dots.positionTheta{frameN+1, trialN}(expiredDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(expiredDots) dots.distanceToCenterX{frameN+1, trialN}(expiredDots)/prm.screen.ppdX*prm.screen.ppdY];
+    dots.position{frameN+1, trialN}(expiredDots, :) = dots.positionTheta{frameN+1, trialN}(expiredDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(expiredDots) dots.distanceToCenterX{frameN+1, trialN}(expiredDots)*prm.screen.pixelRatioWidthPerHeight];
     dots.showTime{frameN+1, trialN}(expiredDots) = round(sec2frm(prm.rdk.lifeTime));
     % update new direction for expired noise dots
     expiredNoiseDots = find(dots.label{1, trialN}==0 & dots.showTime{frameN+1, trialN} <= 0); % noise dots expired
-    dots.movementNextFrame{frameN+1, trialN}(expiredNoiseDots) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX moveDistanceToCenterX/prm.screen.ppdX*prm.screen.ppdY]; % new random direction for noise dots    
+    if expiredNoiseDots
+        dots.movementNextFrame{frameN+1, trialN}(expiredNoiseDots, :) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX(expiredNoiseDots) moveDistanceToCenterX(expiredNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
+    end
 end
 
 if info.eyeTracker==1

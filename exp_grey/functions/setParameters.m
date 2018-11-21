@@ -8,12 +8,12 @@ global prm
 
 % physical parameters, in cm
 prm.screen.viewDistance = 45; % 57.29 cm corresponds to 1cm on screen as 1 dva
-prm.screen.monitorWidth = 40.5; % horizontal dimension of viewable screen (cm)
+prm.screen.monitorWidth = 38.4; % horizontal dimension of viewable screen (cm)
 % 29.4 for the laptop; 36 for the torsion monitor in X717; 40.5 for
-% the backroom monitor in X715
-prm.screen.monitorHeight = 30.5;
+% the backroom monitor in X715; 38.4 for ASUS
+prm.screen.monitorHeight = 21.6;
 % 16.5 for the laptop; 27.1 for the torsion monitor in X717; 30.5 for
-% the backroom monitor in X715
+% the backroom monitor in X715; 21.6 for ASUS
 
 % display settings
 % prm.screen.backgroundColour = []; % background, currently set in openScreen
@@ -31,12 +31,13 @@ prm.gap.duration = 0.3;
 
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
-prm.rdk.dotNumber = 125;
+prm.rdk.dotDensity = 2; % dot per dva
 prm.rdk.lifeTime = 0.2;
 prm.rdk.dotRadius = 0.15;
 prm.rdk.apertureRadius = 6;
 prm.rdk.speed = 10; % dva per sec
 % prm.rdk.colour = prm.screen.whiteColour; % currently set after openScreen
+prm.rdk.dotNumber = round(prm.rdk.dotDensity*pi*prm.rdk.apertureRadius^2);
 
 % Eyelink parameters
 prm.eyeLink.nDrift = 50; % drift correction every n trials
