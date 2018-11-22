@@ -36,6 +36,8 @@ prm.screen.pixelRatioWidthPerHeight = (prm.screen.monitorWidth/(prm.screen.size(
 prm.screen.ppdX = pi * (prm.screen.size(3)-prm.screen.size(1)) / atan(prm.screen.monitorWidth/2/prm.screen.viewDistance) / 360;
 % pixels per degree, calculated vertically
 prm.screen.ppdY = prm.screen.ppdX*prm.screen.pixelRatioWidthPerHeight;
-% prm.screen.ppdY = pi * (prm.screen.size(4)-prm.screen.size(2)) / atan(prm.screen.monitorHeight/2/prm.screen.viewDistance) / 360; % not accurate at all......
+% prm.screen.ppdY = pi * (prm.screen.size(4)-prm.screen.size(2)) / atan(prm.screen.monitorHeight/2/prm.screen.viewDistance) / 360; 
+% the same computation not accurate due to small calculation errors...
+% use ratio to calculate so that it's consistent everywhere......
 
 end
