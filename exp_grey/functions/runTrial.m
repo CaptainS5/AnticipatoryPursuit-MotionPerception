@@ -17,7 +17,7 @@ rectFixDot = [prm.screen.center(1)-rectSizeDotX,...
     prm.screen.center(2)-rectSizeDotY,...
     prm.screen.center(1)+rectSizeDotX,...
     prm.screen.center(2)+rectSizeDotY];
-[fixRangeRadius, ] = round(dva2pxl(prm.fixRange.radius, prm.fixRange.radius)); % radius in pxl
+[fixRangeRadiusX, fixRangeRadiusY] = dva2pxl(prm.fixRange.radius, prm.fixRange.radius); % radius in pxl
 
 % set up Gap
 gapFrames = round(sec2frm(prm.gap.duration));
@@ -32,8 +32,9 @@ trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
 resp.trialType(tempN, 1) = trialType;
 rdkFrames = round(sec2frm(prm.rdk.duration));
 
-[dots.diameterX, ] = dva2pxl(2*prm.rdk.dotRadius, 2*prm.rdk.dotRadius);
-[apertureRadiusX, apertureRadiusY] = dva2pxl(2*prm.rdk.apertureRadius, 2*prm.rdk.apertureRadius);
+[dots.diameterX, ] = dva2pxl(prm.rdk.dotRadius, prm.rdk.dotRadius);
+dots.diameterX = dots.diameterX*2;
+[apertureRadiusX, apertureRadiusY] = dva2pxl(prm.rdk.apertureRadius, prm.rdk.apertureRadius);
 
 % Postion dots in a circular aperture
 dots.distanceToCenterX{1, trialN} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
@@ -70,11 +71,10 @@ Screen('FillOval', aperature, [255 255 255 100], apertureRect);
 
 % set up eye position tolerance spatial windows
 % tolerance of fixation
-[xSizeF ySizeF]= dva2pxl(prm.fixRange.radius, prm.fixRange.radius);
-fixRange = [(prm.screen.center(1)-xSizeF) (prm.screen.center(2)-ySizeF) (prm.screen.center(1)+xSizeF) (prm.screen.center(2)+ySizeF)];
+fixRange = [(prm.screen.center(1)-fixRangeRadiusX) (prm.screen.center(2)-fixRangeRadiusY) (prm.screen.center(1)+fixRangeRadiusX) (prm.screen.center(2)+fixRangeRadiusY)];
 % Size of the Motion period tolerance window
-[xSizeM ySizeM]= dva2pxl(prm.motionRange.xLength, prm.motionRange.yLength);
-motionRange = [(prm.screen.center(1)-xSizeM/2) (prm.screen.center(2)-ySizeM/2) (prm.screen.center(1)+xSizeM/2) (prm.screen.center(2)+ySizeM/2)];
+[xSizeM ySizeM]= dva2pxl(prm.motionRange.xLength/2, prm.motionRange.yLength/2);
+motionRange = [(prm.screen.center(1)-xSizeM) (prm.screen.center(2)-ySizeM) (prm.screen.center(1)+xSizeM) (prm.screen.center(2)+ySizeM)];
 
 trialInfo = sprintf('%d %d %d',trialN, list.coh(trialN,1), list.rdkDir(trialN,1));
 if info.eyeTracker==1
@@ -147,13 +147,13 @@ while frameN<=fixFrames
             if xeye~=prm.eyeLink.el.MISSING_DATA & yeye~=prm.eyeLink.el.MISSING_DATA & evt.pa(prm.eyeLink.eye_used+1)>0
                 % if data is valid, compare gaze position with the limits of the tolerance window
                 diffFix = sqrt((xeye-prm.screen.center(1))^2+((yeye-prm.screen.center(2))/prm.screen.pixelRatioWidthPerHeight)^2);
-                if diffFix <= fixRangeRadius % fixation ok
+                if diffFix <= fixRangeRadiusX % fixation ok
                     if trialType==1
                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.stdColour, rectFixDot);
                     elseif trialType==0
                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
                     end
-                elseif diffFix > fixRangeRadius % fixation out of range, show warning
+                elseif diffFix > fixRangeRadiusX % fixation out of range, show warning
                     Snd('Play', prm.beep.sound, prm.beep.samplingRate, 16);
                     % Plays the sound in case of wrong fixation
                     % show white fixation

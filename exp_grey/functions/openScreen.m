@@ -32,12 +32,14 @@ prm.screen.refreshRate = 1/Screen('GetFlipInterval', prm.screen.windowPtr); % re
 % for a pixel, the ration of its physical width to its height
 prm.screen.pixelRatioWidthPerHeight = (prm.screen.monitorWidth/(prm.screen.size(3)-prm.screen.size(1)))/(prm.screen.monitorHeight/(prm.screen.size(4)-prm.screen.size(2)));
 
-% pixels per degree, calculated horizontally
-prm.screen.ppdX = pi * (prm.screen.size(3)-prm.screen.size(1)) / atan(prm.screen.monitorWidth/2/prm.screen.viewDistance) / 360;
-% pixels per degree, calculated vertically
-prm.screen.ppdY = prm.screen.ppdX*prm.screen.pixelRatioWidthPerHeight;
+% pixels per cm, horizontal and vertical
+prm.screen.ppcX = (prm.screen.size(3)-prm.screen.size(1))/prm.screen.monitorWidth;
+prm.screen.ppcY = (prm.screen.size(4)-prm.screen.size(2))/prm.screen.monitorHeight;
+
+% % ppd is not accurate, nonlinear transformation... do not use
+% % pixels per degree, calculated horizontally
+% prm.screen.ppdX = pi * (prm.screen.size(3)-prm.screen.size(1)) / atan(prm.screen.monitorWidth/2/prm.screen.viewDistance) / 360;
+% % pixels per degree, calculated vertically
 % prm.screen.ppdY = pi * (prm.screen.size(4)-prm.screen.size(2)) / atan(prm.screen.monitorHeight/2/prm.screen.viewDistance) / 360; 
-% the same computation not accurate due to small calculation errors...
-% use ratio to calculate so that it's consistent everywhere......
 
 end
