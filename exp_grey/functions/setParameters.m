@@ -12,7 +12,7 @@ prm.screen.monitorWidth = 38.4; % horizontal dimension of viewable screen (cm)
 % 29.4 for the laptop; 36 for the torsion monitor in X717; 40.5 for
 % the backroom monitor in X715; 38.4 for ASUS
 prm.screen.monitorHeight = 21.6;
-% 16.5 for the laptop; 27.1 for the torsion monitor in X717; 30.5 for
+% 16.5 for the laptop; 27.1 for the torsion monitor in X717; 30.6 for
 % the backroom monitor in X715; 21.6 for ASUS
 
 % display settings
