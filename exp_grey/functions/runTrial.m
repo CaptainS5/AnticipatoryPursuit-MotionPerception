@@ -1,15 +1,15 @@
-function [key rt] = runTrial(blockN, trialN, tempN)
+function [key rt] = runTrial(blockN, trialN)
 
 global prm info resp list dots
 
 % Initialization
 % fill the background
 Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
-resp.trialIdx(tempN, 1) = trialN; % index for the current trial
+resp.trialIdx(trialN, 1) = trialN; % index for the current trial
 
 % set up fixation
-resp.fixationDuration(tempN, 1) = prm.fixation.durationBase+rand*prm.fixation.durationJitter;
-fixFrames = round(sec2frm(resp.fixationDuration(tempN, 1)));
+resp.fixationDuration(trialN, 1) = prm.fixation.durationBase+rand*prm.fixation.durationJitter;
+fixFrames = round(sec2frm(resp.fixationDuration(trialN, 1)));
 [rectSizeDotX rectSizeDotY] = dva2pxl(prm.fixation.dotRadius, prm.fixation.dotRadius);
 rectSizeDotX = round(rectSizeDotX);
 rectSizeDotY = round(rectSizeDotY);
@@ -25,11 +25,11 @@ gapFrames = round(sec2frm(prm.gap.duration));
 % set up RDK--use transparent motion noise, fixed label for target and
 % noise dots; noise dots moving in a new random direction after reappearance
 coh = list.coh(trialN, 1);
-resp.coh(tempN, 1) = coh;
+resp.coh(trialN, 1) = coh;
 rdkDir = list.rdkDir(trialN, 1); % -1=left, 1=right
-resp.rdkDir(tempN, 1) = rdkDir;
+resp.rdkDir(trialN, 1) = rdkDir;
 trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
-resp.trialType(tempN, 1) = trialType;
+resp.trialType(trialN, 1) = trialType;
 rdkFrames = round(sec2frm(prm.rdk.duration));
 
 [dots.diameterX, ] = dva2pxl(prm.rdk.dotRadius, prm.rdk.dotRadius);
@@ -224,7 +224,7 @@ for frameN = 1:gapFrames
         Screen('Flip', prm.screen.windowPtr);
     end
 end
-resp.fixationDurationTrue(tempN, 1) = fixOffTime-fixOnTime;
+resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
 
 % if info.eyeTracker==1
 %     Eyelink('command','clear_screen 0'); % clears the box from the Eyelink-operator screen
@@ -294,11 +294,6 @@ end
 
 if info.eyeTracker==1
     Eyelink('message', 'rdkOff');
-    WaitSecs(0.05);
-    Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
-    Eyelink('Command', 'set_idle_mode');
-    WaitSecs(0.05);
-    Eyelink('StopRecording');
 end
 % rdkOffsetTime = GetSecs; % here is actually the offset time
 
@@ -342,7 +337,7 @@ elseif trialType==0 % record response in test trials
         %% end of button response
     end
 end
-resp.rdkDuration(tempN, 1) = rdkOffTime-rdkOnTime;
+resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
 % %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
 if rem(trialN, prm.reminderTrialN)==0
@@ -363,3 +358,10 @@ end
 % blank screen
 Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
 Screen('Flip', prm.screen.windowPtr);
+
+if info.eyeTracker==1
+    Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+    Eyelink('Command', 'set_idle_mode');
+    WaitSecs(0.05);
+    Eyelink('StopRecording');
+end
