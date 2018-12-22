@@ -161,11 +161,11 @@ while frameN<=fixFrames
                     frameN = frameN - 1;
                 end
                 if initialF==0
-                    [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
-                    initialF = 1;
                     if info.eyeTracker==1
                         Eyelink('message', 'fixationOn');
                     end
+                    [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
+                    initialF = 1;
                 else
                     Screen('Flip', prm.screen.windowPtr);
                 end
@@ -215,11 +215,11 @@ initialG = 0;
 for frameN = 1:gapFrames
     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
     if initialG == 0
-        [VBL fixOffTime] = Screen('Flip', prm.screen.windowPtr);
-        initialG = 1;
         if info.eyeTracker==1
             Eyelink('message', 'fixationOff');
         end
+        [VBL fixOffTime] = Screen('Flip', prm.screen.windowPtr);
+        initialG = 1;
     else
         Screen('Flip', prm.screen.windowPtr);
     end
@@ -329,10 +329,19 @@ elseif trialType==0 % record response in test trials
         %% button response
         [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
         if keyIsDown
-            key = KbName(keyCode);
-            rt = secs-rdkOffTime;
-            recordFlag = 1;
-            % break
+            key = KbName(keyCode);            
+            % wait until the valid keys are pressed
+            if strcmp(key, prm.leftKey) || strcmp(key, prm.rightKey) || strcmp(key, prm.stopKey)
+                rt = secs-rdkOffTime;
+                recordFlag = 1;
+            else % invalid key
+                % feedback on the screen
+                respText = 'Invalid Key \n Press again';
+                DrawFormattedText(prm.screen.windowPtr, respText,...
+                    'center', 'center', prm.textColour);
+                Screen('Flip', prm.screen.windowPtr);
+                clear KbCheck
+            end
         end
         %% end of button response
     end
