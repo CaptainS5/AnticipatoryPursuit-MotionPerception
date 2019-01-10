@@ -1,5 +1,5 @@
 % function transform2csv
-% to use in R
+% to use in R, also to generate the raw data for palamedes
 % Xiuyun Wu, 12/19/2018
 clear all; close all; clc
 
@@ -58,4 +58,4 @@ end
 %     dataIdx = dataIdx + 1;
 
 % save csv
-writetable(dataRaw, 'psychometricFunctionData.csv');
+% writetable(dataRaw, 'psychometricFunctionData.csv');
