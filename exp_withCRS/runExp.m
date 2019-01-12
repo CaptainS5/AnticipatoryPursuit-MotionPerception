@@ -1,7 +1,7 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1; % debugging
 try
-    global prm list resp info dots
+    global prm list resp info dots CRS
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
@@ -45,25 +45,23 @@ try
     prm.rdk.colour = prm.screen.whiteColour;
     prm.textColour = prm.screen.blackColour;
     
-    HideCursor;
-    
-    %     generate matrices for the mask
-    maskFrameN = round(sec2frm(prm.mask.duration));
-    for ii = 1:maskFrameN
-        imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum, prm.mask.matrixSize)*255;
-        prm.mask.tex{ii} = Screen('MakeTexture', prm.screen.windowPtr, imgMask);
-    end
+%     HideCursor; 
     
     if strcmp(info.subID{1}, 'luminance')
-        % testing monitor luminance
-        Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
-        Screen('Flip', prm.screen.windowPtr);
+        % testing display luminance
+        stimulusPage = 1;
+        % choose the page to draw
+        crsSetDrawPage(stimulusPage);
+        % show background colour
+        crsSetPen1(CRS.BACKGROUND);
+        crsDrawRect([0, 0], [45, 45]); % draw a rectangle large enough
+        % Display page 1
+        crsSetDisplayPage(stimulusPage);
+        
         KbWait();
         clear KbCheck
         % WaitSecs(0.2);
-        %
-        % Screen('FillRect', prm.screen.windowPtr, prm.grating.lightest); % fill background
-        % Screen('Flip', prm.screen.windowPtr);
+
         % KbWait();
     else
         %% start the experiment
@@ -74,12 +72,16 @@ try
             prm.fileName.resp = [prm.fileName.folder, '\response', num2str(info.block), '_', num2str(info.trial), '_', info.fileNameTime];
         end
         % initialize the response
-        resp = table(); % 1 = left, 2 = right
-        
+        resp = table(); % 1 = left, 2 = right        
         trialN = info.trial; % the trial number to look up in random assignment
-        %         tempN = 1; % number of trials presented so far
-        %         trialMakeUp = [];
-        %         makeUpN = 0;
+        
+        % prepare mask matrices
+        %     %     generate matrices for the mask
+%     maskFrameN = round(sec2frm(prm.mask.duration));
+%     for ii = 1:maskFrameN
+%         imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum, prm.mask.matrixSize)*255;
+%         prm.mask.tex{ii} = Screen('MakeTexture', prm.screen.windowPtr, imgMask);
+%     end
         
         %% Initializes the connection with Eyelink
         if eyeTracker==1
@@ -239,8 +241,7 @@ try
     if eyeTracker==1
         Eyelink('ShutDown');
     end
-    Screen('CloseAll')
-    Screen('Close')
+    crsClearPage(stimulusPage, CRS.BACKGROUND);
     
 catch expME
     disp('Error in runExp: \n');
