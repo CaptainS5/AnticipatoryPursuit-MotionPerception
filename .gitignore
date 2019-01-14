@@ -13,5 +13,6 @@
 *.dat
 *.jpg
 *.avi
+*.asc
 data/*
 results/*

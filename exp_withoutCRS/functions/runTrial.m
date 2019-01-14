@@ -10,6 +10,7 @@ resp.trialIdx(trialN, 1) = trialN; % index for the current trial
 % set up fixation
 resp.fixationDuration(trialN, 1) = prm.fixation.durationBase+rand*prm.fixation.durationJitter;
 fixFrames = round(sec2frm(resp.fixationDuration(trialN, 1)));
+resp.fixFrames(trialN, 1) = fixFrames;
 [rectSizeDotX rectSizeDotY] = dva2pxl(prm.fixation.dotRadius, prm.fixation.dotRadius);
 rectSizeDotX = round(rectSizeDotX);
 rectSizeDotY = round(rectSizeDotY);
@@ -21,6 +22,7 @@ rectFixDot = [prm.screen.center(1)-rectSizeDotX,...
 
 % set up Gap
 gapFrames = round(sec2frm(prm.gap.duration));
+resp.gapFrames(trialN, 1) = gapFrames;
 
 % set up RDK--use transparent motion noise, fixed label for target and
 % noise dots; noise dots moving in a new random direction after reappearance
@@ -31,6 +33,7 @@ resp.rdkDir(trialN, 1) = rdkDir;
 trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
 resp.trialType(trialN, 1) = trialType;
 rdkFrames = round(sec2frm(prm.rdk.duration));
+resp.rdkFrames(trialN, 1) = rdkFrames;
 
 [dots.diameterX, ] = dva2pxl(prm.rdk.dotRadius, prm.rdk.dotRadius);
 dots.diameterX = dots.diameterX*2;
@@ -59,6 +62,7 @@ dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[mo
 
 % set up mask
 maskFrameN = round(sec2frm(prm.mask.duration));
+resp.maskFrameN(trialN, 1) = maskFrameN;
 
 % Make an aperature
 Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
@@ -77,6 +81,11 @@ fixRange = [(prm.screen.center(1)-fixRangeRadiusX) (prm.screen.center(2)-fixRang
 motionRange = [(prm.screen.center(1)-xSizeM) (prm.screen.center(2)-ySizeM) (prm.screen.center(1)+xSizeM) (prm.screen.center(2)+ySizeM)];
 
 trialInfo = sprintf('%d %d %d',trialN, list.coh(trialN,1), list.rdkDir(trialN,1));
+%% start display
+% blank screen
+Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
+Screen('Flip', prm.screen.windowPtr);
+
 if info.eyeTracker==1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Eyelink('message', 'Trialinfo: %s', trialInfo);
@@ -88,11 +97,6 @@ if info.eyeTracker==1
     Eyelink('StartRecording');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
-
-%% start display
-% blank screen
-Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
-Screen('Flip', prm.screen.windowPtr);
 
 %% draw gaze position tolerance window on the operator (Eyelink host) PC
 % if info.eyeTracker==1
@@ -309,7 +313,11 @@ if trialType==1 % present dynamic mask if it's standard trial
         %     imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
         %     demoN = demoN + 1;
         % end
-        [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+        if maskF==1
+            [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+        else
+            Screen('Flip', prm.screen.windowPtr);
+        end
     end
     key = 'std'; rt = 0;
 elseif trialType==0 % record response in test trials
