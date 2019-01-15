@@ -14,7 +14,7 @@
 % output: trial --> a structure containing all relevant information for
 %                   each trial
 
-function [trial] = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentTrial)
+function [trial] = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentTrial, eventLog)
 % get eyeData for this trial
 trial.eyeX_filt = eyeData.X_filt;
 trial.eyeY_filt = eyeData.Y_filt;
@@ -32,8 +32,12 @@ trial.eyeDDDY = eyeData.DDDY;
 % for example stimulus speed, fixation duration and other events
 trial.log.subject = currentSubject;
 trial.log.trialNumber = currentTrial;
-trial.log.parameters = parameters; % this is just a dummy
-trial.log.trialStart = variable.fixationOn; %parameters.trialStart;
-trial.log.trialEnd = variable.rdkOff; %
-trial.log.targetOnset = variable.rdkOn;
+trial.log.prob = parameters.prob(currentTrial, 1); % n%
+trial.log.coh = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
+trial.log.choice = parameters.choice(currentTrial, 1); % 0-left, 1-right
+
+% frame indices of all events; after comparing eventLog with eyeData.frameIdx
+trial.log.trialStart = 1; % the first frame, fixation onset, decided in readEyeData
+trial.log.targetOn = find(eyeData.frameIdx==eventLog.rdkOn(currentTrial, 1)); % rdk onset
+trial.log.trialEnd = find(eyeData.frameIdx==eventLog.rdkOff(currentTrial, 1)); % rdk offset
 end

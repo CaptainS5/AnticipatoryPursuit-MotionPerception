@@ -18,15 +18,22 @@
 %% Eye Data
 %  eye data need to have been converted using convert_edf2asc.m
 ascFile = eyeFiles(currentTrial,1).name;
-trialStart = 1; %different trial start can be specified using e.g. parameters
-eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStart);
+trialStartIdx = eventLog.fixationOn(currentTrial, 1); % different trial start can be specified using e.g. parameters
+eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStartIdx);
 eyeData = processEyeData(eyeData); 
 
 %% extract all relevant experimental data and store it in trial variable
-trial = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentTrial); 
+trial = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentTrial, eventLog); 
+trial.stim_onset = trial.log.targetOn;
+trial.stim_offset = trial.log.trialEnd;
+trial.length = trial.stim_offset;
 
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
+onset = 1;
+offset = trial.stim_offset;
+stimulusVelocityX = 10; % deg/s
+stimulusVelocityY = 0;
 [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);
 [saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, threshold, stimulusVelocityY);
 

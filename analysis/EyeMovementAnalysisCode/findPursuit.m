@@ -15,16 +15,24 @@
 
 function [pursuit] = findPursuit(trial)
 
-anticipatoryPeriod = 260; % when should we start looking for pursuit onset
+anticipatoryPeriod = ms2frames(260); % when should we start looking for pursuit onset
 pursuitSearchEnd = 140; % this means we stop searching for pursuit onset 140 ms after stimulus onset
 % x-value: TIME
 if trial.stim_onset > anticipatoryPeriod
     startTime = trial.stim_onset-anticipatoryPeriod;
     % we want to make sure the end point is before the catch up saccade
-    endTime = min([trial.stim_onset+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    if ~isempty(trial.saccades.onsets)
+        endTime = min([trial.stim_onset+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    else
+        endTime = trial.stim_onset+ms2frames(pursuitSearchEnd);
+    end
 else
     startTime = trial.stim_onset-(trial.stim_onset-1);
-    endTime = min([trial.stim_onset-1+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    if ~isempty(trial.saccades.onsets)
+        endTime = min([trial.stim_onset-1+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    else
+        endTime = trial.stim_onset-1+ms2frames(pursuitSearchEnd);
+    end
 end
 
 % this is basically saying there is no pursuit
@@ -85,7 +93,11 @@ else
         earlyOn = max([trial.saccades.X.onsets(idx) trial.saccades.Y.onsets(idy)]);
         earlyOff = max([trial.saccades.X.offsets(idx) trial.saccades.Y.offsets(idy)]);
     end
-    endMark = min([(mark+240) trial.saccades.onsets(1)]); %indicates end of open loop phase
+    if ~isempty(trial.saccades.onsets)
+        endMark = min([(mark+240) trial.saccades.onsets(1)]); %indicates end of open loop phase
+    else
+        endMark = mark+240;
+    end
     checkX = mean(trial.eyeDX_filt(mark:endMark));
     checkY = mean(trial.eyeDY_filt(mark:endMark));
     % first check, if the pursuit onset is inside the first saccade

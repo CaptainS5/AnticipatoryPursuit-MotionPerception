@@ -38,27 +38,35 @@ for i = 3:length(folderNames) % we are starting at 3 because matlab always has 2
     ascfiles = dir([currentFolder '\*.asc']);
     nHeader = 26; % this number depends on data collection; for EyeCatch/Strike it is 25
     % declare variables that you want to read out
-    variable = table();
+    eventLog = table();
     % STEP 2.2
     % loop over all asc files for 1 subject/data folder
     for j = 1:length(ascfiles)
         ascfile = ascfiles(j).name;
         path = fullfile(currentFolder, ascfile);
         fid = fopen(path);
-        % skip the header and then search for a message
+        % skip the header and then search for messages
         textscan(fid, '%*[^\n]', nHeader);
-        entries = textscan(fid, '%s %*[^\n]');
-        label = strfind(entries{:}, 'MSG');
-        idx = find(not(cellfun('isempty', label)));
-        variable.fixationOn(j) = idx(1); % frame idx in sample-only data; deduct message lines before
-        variable.fixationOff(j) = idx(1);
-        variable.rdkOn(j) = idx(1);
-        variable.rdkOff(j) = idx(1);
-        
+        entries = textscan(fid, '%s %s %s %*[^\n]');
+        for lineN = 1:size(entries{1}, 1)
+            if strcmp(entries{1}{lineN}, 'MSG')
+                if strcmp(entries{3}{lineN}, 'fixationOn')
+                    eventLog.fixationOn(j, 1) = str2num(entries{2}{lineN}); % read frame idx in original data
+                elseif strcmp(entries{3}{lineN}, 'fixationOff')
+                    eventLog.fixationOff(j, 1) = str2num(entries{2}{lineN});
+                elseif strcmp(entries{3}{lineN}, 'rdkOn')
+                    eventLog.rdkOn(j, 1) = str2num(entries{2}{lineN});
+                elseif strcmp(entries{3}{lineN}, 'rdkOff')
+                    eventLog.rdkOff(j, 1) = str2num(entries{2}{lineN});
+                end
+            end
+        end
+        %         label = strfind(entries{:}, 'MSG');
+        %         idx = find(not(cellfun('isempty', label)));
         fclose(fid);
     end
     cd(currentFolder)
-    save('variable', 'variable')
+    save('eventLog', 'eventLog')
     cd(startFolder)
     % STEP 2.3
     % convert data into samples only and replace missing values with 9999

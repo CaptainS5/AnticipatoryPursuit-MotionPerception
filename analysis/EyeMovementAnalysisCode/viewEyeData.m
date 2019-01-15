@@ -20,7 +20,8 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1; %chose trial you want to look at here; default = 1
+% currentTrial = 1; %chose trial you want to look at here; default =
+% 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
 sampleRate = 1000;
@@ -53,13 +54,15 @@ numTrials = length(dir('*.asc'));
 eyeFiles = dir('*.asc');
 % load mat file containing experimental info
 % combine all response files
-logFiles = dir('response*.mat');
+respFiles = dir('response*.mat');
 parameters = [];
-for logN = 1:length(logFiles)
-    load(logFiles(logN).name)
+for logN = 1:length(respFiles)
+    load(respFiles(logN).name)
     parameters = [parameters; resp];
     parameters.trialIdx = [1:height(parameters)]';
 end
+load eventLog % variable matrix has all the even message frame indice
+% for later use in locating eye data frames
 cd(analysisPath);
 
 sidx = strfind(currentSubjectPath, 'data\');

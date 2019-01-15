@@ -151,7 +151,7 @@ try
             
             if eyeTracker==1
                 % prepare eye recording
-                prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN), '.edf'];
+                prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN, '%03d'), '.edf'];
                 if (size(prm.eyeLink.edfName, 2)-4>8)
                     error('edf filename is too long!'); % Security loop against Eyelink
                     % Un-registration of data if namefile
