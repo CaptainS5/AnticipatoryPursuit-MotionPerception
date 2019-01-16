@@ -1,6 +1,6 @@
 function [key rt] = runTrial(blockN, trialN)
 
-global prm info resp list dots
+global prm info resp list dots demoN imgDemo
 
 % Initialization
 % fill the background
@@ -125,12 +125,12 @@ while frameN<=fixFrames
             EyelinkDoTrackerSetup(prm.eyeLink.el);
             EyelinkDoDriftCorrection(prm.eyeLink.el);
             Eyelink('message', 'Recalibrated');
-%             WaitSecs(0.05);
-%             % Before recording, we place reference graphics on the host display
-%             % Must be in offline mode to transfer image to Host PC
-%             Eyelink('Command', 'set_idle_mode'); %it puts the tracker into offline mode
-%             WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
-%             Eyelink('StartRecording');
+            %             WaitSecs(0.05);
+            %             % Before recording, we place reference graphics on the host display
+            %             % Must be in offline mode to transfer image to Host PC
+            %             Eyelink('Command', 'set_idle_mode'); %it puts the tracker into offline mode
+            %             WaitSecs(0.05); % it waits for 50ms before calling the startRecording function
+            %             Eyelink('StartRecording');
             frameN = 1;
             clear KbCheck
         end
@@ -164,6 +164,10 @@ while frameN<=fixFrames
                     Screen('FillOval', prm.screen.windowPtr, prm.screen.whiteColour, rectFixDot);
                     frameN = frameN - 1;
                 end
+                if demoN > 0
+                    imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+                    demoN = demoN + 1;
+                end
                 if initialF==0
                     if info.eyeTracker==1
                         Eyelink('message', 'fixationOn');
@@ -178,6 +182,10 @@ while frameN<=fixFrames
                 % if data is invalid (e.g. during a blink), show white
                 % fixation
                 Screen('FillOval', prm.screen.windowPtr, prm.screen.whiteColour, rectFixDot);
+                if demoN > 0
+                    imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+                    demoN = demoN + 1;
+                end
                 Screen('Flip', prm.screen.windowPtr);
                 frameN = 1;
             end
@@ -218,6 +226,11 @@ end
 initialG = 0;
 for frameN = 1:gapFrames
     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
+    if demoN > 0
+        imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+        demoN = demoN + 1;
+    end
+    
     if initialG == 0
         if info.eyeTracker==1
             Eyelink('message', 'fixationOff');
@@ -236,7 +249,7 @@ resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
 % %     Screen('Flip', prm.eyeLink.el.window, [], 1); % don't erase
 % end
 
-%% RDK   
+%% RDK
 if info.eyeTracker==1
     %mark zero-plot time in data file
     Eyelink('Message', 'SYNCTIME');
@@ -249,6 +262,11 @@ for frameN = 1:rdkFrames
     Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position{frameN, trialN}),...
         dots.diameterX, prm.rdk.colour, prm.screen.center, 1);  % change 1 to 0 to draw square dots
     %     Screen('DrawTexture', prm.screen.windowPtr, aperature);
+    if demoN > 0
+        imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+        demoN = demoN + 1;
+    end
+    
     if frameN==1
         [VBL rdkOnTime] = Screen('Flip', prm.screen.windowPtr);
     else
@@ -264,15 +282,15 @@ for frameN = 1:rdkFrames
     moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, or the horizontal right
     moveTheta = [cos(moveTheta) sin(moveTheta)]; % target dots won't be changed so no need to change the target ones
     % Update lifetime
-    dots.showTime{frameN+1, trialN} = dots.showTime{frameN, trialN}-1;    
+    dots.showTime{frameN+1, trialN} = dots.showTime{frameN, trialN}-1;
     % Update positions
     dots.position{frameN+1, trialN} = dots.position{frameN, trialN} + dots.movementNextFrame{frameN, trialN};
     
-    % Replace dots out of the aperture    
+    % Replace dots out of the aperture
     dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
     outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
     dots.distanceToCenterX{frameN+1, trialN}(outDots) = apertureRadiusX * sqrt((rand(length(outDots),1)));
-    dots.distanceToCenterX{frameN+1, trialN}(outDots) = max(dots.distanceToCenterX{frameN+1, trialN}(outDots)-dots.diameterX/2, 0); % new distance to the center   
+    dots.distanceToCenterX{frameN+1, trialN}(outDots) = max(dots.distanceToCenterX{frameN+1, trialN}(outDots)-dots.diameterX/2, 0); % new distance to the center
     % generate new positions and update lifetime
     dots.position{frameN+1, trialN}(outDots, :) = dots.positionTheta{frameN+1, trialN}(outDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(outDots) dots.distanceToCenterX{frameN+1, trialN}(outDots)*prm.screen.pixelRatioWidthPerHeight];
     dots.showTime{frameN+1, trialN}(outDots) = round(sec2frm(prm.rdk.lifeTime));
@@ -309,10 +327,11 @@ if trialType==1 % present dynamic mask if it's standard trial
         Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
         Screen('DrawTexture', prm.screen.windowPtr, aperature);
         
-        % if demoN > 0
-        %     imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
-        %     demoN = demoN + 1;
-        % end
+        if demoN > 0
+            imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+            demoN = demoN + 1;
+        end
+        
         if maskF==1
             [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
         else
@@ -324,9 +343,11 @@ elseif trialType==0 % record response in test trials
     %% Response
     while KbCheck; end % Wait until all keys are released
     % response instruction
-    textResp = ['LEFT or RIGHT?'];
-    Screen('TextSize', prm.screen.windowPtr, 55);
-    DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 350, prm.screen.blackColour);
+    %     textResp = ['LEFT or RIGHT?'];
+    %     Screen('TextSize', prm.screen.windowPtr, 55);
+    textResp = ['?'];
+    Screen('TextSize', prm.screen.windowPtr, 35);
+    DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen.blackColour);
     
     [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
     
@@ -337,7 +358,7 @@ elseif trialType==0 % record response in test trials
         %% button response
         [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
         if keyIsDown
-            key = KbName(keyCode);            
+            key = KbName(keyCode);
             % wait until the valid keys are pressed
             if strcmp(key, prm.leftKey) || strcmp(key, prm.rightKey) || strcmp(key, prm.stopKey)
                 rt = secs-rdkOffTime;
@@ -370,6 +391,31 @@ end
 if info.eyeTracker==1 && rem(trialN, prm.eyeLink.nDrift)==0
     % do a periodic driftcorrection
     EyelinkDoDriftCorrection(prm.eyeLink.el);
+elseif trialType==1 % standard trials
+    % % just draw the calibration target
+    %     size=round(2.5/100*prm.screen.size(3));
+    %     inset=round(1/100*prm.screen.size(3));
+    %
+    %     rect=CenterRectOnPoint([0 0 size size], prm.screen.center(1), prm.screen.center(2));
+    %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.blackColour,  rect);
+    %     rect=InsetRect(rect, inset, inset);
+    %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.backgroundColour, rect);
+    %
+    %     Screen( 'Flip',  prm.screen.windowPtr);
+    Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
+    Screen('Flip', prm.screen.windowPtr);
+    recordFlag=0;
+    while recordFlag==0
+        %% button response
+        [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
+        if keyIsDown
+            key = KbName(keyCode);
+            % wait until the valid keys are pressed
+            if strcmp(key, 'DownArrow') || strcmp(key, prm.stopKey)
+                recordFlag = 1;
+            end
+        end
+    end
 end
 
 % blank screen

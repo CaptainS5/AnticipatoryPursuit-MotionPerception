@@ -24,14 +24,14 @@ eyeData = processEyeData(eyeData);
 
 %% extract all relevant experimental data and store it in trial variable
 trial = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentTrial, eventLog); 
-trial.stim_onset = trial.log.targetOn;
+trial.stim_onset = trial.log.targetOnset;
 trial.stim_offset = trial.log.trialEnd;
 trial.length = trial.stim_offset;
 
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
 onset = 1;
-offset = trial.stim_offset;
+offset = trial.stim_offset+ms2frames(300); % to be able to detect saccades at the end of display
 stimulusVelocityX = 10; % deg/s
 stimulusVelocityY = 0;
 [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);
@@ -42,11 +42,11 @@ stimulusVelocityY = 0;
 clear saccades;
 
  %% OPTIONAL: find and analyze pursuit
-pursuit = findPursuit(trial); 
-% remove saccades
-trial = removeSaccades(trial);
-% analyze pursuit
-pursuit = analyzePursuit(trial, pursuit);
+% pursuit = findPursuit(trial); 
+% % remove saccades
+% trial = removeSaccades(trial);
+% % analyze pursuit
+% pursuit = analyzePursuit(trial, pursuit);
 
 %% OPTIONAL: find micro saccades
 % % remove saccades

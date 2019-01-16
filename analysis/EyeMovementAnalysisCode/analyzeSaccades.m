@@ -19,16 +19,26 @@ function [trial, saccades] = analyzeSaccades(trial, saccades)
 trial.saccades.X.onsets = [];
 trial.saccades.X.offsets = [];
 for i = 1:length(saccades.X.onsets)
-    trial.saccades.X.onsets(i,1) = saccades.X.onsets(i);
-    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);
+    trial.saccades.X.onsets(i,1) = saccades.X.onsets(i); % ?... why use the loop
+    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);  
 end
+% currently do not discriminate when removing saccade; just grab
+% the time points needed later
+trial.saccades.X.onsetsDuring = trial.saccades.X.onsets;
+trial.saccades.X.offsetsDuring = trial.saccades.X.offsets;
+
 % and for y
 trial.saccades.Y.onsets = [];
 trial.saccades.Y.offsets = [];
 for i = 1:length(saccades.Y.onsets)    
-    trial.saccades.Y(i,1) = saccades.Y.onsets(i);
-    trial.saccades.Y(i,1) = saccades.Y.offsets(i);
+    trial.saccades.Y.onsets(i,1) = saccades.Y.onsets(i);
+    trial.saccades.Y.offsets(i,1) = saccades.Y.offsets(i);
 end
+% currently do not discriminate when removing saccade; just grab
+% the time points needed later
+trial.saccades.Y.onsetsDuring = trial.saccades.Y.onsets;
+trial.saccades.Y.offsetsDuring = trial.saccades.Y.offsets;
+
 % store all found on and offsets together
 trial.saccades.onsets = [trial.saccades.X.onsets; trial.saccades.Y.onsets];
 trial.saccades.offsets = [trial.saccades.X.offsets; trial.saccades.Y.offsets];

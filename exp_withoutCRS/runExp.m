@@ -1,7 +1,7 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
-clear all; close all; clc; currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1; % debugging
+clear all; close all; clc; currentBlock=0; currentTrial = 1; prob = 0; eyeTracker=0; eyeType = 1; % debugging
 try
-    global prm list resp info dots
+    global prm list resp info dots demoN imgDemo
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
@@ -19,7 +19,7 @@ try
     cd('data\')
     prm.resultPath = pwd;
     cd ..
-    cd('exp_grey\')
+    cd('exp_withoutCRS\')
     prm.expPath = pwd;
     
     info = getInfo(currentBlock, currentTrial, eyeType, prob, eyeTracker);
@@ -31,10 +31,16 @@ try
     save([prm.fileName.folder, '\Info', num2str(currentBlock), '_', info.fileNameTime], 'info')
     
     % load trial info for the current block
+    demoN = 0; % default not to record demo images
     if info.prob > 0
-        load(['listNew', num2str(info.prob), 'prob.mat'])
+        load(['list', num2str(info.prob), 'prob.mat'])
+    elseif info.prob == 0  % practice trials
+        load('practiceList.mat')
     elseif info.prob == -1  % test trials
-        load('testListNew.mat')
+        load('testList.mat')
+    elseif info.prob == -100 % demo trials
+        load('demoList.mat')
+        demoN = 1;
     else
         error('ERROR: condition table does not exist')
     end
@@ -194,16 +200,16 @@ try
                 break
             elseif strcmp(key, 'std') % standard trials, no response
                 resp.choice(trialN, 1) = 999;
-            else% wrong key
-                % % repeat this trial at the end of the block
-                % makeUpN = makeUpN + 1;
-                % trialMakeUp(makeUpN) = trialN;
-                resp.choice(trialN, 1) = 999;
-                % feedback on the screen
-                respText = 'Invalid Key';
-                DrawFormattedText(prm.screen.windowPtr, respText,...
-                    'center', 'center', prm.textColour);
-                Screen('Flip', prm.screen.windowPtr);
+%             else% wrong key
+%                 % % repeat this trial at the end of the block
+%                 % makeUpN = makeUpN + 1;
+%                 % trialMakeUp(makeUpN) = trialN;
+%                 resp.choice(trialN, 1) = 999;
+%                 % feedback on the screen
+%                 respText = 'Invalid Key';
+%                 DrawFormattedText(prm.screen.windowPtr, respText,...
+%                     'center', 'center', prm.textColour);
+%                 Screen('Flip', prm.screen.windowPtr);
             end
             resp.RTms(trialN, 1) = rt*1000; % in ms
             resp.prob(trialN, 1) = info.prob;
@@ -237,8 +243,17 @@ try
         %             end
         %         end
     end
+    
+    if demoN>0
+        cd([prm.expPath, '\demo'])
+        for ii = 1:length(imgDemo)
+            imwrite(imgDemo{ii}, ['frame', num2str(ii), '.jpg'])
+        end
+    end
+    
     prm.fileName.prm = [prm.fileName.folder, '\parameters', num2str(info.block), '_', info.fileNameTime];
-    save(prm.fileName.prm, 'prm', 'dots');
+    save(prm.fileName.prm, 'prm');
+    save([prm.fileName.folder '\dotMatrices', num2str(info.block), '_', info.fileNameTime], 'dots');
     if eyeTracker==1
         Eyelink('ShutDown');
     end

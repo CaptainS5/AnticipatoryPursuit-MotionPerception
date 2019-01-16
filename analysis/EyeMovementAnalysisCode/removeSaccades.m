@@ -38,7 +38,7 @@ for i = 1:length(trial.saccades.X.onsetsDuring)
     trial.DX_noSac(trial.saccades.X.onsetsDuring(i):trial.saccades.X.offsetsDuring(i)) = NaN;
     trial.DY_noSac(trial.saccades.X.onsetsDuring(i):trial.saccades.X.offsetsDuring(i)) = NaN;
     % and finally interpolate the eye position if we later want to plot
-    % smoot eye movement traces
+    % smooth eye movement traces
     for j = 1:lengthSacX+1
         trial.X_interpolSac(trial.saccades.X.onsetsDuring(i)-1+j) = trial.eyeX_filt(trial.saccades.X.onsetsDuring(i)) + slopeX*j;
         trial.Y_interpolSac(trial.saccades.X.onsetsDuring(i)-1+j) = trial.eyeY_filt(trial.saccades.X.onsetsDuring(i)) + slopeY*j;

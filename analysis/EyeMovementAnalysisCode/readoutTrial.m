@@ -32,12 +32,15 @@ trial.eyeDDDY = eyeData.DDDY;
 % for example stimulus speed, fixation duration and other events
 trial.log.subject = currentSubject;
 trial.log.trialNumber = currentTrial;
+trial.log.trialType = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
 trial.log.prob = parameters.prob(currentTrial, 1); % n%
+trial.log.rdkDir = parameters.rdkDir(currentTrial, 1);
 trial.log.coh = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
 trial.log.choice = parameters.choice(currentTrial, 1); % 0-left, 1-right
 
 % frame indices of all events; after comparing eventLog with eyeData.frameIdx
 trial.log.trialStart = 1; % the first frame, fixation onset, decided in readEyeData
-trial.log.targetOn = find(eyeData.frameIdx==eventLog.rdkOn(currentTrial, 1)); % rdk onset
+trial.log.fixationOff = find(eyeData.frameIdx==eventLog.fixationOff(currentTrial, 1));
+trial.log.targetOnset = find(eyeData.frameIdx==eventLog.rdkOn(currentTrial, 1)); % rdk onset
 trial.log.trialEnd = find(eyeData.frameIdx==eventLog.rdkOff(currentTrial, 1)); % rdk offset
 end

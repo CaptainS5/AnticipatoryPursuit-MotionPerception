@@ -12,6 +12,7 @@
 %               VPOM students
 % for questions email jolande.fooken@rwth-aachen.de
 
+clear all; clc
 %% open a new figure
 % (size depends on your current screen size) 
 name = 'click through eye movement data';
@@ -68,6 +69,21 @@ cd(analysisPath);
 sidx = strfind(currentSubjectPath, 'data\');
 currentSubject = currentSubjectPath(sidx+5:end);
 
+errorFilePath = fullfile(analysisPath,'\ErrorFiles\');
+if exist(errorFilePath, 'dir') == 0
+  % Make folder if it does not exist.
+  mkdir(errorFilePath);
+end
+errorFileName = [errorFilePath 'Sub_' currentSubject '_errorFile.mat'];
+
+try
+    load(errorFileName);
+    disp('Error file loaded');
+catch  %#ok<CTCH>
+    errorStatus = NaN(size(eventLog, 1), 1);
+    disp('No error file found. Created a new one.');
+end
+
 %% run analysis for each trial and plot
 for trialN = 1:height(parameters)
     if parameters.trialType(trialN)==0
@@ -75,15 +91,71 @@ for trialN = 1:height(parameters)
         analyzeTrial;
         plotResults;
         
-        buttons.previous = uicontrol(fig,'string','<< Previous','Position',[0,70,100,30],...
+        buttons.exitAndSave = uicontrol(fig,'string','Exit & Save','Position',[0,35,100,30],...
+            'callback', 'close(fig);save(errorFileName,''errorStatus'');');
+        buttons.exit = uicontrol(fig,'string','Exit','Position',[0,5,100,30],...
+            'callback','close(fig);');
+        
+%         buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,105,100,30],...
+%             'callback','currentTrial = currentTrial+1;analyzeTrial;plotResults;finishButton;');
+        buttons.jumpToTrialn = uicontrol(fig,'string','Jump to trial..','Position',[0,70,100,30],...
+    'callback','inputTrial = inputdlg(''Go to trial:'');currentTrial = str2num(inputTrial{:});analyzeTrial;plotResults;');
+        buttons.previous = uicontrol(fig,'string','<< Previous','Position',[0,100,100,30],...
             'callback','currentTrial = max(currentTrial-1,1);analyzeTrial;plotResults');
+                buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,130,100,30],...
+            'callback','errorStatus(currentTrial)=0;currentTrial = currentTrial+1;analyzeTrial;plotResults;');
+        buttons.discardTrial = uicontrol(fig,'string','!Blink error (1) >>','Position',[0,160,100,30],...
+            'callback', 'errorStatus(currentTrial)=1;currentTrial = currentTrial+1;analyzeTrial;plotResults;');
+        buttons.discardTrial = uicontrol(fig,'string','!Saccade error (2) >>','Position',[0,190,100,30],...
+            'callback', 'errorStatus(currentTrial)=2;currentTrial = currentTrial+1;analyzeTrial;plotResults;');
+        buttons.discardTrial = uicontrol(fig,'string','!Pursuit error (3) >>','Position',[0,220,100,30],...
+            'callback', 'errorStatus(currentTrial)=3;currentTrial = currentTrial+1;analyzeTrial;plotResults;');
         
-        buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,105,100,30],...
-            'callback','currentTrial = currentTrial+1;analyzeTrial;plotResults;finishButton;');
+        assignin('base', 'buttons', buttons);        
+        while 1
+            w = waitforbuttonpress;
+            if w %Key press
+                figure(fig)  %focus on figure
+                key = get(gcf,'CurrentKey');
+                if strcmp(key,'numpad0') || strcmp(key,'0')
+                    errorStatus(currentTrial)=0;
+                    currentTrial = min(currentTrial+1,size(eventLog, 1));
+                    analyzeTrial;
+                    plotResults;
+                elseif strcmp(key,'numpad1') || strcmp(key,'1')
+                    errorStatus(currentTrial)=1;
+                    currentTrial = min(currentTrial+1,size(eventLog, 1));
+                    analyzeTrial;
+                    plotResults;
+                elseif strcmp(key,'numpad2') || strcmp(key,'2')
+                    errorStatus(currentTrial)=2;
+                    currentTrial = min(currentTrial+1,size(eventLog, 1));
+                    analyzeTrial;
+                    plotResults;
+                elseif strcmp(key,'numpad3') || strcmp(key,'3')
+                    errorStatus(currentTrial)=3;
+                    currentTrial = min(currentTrial+1,size(eventLog, 1));
+                    analyzeTrial;
+                    plotResults;
+                elseif strcmp(key,'backspace')
+                    currentTrial = max(currentTrial-1,1);
+                    analyzeTrial;
+                    plotResults;
+                elseif strcmp(key,'return')
+                    save(errorFileName,'errorStatus');
+                    close(fig);
+                    break;
+                elseif strcmp(key,'escape')
+                    close(fig);
+                    break;
+                elseif strcmp(key,'f12')
+                    break;
+                end
+            end
+        end
         
-        buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[0,220,100,30],...
-            'callback', 'currentTrial = currentTrial;analyzeTrial;plotResults; markError');
     end
+    
 end
 %% OPTION ADJUST SACCADES
 % we have an implementation for adjusting/manually adding saccades. for
