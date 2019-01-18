@@ -6,7 +6,7 @@
 directions = [0 180]; % 0 = RIGHT, 180 = LEFT
 cohLevels = [0 0.05 0.1 0.15]; % dot coherence level [0...1]
 trialsPerCohLevel = [13 26 26 26]; % number of test trials per coherence level
-rightProbability = 50/100; %probability of rightward movement for standard stimulus
+rightProbability = 90/100; %probability of rightward movement for standard stimulus
 NStandardTrials = 500;  % number of standard trials
 
 % number of trials for each type of stimulus

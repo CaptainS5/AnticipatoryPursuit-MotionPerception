@@ -34,7 +34,7 @@ for subN = 1:size(names, 2)
         for ii = 1:length(cohLevels)
             dataT.cohIdx(dataT.cohFit==cohLevels(ii), 1) = ii;
         end
-        numRight = accumarray(dataT.cohIdx, dataT.choice, [], @sum) % choice 1=right, 0=left
+        numRight = accumarray(dataT.cohIdx, dataT.choice, [], @sum); % choice 1=right, 0=left
         outOfNum = trialN*ones(size(cohLevels)); % total trial numbers
         
         PF = @PAL_Logistic;  %Alternatives: PAL_Gumbel, PAL_Weibull,
@@ -72,5 +72,5 @@ for subN = 1:size(names, 2)
     hold off
     legend([f{:}], {'Prob 50%' 'Prob 70%' 'Prob 90%'}, 'box', 'off', 'location', 'northwest')
     
-%     saveas(gcf, ['pf_', names{subN}, '.pdf'])
+    saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end

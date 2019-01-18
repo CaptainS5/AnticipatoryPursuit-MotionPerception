@@ -2,7 +2,7 @@
 % script to create a condition table for anticipitory smooth pursuit RDK
 % Xiuyun Wu - Nov 14 2018, slightly modifeid from Austin's version
 
-%RDK options
+% RDK options
 directions = [1 -1]; % -1=left, 1=right % [0 180]; % 0 = RIGHT, 180 = LEFT
 cohLevels = [0 0.04 0.08 0.12]; % dot coherence level [0...1]
 trialsPerCohLevel =  [13 26 26 26]; % number of test trials per coherence level, [13 26 26 26]

@@ -11,8 +11,20 @@ cd ..
 analysisF = pwd;
 dataFolder = {'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'};
 trialPerCon = 26; % for each coherence level in each direction
-% eye data processing parameters
+% parameters
+sampleRate = 1000;
+screenSizeX = 39.7;
+screenSizeY = 29.5;
+screenResX = 1280; 
+screenResY = 1024;
+distance = 57; % 55 for later experiments
+% saccade algorithm threshold --> depends on your stimulus speed and
+% expected saccade size
+% note that this threshold is hard-coded! If you want to test different
+% values this will not update while clicking through and you will have to
+% declare the variable eagain in the command window
 saccadeThreshold = 20;
+microSaccadeThreshold = 5;
 
 %% Perceptual trials
 % count = 1;

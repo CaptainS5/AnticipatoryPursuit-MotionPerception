@@ -17,9 +17,9 @@ function screenInfo = openExperiment(monWidth, viewDist, curScreen)
 % Copyright 2006 MKMK
 % Copyright 2013 Jian Wang
 
-if nargin < 3
-    curScreen = 0;
-end
+% if nargin < 3
+    curScreen = 1;
+% end
 
 AssertOpenGL;
 

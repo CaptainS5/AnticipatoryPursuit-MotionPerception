@@ -1,5 +1,8 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
-clear all; close all; clc; currentBlock=0; currentTrial = 1; prob = 0; eyeTracker=0; eyeType = 1; % debugging
+clear all; close all; clc; 
+% change parameters here: (set subID in getInfo; longest 2 letters)
+% prob: 50, 70, or 90; 0--practice block
+currentBlock=0; currentTrial = 1; prob = 0; eyeTracker=0; eyeType = 1; % debugging
 try
     global prm list resp info dots demoN imgDemo
     % prm--parameters, mostly defined in setParameters

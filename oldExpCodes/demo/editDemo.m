@@ -4,7 +4,7 @@ clc; clear; close all
 % creat movie demo
 % frames{1} = imread('fixation.jpg');
 
-cd('RDK-20degPerSec\100% coh')
+cd('RDK-2degPerSec\15% coh')
 files = dir('frame*.jpg');
 for ii = 1:length(files)
     temp = imread(['frame', num2str(ii), '.jpg']);
@@ -17,12 +17,12 @@ end
 % frame5--start of RDK
 
 % create the video writer with 1 fps
-writerObj = VideoWriter('demoTrial.avi');
+writerObj = VideoWriter('demoTrialRDK.avi');
 writerObj.FrameRate = 60;
 % open the video writer
 open(writerObj);
 % write the frames to the video
-for u=1:length(frames)
+for u=1:46%length(frames)
     % convert the image to a frame
     frame = im2frame(frames{u});
     if u==2 % fixation
