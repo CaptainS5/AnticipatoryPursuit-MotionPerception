@@ -319,7 +319,7 @@ if info.eyeTracker==1
 end
 % rdkOffsetTime = GetSecs; % here is actually the offset time
 
-if trialType==1 % present dynamic mask if it's standard trial
+% if trialType==1 % present dynamic mask if it's standard trial
     %% Mask
     % random order of the textures
     maskIdx = randperm(maskFrameN);
@@ -338,8 +338,9 @@ if trialType==1 % present dynamic mask if it's standard trial
             Screen('Flip', prm.screen.windowPtr);
         end
     end
-    key = 'std'; rt = 0;
-elseif trialType==0 % record response in test trials
+%     key = 'std'; rt = 0;
+    
+if trialType==0 % record response in test trials
     %% Response
     while KbCheck; end % Wait until all keys are released
     % response instruction
@@ -403,6 +404,13 @@ elseif trialType==1 % standard trials
     %
     %     Screen( 'Flip',  prm.screen.windowPtr);
     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
+    % % draw a down arrow
+    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)-10, ...
+    %         prm.screen.center(1), prm.screen.center(2)+10, 2); % vertical line for a down arrow
+    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
+    %         prm.screen.center(1)-8, prm.screen.center(2)+5, 3); % left half of the arrow
+    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
+    %         prm.screen.center(1)+8, prm.screen.center(2)+5, 3); % left half of the arrow
     Screen('Flip', prm.screen.windowPtr);
     recordFlag=0;
     while recordFlag==0

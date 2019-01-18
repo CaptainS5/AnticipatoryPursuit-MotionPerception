@@ -15,11 +15,10 @@ global imgDemo demoN
 
 try
     cd ..
-    cd ..
     cd('data\')
     resultpath = pwd;
     cd ..
-    cd('exp_grey\oldCodes')
+    cd('oldExpCodes')
     addpath(genpath(pwd))
     clear res;
 %     Screen('Preference', 'SkipSyncTests', 1);
@@ -31,15 +30,15 @@ try
     session = input('Session (f, p...): ', 's'); % f-fixation; p-pursuit
     if isempty(session), session = 'p'; end
     prop = input('Percentage of Right movements (default = 75): ');
-    if isempty(prop), prop = 90; end
+    if isempty(prop), prop =90; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
     if isempty(eyeTracker), eyeTracker = 0; end
 
     % load condition table
     if prop == 50
         load('list50prob.mat')
-    elseif prop == 75
-        load('list75prob.mat')
+    elseif prop == 70
+        load('list70prob.mat')
     elseif prop == 90
         load('list90prob.mat')
     elseif prop == -1 % test trials
@@ -229,7 +228,7 @@ try
 
         % %%%% Check for presence of the eye position signal within the tolerance
         % %%%% window and wait for a random interval before the Gap-screen %%%%
-
+        Eyelink('message', 'fixationOn');
         while (FixTime < fix_dur)
             CurrentTime = GetSecs; % GetSecs returns the time in seconds (based on internal clock)
             FixTime = CurrentTime - StimulusOnsetTime;
@@ -306,7 +305,7 @@ try
         end
         [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
 
-        Eyelink('message', 'StimulusOff');
+        Eyelink('message', 'fixationOff');
         WaitSecs(gap_dur);
 
         Eyelink('command','draw_box %d %d %d %d 7',MOV_BOX_COORDS(1),MOV_BOX_COORDS(2),MOV_BOX_COORDS(3),MOV_BOX_COORDS(4));
@@ -323,13 +322,13 @@ try
 
             %mark zero-plot time in data file
             Eyelink('Message', 'SYNCTIME');
-            Eyelink('message', 'TargetOn');
+            Eyelink('message', 'rdkOn');
 
             % make rdk
             [frames, rseed, start_time, end_time, response, response_time] = ...
                 dotsX(screenInfo, dotInfo);
 
-            Eyelink('message', 'TargetOff');
+            Eyelink('message', 'rdkOff');
             WaitSecs(0.05);
             Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
             Eyelink('StopRecording');
@@ -338,6 +337,23 @@ try
 %             end
         end
 
+%         % mask
+%         maskIdx = randperm(maskFrameN);
+%     for maskF = 1:maskFrameN
+%         Screen('DrawTextures', screenInfo.curWindow,noiseTexture{maskIdx(maskF)});
+%         Screen('DrawTexture', screenInfo.curWindow, aperature);
+%         
+%         if demoN > 0
+%             imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
+%             demoN = demoN + 1;
+%         end
+%         
+% %         if maskF==1
+% %             [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+% %         else
+%             Screen('Flip', prm.screen.windowPtr);
+% %         end
+%     end
 
         %%%%%%%%%%%%%%%%%%%%%%%% RESPONSE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -349,10 +365,11 @@ try
 
             % black=BlackIndex(screenInfo.curWindow); %value for white pixel%color value for text
 
-            line1 = 'LEFT or RIGHT?';
-            Screen('TextSize', screenInfo.curWindow, 55);
+            %             line1 = 'LEFT or RIGHT?';
+            line1 = '?';
+            Screen('TextSize', screenInfo.curWindow, 25);
             DrawFormattedText(screenInfo.curWindow, [line1],...
-                'center',350, [0 0 0]);
+                'center','center', [0 0 0]);
 
             if demoN > 0
                 imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
