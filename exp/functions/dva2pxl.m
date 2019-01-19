@@ -10,8 +10,8 @@ lengthXcm = tan(lengthX/180*pi)*prm.screen.viewDistance;
 lengthYcm = tan(lengthY/180*pi)*prm.screen.viewDistance;
 
 % then calculate how many pixels
-lengthPixelX = lengthXcm*prm.screen.ppcX;
-lengthPixelY = lengthYcm*prm.screen.ppcY;
+lengthPixelX = round(lengthXcm*prm.screen.ppcX);
+lengthPixelY = round(lengthYcm*prm.screen.ppcY);
 
 end
 

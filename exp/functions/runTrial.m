@@ -24,8 +24,7 @@ rectFixDot = [prm.screen.center(1)-rectSizeDotX,...
 gapFrames = round(sec2frm(prm.gap.duration));
 resp.gapFrames(trialN, 1) = gapFrames;
 
-% set up RDK--use transparent motion noise, fixed label for target and
-% noise dots; noise dots moving in a new random direction after reappearance
+% set up RDK
 coh = list.coh(trialN, 1);
 resp.coh(trialN, 1) = coh;
 rdkDir = list.rdkDir(trialN, 1); % -1=left, 1=right
@@ -39,39 +38,48 @@ resp.rdkFrames(trialN, 1) = rdkFrames;
 dots.diameterX = dots.diameterX*2;
 [apertureRadiusX, apertureRadiusY] = dva2pxl(prm.rdk.apertureRadius, prm.rdk.apertureRadius);
 
-% Postion dots in a circular aperture
+% Postion dots in a circular aperture using distanceToCenter and
+% positionTheta
 dots.distanceToCenterX{1, trialN} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
-dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0); % make sure that dots do not overlap outer border
+% dots.distanceToCenterX{1, trialN}(dots.distanceToCenterX{1, trialN}-dots.diameterX/2>=0, :) = dots.distanceToCenterX{1, trialN}-dots.diameterX/2; % make sure that dots do not overlap outer border
+% previously was dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0); 
+% just use the aperture...
 theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
 dots.positionTheta{1, trialN} = [cos(theta) sin(theta)];  % values between -1 and 1
 dots.position{1, trialN} = dots.positionTheta{1, trialN} .* [dots.distanceToCenterX{1, trialN} dots.distanceToCenterX{1, trialN}*prm.screen.pixelRatioWidthPerHeight];
 % initialize dot presentation time
 dots.showTime{1, trialN} = round(rand(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
 
-% dots movement distance in each frame, depends on coherence, updated later
-% for noise dots
+% dots movement distance in each frame, depends on coherence, updated
+% later in each frame
 moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, or the horizontal right
 targetDotsN = round(coh*prm.rdk.dotNumber); % number of dots should be moving coherently
-dots.label{1, trialN} = [ones(targetDotsN, 1); zeros(prm.rdk.dotNumber-targetDotsN, 1)]; % target = 1, noise = 0
-moveTheta(1:targetDotsN, 1) = 0; % assign the dots to be coherently moving rightwards
-moveTheta = [cos(moveTheta) sin(moveTheta)];
 
-[moveDistanceToCenterX, ] = dva2pxl(prm.rdk.speed, prm.rdk.speed);
-moveDistanceToCenterX = repmat(moveDistanceToCenterX, prm.rdk.dotNumber, 1);
-dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistanceToCenterX moveDistanceToCenterX*prm.screen.pixelRatioWidthPerHeight];
+% transparent motion noise, fixed label for target and
+% noise dots; noise dots moving in a new random direction after
+% reappearance,
+% while target dots always have the same moveTheta
+dots.label{1, trialN} = [ones(targetDotsN, 1); zeros(prm.rdk.dotNumber-targetDotsN, 1)]; % target = 1, noise = 0
+moveTheta(1:targetDotsN, 1) = 0; % assign the signal dots to be coherently moving rightwards
+moveTheta = [cos(moveTheta) sin(moveTheta)];
+% to use Brownian motion, dots.label is updated later in each frame
+
+[moveDistance, ] = dva2pxl(prm.rdk.speed, prm.rdk.speed);
+moveDistance = repmat(moveDistance, prm.rdk.dotNumber, 1);
+dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
 
 % set up mask
 maskFrameN = round(sec2frm(prm.mask.duration));
 resp.maskFrameN(trialN, 1) = maskFrameN;
 
-% Make an aperature
-Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-apertureRect = [prm.screen.center(1)-apertureRadiusX,...
-    prm.screen.center(2)-apertureRadiusY,...
-    prm.screen.center(1)+apertureRadiusX,...
-    prm.screen.center(2)+apertureRadiusY];
-aperature = Screen('OpenOffscreenwindow', prm.screen.windowPtr, prm.screen.backgroundColour, prm.screen.size);
-Screen('FillOval', aperature, [255 255 255 100], apertureRect);
+% % Make an aperture
+% Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+% apertureRect = [prm.screen.center(1)-apertureRadiusX,...
+%     prm.screen.center(2)-apertureRadiusY,...
+%     prm.screen.center(1)+apertureRadiusX,...
+%     prm.screen.center(2)+apertureRadiusY];
+% aperture = Screen('OpenOffscreenwindow', prm.screen.windowPtr, prm.screen.backgroundColour, prm.screen.size);
+% Screen('FillOval', aperture, prm.screen.backgroundColour, apertureRect);
 
 % set up eye position tolerance spatial windows
 % tolerance of fixation
@@ -257,11 +265,11 @@ if info.eyeTracker==1
 end
 
 for frameN = 1:rdkFrames
-    %Draw dots on screen
+    % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
     Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position{frameN, trialN}),...
         dots.diameterX, prm.rdk.colour, prm.screen.center, 1);  % change 1 to 0 to draw square dots
-    %     Screen('DrawTexture', prm.screen.windowPtr, aperature);
+    Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
     if demoN > 0
         imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
         demoN = demoN + 1;
@@ -272,46 +280,51 @@ for frameN = 1:rdkFrames
     else
         Screen('Flip', prm.screen.windowPtr);
     end
-    % initialize the new parameters for next frame
-    dots.distanceToCenterX{frameN+1, trialN} = dots.distanceToCenterX{frameN, trialN};
-    dots.movementNextFrame{frameN+1, trialN} = dots.movementNextFrame{frameN, trialN};
+
+    % set up dot position to present in the next frame(dots.position{frameN+1, trialN}), 
+    % which will be current position(dots.position{frameN, trialN}) plus 
+    % movement in this frame(dots.movementNextFrame{frameN, trialN})
+    % Update positions
+    dots.position{frameN+1, trialN} = dots.position{frameN, trialN} + dots.movementNextFrame{frameN, trialN};
+    % Update lifetime
+    dots.showTime{frameN+1, trialN} = dots.showTime{frameN, trialN}-1;
+    % still needs to replace expired dots and move dots out of the aperture into the aperture again, from the opposite edge   
+    
+    % first initialize the new parameters to use for next frame
+    dots.distanceToCenterX{frameN+1, trialN} = dots.distanceToCenterX{frameN, trialN}; % for new random positions
+    dots.movementNextFrame{frameN+1, trialN} = dots.movementNextFrame{frameN, trialN}; % for new moving directions
     % new random position angle
     theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
     dots.positionTheta{frameN+1, trialN} = [cos(theta) sin(theta)];  % values between -1 and 1
     % new random movement direction
-    moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, or the horizontal right
-    moveTheta = [cos(moveTheta) sin(moveTheta)]; % target dots won't be changed so no need to change the target ones
-    % Update lifetime
-    dots.showTime{frameN+1, trialN} = dots.showTime{frameN, trialN}-1;
-    % Update positions
-    dots.position{frameN+1, trialN} = dots.position{frameN, trialN} + dots.movementNextFrame{frameN, trialN};
-    
-    % Replace dots out of the aperture
-    dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
-    outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
-    dots.distanceToCenterX{frameN+1, trialN}(outDots) = apertureRadiusX * sqrt((rand(length(outDots),1)));
-    dots.distanceToCenterX{frameN+1, trialN}(outDots) = max(dots.distanceToCenterX{frameN+1, trialN}(outDots)-dots.diameterX/2, 0); % new distance to the center
-    % generate new positions and update lifetime
-    dots.position{frameN+1, trialN}(outDots, :) = dots.positionTheta{frameN+1, trialN}(outDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(outDots) dots.distanceToCenterX{frameN+1, trialN}(outDots)*prm.screen.pixelRatioWidthPerHeight];
-    dots.showTime{frameN+1, trialN}(outDots) = round(sec2frm(prm.rdk.lifeTime));
-    % update new direction for noise dots out of the aperture
-    outNoiseDots = find(dots.label{1, trialN}==0 & dotDist>apertureRadiusX^2); % noise dots out of the aperture
-    if outNoiseDots
-        dots.movementNextFrame{frameN+1, trialN}(outNoiseDots, :) = moveTheta(outNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX(outNoiseDots) moveDistanceToCenterX(outNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
-    end
+    moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, the horizontal right
+    moveTheta = [cos(moveTheta) sin(moveTheta)];   
     
     % Replace dots with expired lifetime
     expiredDots = find(dots.showTime{frameN+1, trialN} <= 0);
     dots.distanceToCenterX{frameN+1, trialN}(expiredDots) = apertureRadiusX * sqrt((rand(length(expiredDots),1)));
-    dots.distanceToCenterX{frameN+1, trialN}(expiredDots) = max(dots.distanceToCenterX{frameN+1, trialN}(expiredDots)-dots.diameterX/2, 0);
     % generate new positions and update lifetime
     dots.position{frameN+1, trialN}(expiredDots, :) = dots.positionTheta{frameN+1, trialN}(expiredDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(expiredDots) dots.distanceToCenterX{frameN+1, trialN}(expiredDots)*prm.screen.pixelRatioWidthPerHeight];
     dots.showTime{frameN+1, trialN}(expiredDots) = round(sec2frm(prm.rdk.lifeTime));
-    % update new direction for expired noise dots
+    % transparent motion,  update new direction only for expired noise dots
     expiredNoiseDots = find(dots.label{1, trialN}==0 & dots.showTime{frameN+1, trialN} <= 0); % noise dots expired
     if expiredNoiseDots
-        dots.movementNextFrame{frameN+1, trialN}(expiredNoiseDots, :) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistanceToCenterX(expiredNoiseDots) moveDistanceToCenterX(expiredNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
+        dots.movementNextFrame{frameN+1, trialN}(expiredNoiseDots, :) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistance(expiredNoiseDots) moveDistance(expiredNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
     end
+    
+    % Relocate dots out of the aperture
+    dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
+    outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
+    % move dots in the aperture from the opposite edge, continue the assigned motion
+    dots.position{frameN+1, trialN}(outDots, :) = -dots.position{frameN+1, trialN}(outDots, :)+dots.movementNextFrame{frameN, trialN}(outDots, :);    
+    
+    %% add these lines for Brownian motion, update labels and directions for all dots
+    dots.label{frameN+1, trialN} = dots.label{frameN, trialN}; % initialize new labels
+    labelOrder = randperm(size(dots.label{frameN+1, trialN}, 1));
+    dots.label{frameN+1, trialN}(:, 1) = dots.label{frameN+1, trialN}(labelOrder, 1); % randomly assign new labels
+    moveTheta(dots.label{frameN+1, trialN}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
+    dots.movementNextFrame{frameN+1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+    %%
 end
 
 if info.eyeTracker==1
@@ -325,7 +338,7 @@ end
     maskIdx = randperm(maskFrameN);
     for maskF = 1:maskFrameN
         Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
-        Screen('DrawTexture', prm.screen.windowPtr, aperature);
+        Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
         
         if demoN > 0
             imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
@@ -338,7 +351,6 @@ end
             Screen('Flip', prm.screen.windowPtr);
         end
     end
-%     key = 'std'; rt = 0;
     
 if trialType==0 % record response in test trials
     %% Response
@@ -347,7 +359,7 @@ if trialType==0 % record response in test trials
     %     textResp = ['LEFT or RIGHT?'];
     %     Screen('TextSize', prm.screen.windowPtr, 55);
     textResp = ['?'];
-    Screen('TextSize', prm.screen.windowPtr, 35);
+    Screen('TextSize', prm.screen.windowPtr, prm.textSize);
     DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen.blackColour);
     
     [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
@@ -375,6 +387,8 @@ if trialType==0 % record response in test trials
         end
         %% end of button response
     end
+else % standard trials
+    key = 'std'; rt = 0;
 end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 

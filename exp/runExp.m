@@ -1,8 +1,15 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; 
-% change parameters here: (set subID in getInfo; longest 2 letters)
-% prob: 50, 70, or 90; 0--practice block
-currentBlock=0; currentTrial = 1; prob = 0; eyeTracker=0; eyeType = 1; % debugging
+% initialize exp info here: (subID--longest 2 letters--can be set in getInfo, or in GUI)
+% currentBlock: now it runs one block at a time
+% currentTrial: can start with any trial number you like (in case being terminated before finishing the whole block), from 1-682
+% prob: 50, 70, or 90 for experiment; enter 0 for the practice block
+% eyeTracker: 1-yes, 0-no
+% eyeType: 1-pursuit, 0-fixation (not implemented yet)
+currentBlock=1; currentTrial = 1; prob = 70; eyeTracker=1; eyeType = 1; % for debugging
+% to use transparent/brownian motion, see line 329-335 in runTrial.m
+% change other parameters in setParameters
+% may need to change screen id in line 12 in openScreen.m
 try
     global prm list resp info dots demoN imgDemo
     % prm--parameters, mostly defined in setParameters
@@ -22,7 +29,7 @@ try
     cd('data\')
     prm.resultPath = pwd;
     cd ..
-    cd('exp_withoutCRS\')
+    cd('exp\')
     prm.expPath = pwd;
     
     info = getInfo(currentBlock, currentTrial, eyeType, prob, eyeTracker);
@@ -56,15 +63,25 @@ try
     
     HideCursor;
     
-    %     generate textures for the mask
+    % make the aperture
+    Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+    [apertureRadiusX, apertureRadiusY] = dva2pxl(prm.rdk.apertureRadius, prm.rdk.apertureRadius);
+    imgApt(:, :, 1) = ones(2*apertureRadiusY+1, 2*apertureRadiusX+1)*prm.screen.backgroundColour; % background layer
+    transApt = zeros(2*apertureRadiusY+1, 2*apertureRadiusX+1); % transparency layer, now all transparent
+    [x,y]=meshgrid(-apertureRadiusX:apertureRadiusX, -apertureRadiusY:apertureRadiusY);
+    x = x/apertureRadiusX;
+    y = y/apertureRadiusY;
+    radiusA = sqrt(x.^2+y.^2);
+    transApt(radiusA>1) = 255; % opaque out of the circle    
+    imgApt(:, :, 2) = transApt;
+    prm.aperture = Screen('MakeTexture', prm.screen.windowPtr, imgApt);
+    
+    % generate textures for the mask, the same size as the aperture
     maskFrameN = round(sec2frm(prm.mask.duration));
     for ii = 1:maskFrameN
-        imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum, prm.mask.matrixSize)*255;
+        imgMask = unifrnd(prm.mask.minLum, prm.mask.maxLum, size(radiusA))*255;
         prm.mask.tex{ii} = Screen('MakeTexture', prm.screen.windowPtr, imgMask);
     end
-    
-    %     % allow transparency
-    %     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
     
     if strcmp(info.subID{1}, 'luminance')
         % testing monitor luminance

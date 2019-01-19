@@ -32,7 +32,7 @@ prm.gap.duration = 0.3;
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
 prm.rdk.dotDensity = 2; % dot per dva
-prm.rdk.lifeTime = 0.15;
+prm.rdk.lifeTime = 0.7;
 prm.rdk.dotRadius = 0.14/2;
 prm.rdk.apertureRadius = 10;
 prm.rdk.speed = 10; % dva per sec
@@ -62,8 +62,7 @@ prm.motionRange.yLength = 50; % Height
 % dynamic mask
 prm.mask.duration = 0.6;
 prm.mask.maxLum = 0.7; % max luminance in the mask
-prm.mask.minLum = 0;
-prm.mask.matrixSize = [1600, 1600];
+prm.mask.minLum = 0.3;
 
 % block conditions
 prm.ITI = 0.05; % inter-trial interval
