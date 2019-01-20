@@ -4,7 +4,7 @@ clc; clear; close all
 % creat movie demo
 % frames{1} = imread('fixation.jpg');
 
-% cd('RDK-20degPerSec\100% coh')
+cd('Brownian motion\0.16_0.08_0.04')
 files = dir('frame*.jpg');
 for ii = 1:length(files)
     temp = imread(['frame', num2str(ii), '.jpg']);

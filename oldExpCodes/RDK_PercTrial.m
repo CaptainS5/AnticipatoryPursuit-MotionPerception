@@ -2,9 +2,6 @@
 % we use it as a script for debugging purposes
 % 7/6/2016 Anna Montagnini and Austin Rothwell
 % adapted 11/1/2018 Xiuyun Wu
-%% current parameters: refresh rate = 60 Hz, 1 frame = 17ms
-% dot lifetime is one frame, presented again two frames after--three frames
-% in a loop
 
 % function trialres = RDK_PercTrial(stimcond)
 % function that displays a RDK stimulus (generated through the Shadlen Dots-stimuli routines)
@@ -30,7 +27,7 @@ try
     session = input('Session (f, p...): ', 's'); % f-fixation; p-pursuit
     if isempty(session), session = 'p'; end
     prop = input('Percentage of Right movements (default = 75): ');
-    if isempty(prop), prop =90; end
+    if isempty(prop), prop =-1; end
     eyeTracker = input('EyeTracker (0=no, 1=yes): ');
     if isempty(eyeTracker), eyeTracker = 0; end
 
@@ -48,7 +45,7 @@ try
     end
 
     % number of trials for each type of stimulus
-    NTrials = length(list);
+    NTrials = size(list, 1);
     nRem_trials = 50;   %  progress report trials (every nRem_trials)
 
     % % selects the lookup table corresponding to the current p-bias value
@@ -98,7 +95,30 @@ try
     % Initialize dots
     % Check ./ShadlenDotsX/createMinDotInfo to change parameters
     dotInfo = createDotInfo(1);
-
+    
+%     % Make the aperture
+%     Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+%     [apertureRadiusX, apertureRadiusY] = dva2pxl(prm.rdk.apertureRadius, prm.rdk.apertureRadius);
+%     imgApt(:, :, 1) = ones(2*apertureRadiusY+1, 2*apertureRadiusX+1)*prm.screen.backgroundColour; % background layer
+%     transApt = zeros(2*apertureRadiusY+1, 2*apertureRadiusX+1); % transparency layer, now all transparent
+%     [x,y]=meshgrid(-apertureRadiusX:apertureRadiusX, -apertureRadiusY:apertureRadiusY);
+%     x = x/apertureRadiusX;
+%     y = y/apertureRadiusY;
+%     radiusA = sqrt(x.^2+y.^2);
+%     transApt(radiusA>1) = 255; % opaque out of the circle    
+%     imgApt(:, :, 2) = transApt;
+%     aperture = Screen('MakeTexture', screenInfo.curWindow, imgApt);    
+    
+    % Dynamic mask, generated before hand, just use random orders of
+    % the textures
+    maskTime = 0.6; % s
+    mask.maxLum = 0.7; % max luminance in the mask
+    mask.minLum = 0;
+    maskFrameN = round(maskTime*screenInfo.monRefresh);
+    for ii = 1:maskFrameN
+        imgMask = unifrnd(mask.minLum, mask.maxLum, [1600 1600])*255;
+        mask.tex{ii} = Screen('MakeTexture', screenInfo.curWindow, imgMask);
+    end
 
     %%%%%%%%%%% WARNING BEEP %%%%%%%%%%%%
 
@@ -123,16 +143,6 @@ try
     % Size of the fixation dot in pixels
     W = 10;
     H =10;
-
-    % Dynamic mask, generated before hand, just use random orders of
-    % the textures
-    maskTime = 0.6; % s
-    maskFrameN = round(maskTime*screenInfo.monRefresh);
-    for ii = 1:maskFrameN
-        randMask = 0.7*rand(600,600)+0.3; % range 0.3-1
-        noise{ii} = randMask*255;
-        noiseTexture{ii} = Screen('MakeTexture', screenInfo.curWindow, noise{ii});
-    end
 
     %% Initializes the connection with Eyelink
     if eyeTracker==1
@@ -336,24 +346,27 @@ try
 %             while
 %             end
         end
+        
+        Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+        % Make an aperature
+        objCirc = floor(createTRect(dotInfo.apXYD, screenInfo));
+        aperature = Screen('OpenOffscreenwindow', screenInfo.curWindow, screenInfo.bckgnd, screenInfo.screenRect);
+        Screen('FillOval', aperature, [255 255 255 100], objCirc);
 
-%         % mask
-%         maskIdx = randperm(maskFrameN);
-%     for maskF = 1:maskFrameN
-%         Screen('DrawTextures', screenInfo.curWindow,noiseTexture{maskIdx(maskF)});
-%         Screen('DrawTexture', screenInfo.curWindow, aperature);
-%         
-%         if demoN > 0
-%             imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
-%             demoN = demoN + 1;
-%         end
-%         
-% %         if maskF==1
-% %             [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
-% %         else
-%             Screen('Flip', prm.screen.windowPtr);
-% %         end
-%     end
+% present dynamic mask 
+            % random order of the textures
+            maskIdx = randperm(maskFrameN);
+            for maskF = 1:maskFrameN
+                Screen('DrawTextures', screenInfo.curWindow, mask.tex{maskIdx(maskF)});
+                Screen('DrawTexture', screenInfo.curWindow, aperature);
+
+                if demoN > 0
+                    imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
+                    demoN = demoN + 1;
+                end
+                [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
+
+            end
 
         %%%%%%%%%%%%%%%%%%%%%%%% RESPONSE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -410,30 +423,7 @@ try
             %     Snd('Play', beep, freq_BAD, 16);
             %     Score=Score-1;
             % end
-        else % present dynamic mask if it's standard trial
-            Screen('BlendFunction', screenInfo.curWindow, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-
-            % Make an aperature
-            objCirc = floor(createTRect(dotInfo.apXYD, screenInfo));
-            aperature = Screen('OpenOffscreenwindow', screenInfo.curWindow, screenInfo.bckgnd, screenInfo.screenRect);
-            Screen('FillOval', aperature, [255 255 255 100], objCirc);
-
-            % random order of the textures
-            maskIdx = randperm(maskFrameN);
-            for maskF = 1:maskFrameN
-                Screen('DrawTextures', screenInfo.curWindow, noiseTexture{maskIdx(maskF)});
-                Screen('DrawTexture', screenInfo.curWindow, aperature);
-
-                if demoN > 0
-                    imgDemo{demoN} = Screen('GetImage', screenInfo.curWindow, [], 'backbuffer');
-                    demoN = demoN + 1;
-                end
-                [VBL StimulusOnsetTime] = Screen('Flip', screenInfo.curWindow);
-
-            end
-
         end
-
 
         %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
         if (rem(trial,nRem_trials)==0 && (NTrials-trial>1))

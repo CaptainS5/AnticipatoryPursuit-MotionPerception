@@ -3,10 +3,11 @@ clear all; close all; clc;
 % initialize exp info here: (subID--longest 2 letters--can be set in getInfo, or in GUI)
 % currentBlock: now it runs one block at a time
 % currentTrial: can start with any trial number you like (in case being terminated before finishing the whole block), from 1-682
-% prob: 50, 70, or 90 for experiment; enter 0 for the practice block
+% prob: 50, 70, or 90 for experiment; enter 0 for the practice block (practiceList), -1
+% for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (not implemented yet)
-currentBlock=1; currentTrial = 1; prob = 70; eyeTracker=1; eyeType = 1; % for debugging
+currentBlock=2; currentTrial = 1; prob = 50; eyeTracker=1; eyeType = 1; % for debugging
 % to use transparent/brownian motion, see line 329-335 in runTrial.m
 % change other parameters in setParameters
 % may need to change screen id in line 12 in openScreen.m
@@ -43,7 +44,7 @@ try
     % load trial info for the current block
     demoN = 0; % default not to record demo images
     if info.prob > 0
-        load(['list', num2str(info.prob), 'prob.mat'])
+        load(['list', num2str(info.prob), 'probNew.mat'])
     elseif info.prob == 0  % practice trials
         load('practiceList.mat')
     elseif info.prob == -1  % test trials
@@ -240,9 +241,15 @@ try
             trialN = trialN+1
             %             tempN = tempN+1;
             
-            % ITI
-            WaitSecs(prm.ITI);
+%             % ITI
+%             WaitSecs(prm.ITI);
         end
+        
+        text =['Finished! \n Be patient and it will exit automatically...'];
+        Screen('TextSize', prm.screen.windowPtr, prm.textSize);
+        DrawFormattedText(prm.screen.windowPtr, text,...
+            'center', 'center', prm.textColour);
+        Screen('Flip', prm.screen.windowPtr);
         
         %         if eyeTracker==1
         %             % eye recording output

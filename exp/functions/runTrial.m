@@ -210,6 +210,10 @@ while frameN<=fixFrames
         elseif trialType==0
             Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
         end
+        if demoN > 0
+            imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+            demoN = demoN + 1;
+        end
         if initialF==0
             [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
             initialF = 1;

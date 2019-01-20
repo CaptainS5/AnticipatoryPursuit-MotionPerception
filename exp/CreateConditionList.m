@@ -4,9 +4,9 @@
 
 % RDK options
 directions = [1 -1]; % -1=left, 1=right % [0 180]; % 0 = RIGHT, 180 = LEFT
-cohLevels = [0 0.04 0.08 0.12]; % dot coherence level [0...1]
+cohLevels = [0 0.08 0.16 0.24]; % dot coherence level [0...1]
 trialsPerCohLevel =  [13 26 26 26]; % number of test trials per coherence level, [13 26 26 26]
-rightProbability = 50/100; %probability of rightward movement for standard stimulus
+rightProbability = 90/100; %probability of rightward movement for standard stimulus
 NStandardTrials = 500;  % number of standard trials, 500
 firstTrialN = 50; % the first n trials that should all be standard trials, 50
 varNames = {'coh', 'rdkDir', 'trialType'}; % 1-R, 2-L
@@ -85,6 +85,6 @@ end
 list = mat2cell(list, size(list, 1), ones(1, 3));
 list = table(list{:}, 'VariableNames', varNames);
 
-save(['list', num2str(rightProbability*100), 'prob.mat'], 'list')
+save(['list', num2str(rightProbability*100), 'probNew.mat'], 'list')
 % list(list.trialType==0, :) = sortrows( list(list.trialType==0, :), 1, 'descend');
 % save(['practiceList.mat'], 'list')
