@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-% currentTrial = 1; %chose trial you want to look at here; default =
+currentTrial = 1958; %chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -36,7 +36,7 @@ distance = 57;
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 20;
+saccadeThreshold = 15;
 microSaccadeThreshold = 5;
 % this is a csv files that will contain information about discarded trials
 % errors = load('errors.csv'); ???
@@ -85,9 +85,9 @@ catch  %#ok<CTCH>
 end
 
 %% run analysis for each trial and plot
-for trialN = 1:height(parameters)
-    if parameters.trialType(trialN)==0
-        currentTrial = trialN;
+% for trialN = startTrial:height(parameters)
+%     if parameters.trialType(trialN)==0
+%         currentTrial = trialN;
         analyzeTrial;
         plotResults;
         
@@ -154,9 +154,9 @@ for trialN = 1:height(parameters)
             end
         end
         
-    end
+%     end
     
-end
+% end
 %% OPTION ADJUST SACCADES
 % we have an implementation for adjusting/manually adding saccades. for
 % many experiments this won't be necessary. If you notice many undetected

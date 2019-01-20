@@ -31,8 +31,12 @@ trial.length = trial.stim_offset;
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
 onset = 1;
-offset = trial.stim_offset+ms2frames(300); % to be able to detect saccades at the end of display
-stimulusVelocityX = 10; % deg/s
+offset = min(trial.stim_offset+ms2frames(300), size(trial.eyeDX_filt, 1)); % to be able to detect saccades at the end of display
+if trial.log.coh==0
+    stimulusVelocityX = 0;
+else
+    stimulusVelocityX = 10*trial.log.rdkDir; % deg/s
+end
 stimulusVelocityY = 0;
 [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);
 [saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, threshold, stimulusVelocityY);

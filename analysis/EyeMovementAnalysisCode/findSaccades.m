@@ -35,15 +35,15 @@ successor = [0; middle(1:end-1)];
 
 % OPTION 1: use less strict criterion: 3 consecutive frames have to exceed
 % the speed criterion
-%relevantFrames = middle+predecessor+successor == 3;
+relevantFrames = middle+predecessor+successor == 3;
 %****
 
-% OPTION 2: stricter criterion: 5 consecutive frames have to exceed 
-% the speed criterion
-prepredecessor = [predecessor(2:end); 0];
-sucsuccessor = [0; successor(1:end-1)];
-relevantFrames = middle+predecessor+successor+sucsuccessor+prepredecessor == 5;
-%****
+% % OPTION 2: stricter criterion: 5 consecutive frames have to exceed 
+% % the speed criterion
+% prepredecessor = [predecessor(2:end); 0];
+% sucsuccessor = [0; successor(1:end-1)];
+% relevantFrames = middle+predecessor+successor+sucsuccessor+prepredecessor == 5;
+% %****
 
 relevantFramesDiff = diff(relevantFrames);
 relevantFramesOnsets = [relevantFramesDiff; 0];

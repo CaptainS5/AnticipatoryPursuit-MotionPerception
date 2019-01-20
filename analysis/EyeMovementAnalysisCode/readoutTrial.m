@@ -34,7 +34,7 @@ trial.log.subject = currentSubject;
 trial.log.trialNumber = currentTrial;
 trial.log.trialType = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
 trial.log.prob = parameters.prob(currentTrial, 1); % n%
-trial.log.rdkDir = parameters.rdkDir(currentTrial, 1);
+trial.log.rdkDir = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
 trial.log.coh = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
 trial.log.choice = parameters.choice(currentTrial, 1); % 0-left, 1-right
 

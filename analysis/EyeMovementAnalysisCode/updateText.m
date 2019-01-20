@@ -18,7 +18,7 @@ screenSize = get(0,'ScreenSize');
 name = evalin('base', 'name');
 % chose position of the text box
 xPosition = 10; 
-yPosition = 300;%screenSize(4)-screenSize(4)*2/3; 
+yPosition = 350;%screenSize(4)-screenSize(4)*2/3; 
 % how large should it be?
 verticalDistance = 20;
 width = 110 ;
@@ -44,17 +44,26 @@ trialNoText = uicontrol(fig,'Style','text',...
 
 textblock = textblock+1;
 if trial.log.trialType==0
-    trialType = 'perceptual';
+    trialType = ['p-', num2str(abs(trial.log.coh*100)), '%'];
 else
-    trialType = 'standard';
+    trialType = 's';
 end
-if trial.log.rdkDir<0
-    direction = 'left';
+if trial.log.coh<0
+    direction = 'L';
+elseif trial.log.coh>0
+    direction = 'R';
 else
-    direction = 'right';
+    direction = 'N';
+end
+if trial.log.choice==0
+    choice = 'L';
+elseif trial.log.choice==1
+    choice = 'R';
+else
+    choice = 'N';
 end
 trialNoText = uicontrol(fig,'Style','text',...
-    'String', ['Trial type: ' trialType ' (' direction ')'],...
+    'String', ['Trial type: ' trialType ' (' direction ', choice ', choice, ')'],...
     'Position',[xPosition yPosition-textblock*verticalDistance width height+5],...
     'HorizontalAlignment','left');
 

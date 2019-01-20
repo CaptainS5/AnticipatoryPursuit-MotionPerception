@@ -27,8 +27,12 @@ resp.gapFrames(trialN, 1) = gapFrames;
 % set up RDK
 coh = list.coh(trialN, 1);
 resp.coh(trialN, 1) = coh;
-rdkDir = list.rdkDir(trialN, 1); % -1=left, 1=right
-resp.rdkDir(trialN, 1) = rdkDir;
+rdkDir = list.rdkDir(trialN, 1); % -1=left, 1=right; used later for movementNextFrame, cannot be 0
+if coh~=0
+    resp.rdkDir(trialN, 1) = rdkDir;
+else
+    resp.rdkDir(trialN, 1) = 0; % mark in the final response file that there is no direction for 0 coherence trials
+end
 trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
 resp.trialType(trialN, 1) = trialType;
 rdkFrames = round(sec2frm(prm.rdk.duration));
