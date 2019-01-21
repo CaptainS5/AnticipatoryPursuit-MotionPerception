@@ -7,7 +7,7 @@ clear all; close all; clc;
 % for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (not implemented yet)
-currentBlock=2; currentTrial = 1; prob = 50; eyeTracker=1; eyeType = 1; % for debugging
+currentBlock=3; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; % for debugging
 % to use transparent/brownian motion, see line 329-335 in runTrial.m
 % change other parameters in setParameters
 % may need to change screen id in line 12 in openScreen.m
@@ -112,7 +112,7 @@ try
         %         makeUpN = 0;
         
         %% Initializes the connection with Eyelink
-        if eyeTracker==1
+        if info.eyeTracker==1
             if EyelinkInit()~= 1; %
                 error('Problems with Eyelink connection!');
                 return;
@@ -155,7 +155,7 @@ try
         
         % initial welcome
         if trialN==1
-            textBlock = ['Block ', num2str(info.block)];
+            textBlock = ['Block ', num2str(info.block), '\n Press any key'];
             Screen('TextSize', prm.screen.windowPtr, prm.textSize);
             DrawFormattedText(prm.screen.windowPtr, textBlock,...
                 'center', 'center', prm.textColour);        % if info.eyeType==0
@@ -176,7 +176,7 @@ try
         while trialN<=prm.trialPerBlock
             clear KbCheck
             
-            if eyeTracker==1
+            if info.eyeTracker==1
                 % prepare eye recording
                 prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN, '%03d'), '.edf'];
                 if (size(prm.eyeLink.edfName, 2)-4>8)
@@ -193,7 +193,7 @@ try
             % trialN is the index for looking up in list;
             % tempN is the actual trial number, including invalid trials
             %
-            if eyeTracker==1
+            if info.eyeTracker==1
                 % eye recording output
                 Eyelink('Command', 'set_idle_mode');
                 WaitSecs(0.05);
@@ -281,7 +281,7 @@ try
     prm.fileName.prm = [prm.fileName.folder, '\parameters', num2str(info.block), '_', info.fileNameTime];
     save(prm.fileName.prm, 'prm');
     save([prm.fileName.folder '\dotMatrices', num2str(info.block), '_', info.fileNameTime], 'dots');
-    if eyeTracker==1
+    if info.eyeTracker==1
         Eyelink('ShutDown');
     end
     Screen('CloseAll')
@@ -292,7 +292,7 @@ catch expME
     rethrow(expME);
     Screen('CloseAll')
     Screen('Close')
-    if eyeTracker==1
+    if info.eyeTracker==1
         Eyelink('StopRecording');
         Eyelink('ShutDown');
     end
