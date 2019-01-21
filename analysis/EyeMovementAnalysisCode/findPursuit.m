@@ -15,21 +15,21 @@
 
 function [pursuit] = findPursuit(trial)
 
-anticipatoryPeriod = ms2frames(260); % when should we start looking for pursuit onset
-pursuitSearchEnd = 140; % this means we stop searching for pursuit onset 140 ms after stimulus onset
+anticipatoryPeriod = ms2frames(300); % when should we start looking for pursuit onset
+pursuitSearchEnd = 400; % this means we stop searching for pursuit onset n ms after stimulus onset
 % x-value: TIME
 if trial.stim_onset > anticipatoryPeriod
     startTime = trial.stim_onset-anticipatoryPeriod;
     % we want to make sure the end point is before the catch up saccade
-    if ~isempty(trial.saccades.onsets)
-        endTime = min([trial.stim_onset+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    if ~isempty(trial.saccades.onsetsDuring)
+        endTime = min([trial.stim_onset+ms2frames(pursuitSearchEnd) trial.saccades.onsetsDuring(1)]);
     else
         endTime = trial.stim_onset+ms2frames(pursuitSearchEnd);
     end
 else
     startTime = trial.stim_onset-(trial.stim_onset-1);
-    if ~isempty(trial.saccades.onsets)
-        endTime = min([trial.stim_onset-1+ms2frames(pursuitSearchEnd) trial.saccades.onsets(1)]);
+    if ~isempty(trial.saccades.onsetsDuring)
+        endTime = min([trial.stim_onset-1+ms2frames(pursuitSearchEnd) trial.saccades.onsetsDuring(1)]);
     else
         endTime = trial.stim_onset-1+ms2frames(pursuitSearchEnd);
     end
@@ -40,14 +40,14 @@ if endTime-startTime < 10
     pursuit.onset = NaN;
 else   
     time = startTime:endTime;
-    fixationInterval = 275; % chose an interval before stimulus onset that
+    fixationInterval = 575; % chose an interval before stimulus onset that
     % we will use as fixation window; needs to be at least 201 ms
     if trial.stim_onset > fixationInterval
-        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-100)));
-        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-100)));
+        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
+        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
     else
-        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-200)));
-        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-200)));
+        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
+        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
     end    
     % 2. calculate 2D vector relative to fixation position
     dataxy_tmp = sqrt( (trial.eyeDX_filt-fix_x).^2 + (trial.eyeDY_filt-fix_y).^2 );
@@ -61,40 +61,40 @@ else
     mark = pursuit.onset;
     % in this first part we're getting the first saccade onset after the
     % stimulus starts moving to make sure that the pursuit onset is before
-    if isempty(trial.saccades.onsets)
+    if isempty(trial.saccades.onsetsDuring)
         on = NaN;
         off = NaN;
         idx = 0;
         idy = 0;
     else
-        on = trial.saccades.onsets(1);
-        off = trial.saccades.offsets(1);
-        if isempty(trial.saccades.X.onsets(1))
+        on = trial.saccades.onsetsDuring(1);
+        off = trial.saccades.offsetsDuring(1);
+        if isempty(trial.saccades.X.onsetsDuring)
             idx = 0;
-            idy = find(trial.saccades.Y.onsets == trial.saccades.Y.onsets(1))-1;
-        elseif isempty(trial.saccades.Y.onsets(1))
-            idx = find(trial.saccades.X.onsets == trial.saccades.X.onsets(1))-1;
+            idy = find(trial.saccades.Y.onsetsDuring == trial.saccades.Y.onsetsDuring(1))-1;
+        elseif isempty(trial.saccades.Y.onsetsDuring)
+            idx = find(trial.saccades.X.onsetsDuring == trial.saccades.X.onsetsDuring(1))-1;
             idy = 0;
         else
-            idx = find(trial.saccades.X.onsets == trial.saccades.X.onsets(1))-1;
-            idy = find(trial.saccades.Y.onsets == trial.saccades.Y.onsets(1))-1;
+            idx = find(trial.saccades.X.onsetsDuring == trial.saccades.X.onsetsDuring(1))-1;
+            idy = find(trial.saccades.Y.onsetsDuring == trial.saccades.Y.onsetsDuring(1))-1;
         end
     end
     if idx == 0 && idy == 0
         earlyOn = NaN;
         earlyOff = NaN;
     elseif idx == 0 && idy > 0
-        earlyOn = trial.saccades.Y.onsets(idy);
-        earlyOff = trial.saccades.Y.offsets(idy);
+        earlyOn = trial.saccades.Y.onsetsDuring(idy);
+        earlyOff = trial.saccades.Y.offsetsDuring(idy);
     elseif idx > 0 && idy == 0
-        earlyOn = trial.saccades.X.onsets(idx);
-        earlyOff = trial.saccades.X.offsets(idx);
+        earlyOn = trial.saccades.X.onsetsDuring(idx);
+        earlyOff = trial.saccades.X.offsetsDuring(idx);
     elseif idx > 0 && idy > 0
-        earlyOn = max([trial.saccades.X.onsets(idx) trial.saccades.Y.onsets(idy)]);
-        earlyOff = max([trial.saccades.X.offsets(idx) trial.saccades.Y.offsets(idy)]);
+        earlyOn = max([trial.saccades.X.onsetsDuring(idx) trial.saccades.Y.onsetsDuring(idy)]);
+        earlyOff = max([trial.saccades.X.offsetsDuring(idx) trial.saccades.Y.offsetsDuring(idy)]);
     end
-    if ~isempty(trial.saccades.onsets)
-        endMark = min([(mark+240) trial.saccades.onsets(1)]); %indicates end of open loop phase
+    if ~isempty(trial.saccades.onsetsDuring)
+        endMark = min([(mark+240) trial.saccades.onsetsDuring(1)]); %indicates end of open loop phase
     else
         endMark = mark+240;
     end

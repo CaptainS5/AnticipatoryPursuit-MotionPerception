@@ -37,6 +37,7 @@ trial.log.prob = parameters.prob(currentTrial, 1); % n%
 trial.log.rdkDir = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
 trial.log.coh = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
 trial.log.choice = parameters.choice(currentTrial, 1); % 0-left, 1-right
+trial.stimulus.absoluteVelocity = 10;
 
 % frame indices of all events; after comparing eventLog with eyeData.frameIdx
 trial.log.trialStart = 1; % the first frame, fixation onset, decided in readEyeData

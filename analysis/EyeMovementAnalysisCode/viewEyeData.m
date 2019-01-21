@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1958; %chose trial you want to look at here; default =
+currentTrial = 1964; %chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -62,7 +62,8 @@ for logN = 1:length(respFiles)
     parameters = [parameters; resp];
     parameters.trialIdx = [1:height(parameters)]';
 end
-load eventLog % variable matrix has all the even message frame indice
+save('parametersAll', 'parameters')
+load eventLog % variable matrix has all the event message frame indice
 % for later use in locating eye data frames
 cd(analysisPath);
 

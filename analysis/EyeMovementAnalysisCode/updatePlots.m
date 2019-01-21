@@ -24,8 +24,8 @@ endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this i
 stimOnset = trial.log.trialStart; % this may have to be changed depending on terminology
 stimOffset = trial.log.trialEnd;
 % range in degrees you want to plot eye position and velocity
-minPosAbs = -20;
-maxPosAbs = 20;
+minPosAbs = 0;
+maxPosAbs = 10;
 minPosX = -25;
 maxPosX = 25;
 minPosY = -25;
@@ -57,6 +57,9 @@ legend({'x pos','y pos', 'sacOn', 'sacOff', ...
 line([trial.log.fixationOff trial.log.fixationOff], [minPosAbs maxPosAbs],'Color','b','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');
 line([trial.stim_offset trial.stim_offset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');
+if ~isempty(trial.pursuit.onset)
+    line([trial.pursuit.onset trial.pursuit.onset], [minPosAbs maxPosAbs],'Color','r','LineStyle','--');
+end
 
 % velocity plot over time
 subplot(2,1,2,'replace');
@@ -76,6 +79,9 @@ plot(trial.saccades.Y.offsets,trial.eyeDY_filt(trial.saccades.Y.offsets),'c*');
 line([trial.log.fixationOff trial.log.fixationOff], [minVel maxVel],'Color','b','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minVel maxVel],'Color','k','LineStyle','--');
 line([trial.stim_offset trial.stim_offset], [minVel maxVel],'Color','k','LineStyle','--');
+if ~isempty(trial.pursuit.onset)
+    line([trial.pursuit.onset trial.pursuit.onset], [minVel maxVel],'Color','r','LineStyle','--');
+end
 
 % % absolute position plot
 % % we will have 3 plots in the bottom row, so we need to make a subplot with

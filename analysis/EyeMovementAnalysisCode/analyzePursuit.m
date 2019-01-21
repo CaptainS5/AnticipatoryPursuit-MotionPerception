@@ -120,7 +120,7 @@ endFrame = pursuitOff;
 closedLoop = startFrame:endFrame;
 % calculate gain first
 speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
-absoluteVel = trial.stimulus.absoluteVelocity;
+absoluteVel = abs(trial.stimulus.absoluteVelocity);
 idx = absoluteVel < 0.05;
 absoluteVel(idx) = NaN;
 pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);

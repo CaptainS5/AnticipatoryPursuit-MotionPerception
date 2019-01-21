@@ -18,30 +18,49 @@ function [trial, saccades] = analyzeSaccades(trial, saccades)
 % for x
 trial.saccades.X.onsets = [];
 trial.saccades.X.offsets = [];
+duringIdx = 1;
 for i = 1:length(saccades.X.onsets)
     trial.saccades.X.onsets(i,1) = saccades.X.onsets(i); % ?... why use the loop
-    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);  
+    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);
+    if trial.saccades.X.onsets(i,1)>=trial.stim_onset && trial.saccades.X.offsets(i,1)<=trial.stim_offset
+        trial.saccades.X.onsetsDuring(duringIdx, 1) = trial.saccades.X.onsets(i,1);
+        trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
+        duringIdx = duringIdx + 1;
+    end
 end
-% currently do not discriminate when removing saccade; just grab
-% the time points needed later
-trial.saccades.X.onsetsDuring = trial.saccades.X.onsets;
-trial.saccades.X.offsetsDuring = trial.saccades.X.offsets;
+if duringIdx>1 
+    trial.saccades.firstSaccadeOnset = trial.saccades.X.onsetsDuring(1, 1);
+else
+    trial.saccades.firstSaccadeOnset = [];
+    trial.saccades.X.onsetsDuring = [];
+    trial.saccades.X.offsetsDuring = [];
+end
 
 % and for y
 trial.saccades.Y.onsets = [];
 trial.saccades.Y.offsets = [];
+duringIdxY = 1;
 for i = 1:length(saccades.Y.onsets)    
     trial.saccades.Y.onsets(i,1) = saccades.Y.onsets(i);
     trial.saccades.Y.offsets(i,1) = saccades.Y.offsets(i);
+    if trial.saccades.Y.onsets(i,1)>=trial.stim_onset && trial.saccades.Y.offsets(i,1)<=trial.stim_offset
+        trial.saccades.Y.onsetsDuring(duringIdxY, 1) = trial.saccades.Y.onsets(i,1);
+        trial.saccades.Y.offsetsDuring(duringIdxY, 1) = trial.saccades.Y.offsets(i,1);
+        duringIdxY = duringIdxY + 1;
+    end
 end
-% currently do not discriminate when removing saccade; just grab
-% the time points needed later
-trial.saccades.Y.onsetsDuring = trial.saccades.Y.onsets;
-trial.saccades.Y.offsetsDuring = trial.saccades.Y.offsets;
+if duringIdxY>1
+    trial.saccades.firstSaccadeOnset = min(trial.saccades.firstSaccadeOnset, trial.saccades.Y.onsetsDuring(1, 1));
+else
+    trial.saccades.Y.onsetsDuring = [];
+    trial.saccades.Y.offsetsDuring = [];
+end
 
 % store all found on and offsets together
 trial.saccades.onsets = [trial.saccades.X.onsets; trial.saccades.Y.onsets];
 trial.saccades.offsets = [trial.saccades.X.offsets; trial.saccades.Y.offsets];
+trial.saccades.onsetsDuring = [trial.saccades.X.onsetsDuring; trial.saccades.Y.onsetsDuring];
+trial.saccades.offsetsDuring = [trial.saccades.X.offsetsDuring; trial.saccades.Y.offsetsDuring];
 
 % calculate saccade amplitudes
 % if there are no y-saccades, use x and y position of x saccades and vice
