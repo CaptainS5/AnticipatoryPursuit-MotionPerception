@@ -44,12 +44,12 @@ stimulusVelocityY = 0;
 %% analyze saccades
 [trial] = analyzeSaccades(trial, saccades);
 clear saccades;
-
- %% OPTIONAL: find and analyze pursuit
-pursuit = findPursuit(trial); 
 % remove saccades
 trial = removeSaccades(trial);
-trial.pursuit = pursuit;
+
+ %% OPTIONAL: find and analyze pursuit
+% pursuit = findPursuit(trial); 
+% trial.pursuit = pursuit;
 % % analyze pursuit
 % pursuit = analyzePursuit(trial, pursuit);
 

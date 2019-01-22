@@ -1,11 +1,11 @@
-% function transform2csv
+% function sortRawData
 % to use in R, also to generate the raw data for palamedes
 % Xiuyun Wu, 12/19/2018
 clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'tW'};
+names = {'t2'};
 data = table();
 
 %%

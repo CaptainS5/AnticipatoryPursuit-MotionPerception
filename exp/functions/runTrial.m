@@ -221,6 +221,7 @@ while frameN<=fixFrames
         if initialF==0
             [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
             initialF = 1;
+            resp.fixationOnTime(trialN, 1) = fixOnTime;
         else
             Screen('Flip', prm.screen.windowPtr);
         end
@@ -258,6 +259,7 @@ for frameN = 1:gapFrames
     end
 end
 resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
+resp.fixationOffTime(trialN, 1) = fixOffTime;
 
 % if info.eyeTracker==1
 %     Eyelink('command','clear_screen 0'); % clears the box from the Eyelink-operator screen
@@ -266,11 +268,6 @@ resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
 % end
 
 %% RDK
-if info.eyeTracker==1
-    %mark zero-plot time in data file
-    Eyelink('Message', 'SYNCTIME');
-    Eyelink('message', 'rdkOn');
-end
 
 for frameN = 1:rdkFrames
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
@@ -284,7 +281,13 @@ for frameN = 1:rdkFrames
     end
     
     if frameN==1
+        if info.eyeTracker==1
+            %mark zero-plot time in data file
+            Eyelink('Message', 'SYNCTIME');
+            Eyelink('message', 'rdkOn');
+        end
         [VBL rdkOnTime] = Screen('Flip', prm.screen.windowPtr);
+        resp.rdkOnTime(trialN, 1) = rdkOnTime;
     else
         Screen('Flip', prm.screen.windowPtr);
     end
@@ -335,11 +338,6 @@ for frameN = 1:rdkFrames
     %%
 end
 
-if info.eyeTracker==1
-    Eyelink('message', 'rdkOff');
-end
-% rdkOffsetTime = GetSecs; % here is actually the offset time
-
 % if trialType==1 % present dynamic mask if it's standard trial
     %% Mask
     % random order of the textures
@@ -354,7 +352,12 @@ end
         end
         
         if maskF==1
+            if info.eyeTracker==1
+                Eyelink('message', 'rdkOff');
+            end
+            % rdkOffsetTime = GetSecs; % here is actually the offset time
             [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+            resp.rdkOffTime(trialN, 1) = rdkOffTime;
         else
             Screen('Flip', prm.screen.windowPtr);
         end

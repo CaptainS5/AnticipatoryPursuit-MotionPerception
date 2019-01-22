@@ -52,7 +52,7 @@ plot(trial.saccades.X.offsets,trial.eyeX_filt(trial.saccades.X.offsets),'m*');
 plot(trial.saccades.Y.onsets,trial.eyeY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeY_filt(trial.saccades.Y.offsets),'c*');
 legend({'x pos','y pos', 'sacOn', 'sacOff', ...
-    'sacOn', 'sacOff'}, 'AutoUpdate','off','Location','NorthWest');
+    'sacOn', 'sacOff'});%, 'AutoUpdate','off','Location','NorthWest');
 % vertical lines indicate events/target onsets
 line([trial.log.fixationOff trial.log.fixationOff], [minPosAbs maxPosAbs],'Color','b','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');

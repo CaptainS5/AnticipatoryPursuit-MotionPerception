@@ -6,7 +6,7 @@ clear all; close all; clc
 names = {'tW'};
 cd ..
 analysisPath = pwd;
-dataPath = {'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'};
+dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
 sampleRate = 1000;
@@ -26,19 +26,19 @@ microSaccadeThreshold = 5;
 %% Perceptual trials
 
 for subN = 1:length(names)
-    currentSsubject = names{subN};
+    currentSubject = names{subN};
     cd(dataPath)
-    cd(currentSsubject)
+    cd(currentSubject)
     currentSubjectPath = pwd;
     eyeFiles = dir('*.asc');
     load('parametersAll')
     load eventLog
     cd(analysisPath)
-    errors = load(['Errorfiles\Sub_' currentSsubject '_errorFile.mat']);
+    errors = load(['Errorfiles\Sub_' currentSubject '_errorFile.mat']);
     
     for currentTrial = 1:size(parameters, 1)
         eyeTrialData.sub(subN, currentTrial) = subN;
-        eyeTrialData.trial(subN, currentTrial) = currentTrial;
+        eyeTrialData.trialIdx(subN, currentTrial) = currentTrial;
         eyeTrialData.trialType(subN, currentTrial) = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
         eyeTrialData.prob(subN, currentTrial) = parameters.prob(currentTrial, 1); % n%
         eyeTrialData.rdkDir(subN, currentTrial) = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
@@ -48,23 +48,24 @@ for subN = 1:length(names)
         
         analyzeTrial;
         
-        eyeTrialData.stim.onset(subN, currentTrial) = trial.stim_onset;
-        eyeTrialData.stim.reversalOnset(subN, currentTrial) = trial.stim_reversalOnset;
-        eyeTrialData.stim.reversalOffset(subN, currentTrial) = trial.stim_reversalOffset;
-        eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
-        eyeTrialData.stim.beforeFrames(subN, currentTrial) = trial.stim_reversalOnset-trial.stim_onset; % for later alignment of velocity traces
-        eyeTrialData.stim.afterFrames(subN, currentTrial) = trial.stim_offset-trial.stim_reversalOffset+1; % for later alignment of velocity traces
-        eyeTrialData.frameLog.startFrame(subN, currentTrial) = trial.startFrame;
-        eyeTrialData.frameLog.endFrame(subN, currentTrial) = trial.endFrame;
-        eyeTrialData.frameLog.length(subN, currentTrial) = trial.length;
-        eyeTrialData.frameLog.lostXframes{subN, currentTrial} = trial.lostXframes;
-        eyeTrialData.frameLog.lostYframes{subN, currentTrial} = trial.lostYframes;
-        eyeTrialData.frameLog.lostTframes{subN, currentTrial} = trial.lostTframes;
-        eyeTrialData.frameLog.quickphaseFrames{subN, currentTrial} = trial.quickphaseFrames;
-        eyeTrialData.saccades{subN, currentTrial} = trial.saccades;
-        eyeTrialData.frames{subN, currentTrial} = trial.frames;
+        eyeTrialData.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
+        eyeTrialData.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
+        eyeTrialData.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
+        eyeTrialData.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
+% %         eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
+% %         eyeTrialData.stim.beforeFrames(subN, currentTrial) = trial.stim_reversalOnset-trial.stim_onset; % for later alignment of velocity traces
+% %         eyeTrialData.stim.afterFrames(subN, currentTrial) = trial.stim_offset-trial.stim_reversalOffset+1; % for later alignment of velocity traces
+% %         eyeTrialData.frameLog.startFrame(subN, currentTrial) = trial.log.trialStart;
+% %         eyeTrialData.frameLog.endFrame(subN, currentTrial) = trial.log.trialEnd;
+%         eyeTrialData.frameLog.length(subN, currentTrial) = trial.log.trialEnd;
+% %         eyeTrialData.frameLog.lostXframes{subN, currentTrial} = trial.lostXframes;
+% %         eyeTrialData.frameLog.lostYframes{subN, currentTrial} = trial.lostYframes;
+% %         eyeTrialData.frameLog.lostTframes{subN, currentTrial} = trial.lostTframes;
+% %         eyeTrialData.frameLog.quickphaseFrames{subN, currentTrial} = trial.quickphaseFrames;
+%         eyeTrialData.saccades{subN, currentTrial} = trial.saccades;
+        eyeTrialData.trial{subN, currentTrial} = trial;
         
     end
 end
-cd([analysisPath '\analysis functions'])
+cd([analysisPath '\analysis'])
 save(['eyeDataAll.mat'], 'eyeTrialData');
