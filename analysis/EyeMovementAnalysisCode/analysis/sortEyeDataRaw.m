@@ -1,12 +1,14 @@
 % Xiuyun Wu, 01/14/2019
 % getting the raw processed eye data... will be much more convenient for
 % later analysis; from fixation onset to rdk offset
+% run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'tW'};
+names = {'t2'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
+% dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data';
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
 sampleRate = 1000;
@@ -68,4 +70,4 @@ for subN = 1:length(names)
     end
 end
 cd([analysisPath '\analysis'])
-save(['eyeDataAll.mat'], 'eyeTrialData');
+save(['eyeData_t2.mat'], 'eyeTrialData');

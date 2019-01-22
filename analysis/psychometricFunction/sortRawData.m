@@ -18,6 +18,16 @@ for sub = 1:size(names, 2)
     cd(['data\', names{sub}])
     % get the filenames to load
     fileResp = dir('response*.mat');
+    % combine all response files for later use in eye data analysis
+    parameters = [];
+    for logN = 1:length(fileResp)
+        load(fileResp(logN).name)
+        parameters = [parameters; resp];
+        parameters.trialIdx = [1:height(parameters)]';
+    end
+    save('parametersAll', 'parameters')
+    
+    % sort perceptual data
     fileResp = struct2cell(fileResp);
     % load raw data into dataRaw
     dataRaw = table();

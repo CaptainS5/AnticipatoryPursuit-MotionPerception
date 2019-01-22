@@ -48,8 +48,8 @@ clear saccades;
 trial = removeSaccades(trial);
 
  %% OPTIONAL: find and analyze pursuit
-% pursuit = findPursuit(trial); 
-% trial.pursuit = pursuit;
+pursuit = findPursuit(trial); 
+trial.pursuit = pursuit;
 % % analyze pursuit
 % pursuit = analyzePursuit(trial, pursuit);
 

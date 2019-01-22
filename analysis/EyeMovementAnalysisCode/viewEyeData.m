@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1964; %chose trial you want to look at here; default =
+currentTrial = 329; %chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -54,15 +54,7 @@ cd(currentSubjectPath);
 numTrials = length(dir('*.asc'));
 eyeFiles = dir('*.asc');
 % load mat file containing experimental info
-% combine all response files
-respFiles = dir('response*.mat');
-parameters = [];
-for logN = 1:length(respFiles)
-    load(respFiles(logN).name)
-    parameters = [parameters; resp];
-    parameters.trialIdx = [1:height(parameters)]';
-end
-save('parametersAll', 'parameters')
+load parametersAll
 load eventLog % variable matrix has all the event message frame indice
 % for later use in locating eye data frames
 cd(analysisPath);
@@ -76,7 +68,6 @@ if exist(errorFilePath, 'dir') == 0
   mkdir(errorFilePath);
 end
 errorFileName = [errorFilePath 'Sub_' currentSubject '_errorFile.mat'];
-
 try
     load(errorFileName);
     disp('Error file loaded');
