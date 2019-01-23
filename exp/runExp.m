@@ -1,16 +1,17 @@
 % function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; 
-% initialize exp info here: (subID--longest 2 letters--can be set in getInfo, or in GUI)
-% currentBlock: now it runs one block at a time
+% initialize exp info here: (subID--longest 2 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
+% currentBlock: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
 % currentTrial: can start with any trial number you like (in case being terminated before finishing the whole block), from 1-682
-% prob: 50, 70, or 90 for experiment; enter 0 for the practice block (practiceList), -1
-% for testList
+% prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
-% eyeType: 1-pursuit, 0-fixation (not implemented yet)
-currentBlock=3; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; % for debugging
-% to use transparent/brownian motion, see line 329-335 in runTrial.m
-% change other parameters in setParameters
+% eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
+currentBlock=3; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; 
+
+% to use transparent/brownian motion, change line 332-339 in runTrial.m
+% change other parameters in setParameters.m
 % may need to change screen id in line 12 in openScreen.m
+
 try
     global prm list resp info dots demoN imgDemo
     % prm--parameters, mostly defined in setParameters

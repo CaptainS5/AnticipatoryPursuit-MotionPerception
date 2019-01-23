@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 683; %chose trial you want to look at here; default =
+currentTrial = 1659; %chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -30,7 +30,7 @@ screenSizeX = 39.7;
 screenSizeY = 29.5;
 screenResX = 1600; 
 screenResY = 1200;
-distance = 57;
+distance = 55;
 % saccade algorithm threshold --> depends on your stimulus speed and
 % expected saccade size
 % note that this threshold is hard-coded! If you want to test different

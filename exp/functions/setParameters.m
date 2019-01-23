@@ -8,11 +8,11 @@ global prm
 
 % physical parameters, in cm
 prm.screen.viewDistance = 55; % 57.29 cm corresponds to 1cm on screen as 1 dva
-prm.screen.monitorWidth = 39.7; % horizontal dimension of viewable screen (cm)
-% 29.4 for the laptop; 36 for the torsion monitor in X717; 39.7 for
+prm.screen.monitorWidth = 39.6; % horizontal dimension of viewable screen (cm)
+% 29.4 for the laptop; 36 for the torsion monitor in X717; 39.6 for
 % the backroom monitor in X715; 38.4 for ASUS
-prm.screen.monitorHeight = 29.5;
-% 16.5 for the laptop; 27.1 for the torsion monitor in X717; 29.5 for
+prm.screen.monitorHeight = 29.7;
+% 16.5 for the laptop; 27.1 for the torsion monitor in X717; 29.7 for
 % the backroom monitor in X715; 21.6 for ASUS
 
 % display settings

@@ -329,7 +329,8 @@ for frameN = 1:rdkFrames
     % move dots in the aperture from the opposite edge, continue the assigned motion
     dots.position{frameN+1, trialN}(outDots, :) = -dots.position{frameN+1, trialN}(outDots, :)+dots.movementNextFrame{frameN, trialN}(outDots, :);    
     
-    %% add these lines for Brownian motion, update labels and directions for all dots
+    %% default is transparent motion; add these lines for Brownian motion
+    % update labels and directions for all dots
     dots.label{frameN+1, trialN} = dots.label{frameN, trialN}; % initialize new labels
     labelOrder = randperm(size(dots.label{frameN+1, trialN}, 1));
     dots.label{frameN+1, trialN}(:, 1) = dots.label{frameN+1, trialN}(labelOrder, 1); % randomly assign new labels
