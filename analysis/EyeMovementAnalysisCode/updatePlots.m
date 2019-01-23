@@ -24,8 +24,8 @@ endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this i
 stimOnset = trial.log.trialStart; % this may have to be changed depending on terminology
 stimOffset = trial.log.trialEnd;
 % range in degrees you want to plot eye position and velocity
-minPosAbs = 0;
-maxPosAbs = 10;
+minPosAbs = -15;
+maxPosAbs = 15;
 minPosX = -25;
 maxPosX = 25;
 minPosY = -25;
@@ -52,7 +52,7 @@ plot(trial.saccades.X.offsets,trial.eyeX_filt(trial.saccades.X.offsets),'m*');
 plot(trial.saccades.Y.onsets,trial.eyeY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeY_filt(trial.saccades.Y.offsets),'c*');
 legend({'x pos','y pos', 'sacOn', 'sacOff', ...
-    'sacOn', 'sacOff'});%, 'AutoUpdate','off','Location','NorthWest');
+    'sacOn', 'sacOff'},'Location','NorthWest');%, 'AutoUpdate','off');
 % vertical lines indicate events/target onsets
 line([trial.log.fixationOff trial.log.fixationOff], [minPosAbs maxPosAbs],'Color','b','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');

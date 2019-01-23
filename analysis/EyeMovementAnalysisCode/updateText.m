@@ -48,6 +48,7 @@ if trial.log.trialType==0
 else
     trialType = 's';
 end
+
 if trial.log.coh<0
     direction = 'L';
 elseif trial.log.coh>0
@@ -55,6 +56,7 @@ elseif trial.log.coh>0
 else
     direction = 'N';
 end
+
 if trial.log.choice==0
     choice = 'L';
 elseif trial.log.choice==1
@@ -62,6 +64,7 @@ elseif trial.log.choice==1
 else
     choice = 'N';
 end
+
 trialNoText = uicontrol(fig,'Style','text',...
     'String', ['Trial type: ' trialType ' (' direction ', choice ', choice, ')'],...
     'Position',[xPosition yPosition-textblock*verticalDistance width height+5],...

@@ -5,12 +5,13 @@ names = {'tW'};
 sampleRate = 1000;
 % for plotting
 minVel = -1;
-maxVel = 10;
+maxVel = 12;
 folder = pwd;
 
 cd(folder)
-load('eyeDataAll.mat');
+load('eyeData_tW.mat');
 probCons = unique(eyeTrialData.prob);
+colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 % align fixation offset,
 % separate perceptual and standard trials
@@ -30,12 +31,12 @@ for subN = 1:size(names, 2)
         % use interpolate points for a better velocity trace
         for validTrialN = 1:lengthF
             endI = eyeTrialData.frameLog.rdkOff(subN, validI(validTrialN));
-            if endI>frameLength
-                startI = endI-frameLength+1;
+            if endI>frameLength(subN)
+                startI = endI-frameLength(subN)+1;
                 startIF = 1;
             else
                 startI = eyeTrialData.frameLog.fixationOn(subN, validI(validTrialN));
-                startIF = frameLength-endI+1;
+                startIF = frameLength(subN)-endI+1;
             end
             frames{subN, probN}.firstStandard(validTrialN, startIF:end) = eyeTrialData.trial{subN, validI(validTrialN)}.DX_interpolSac(startI:endI);
         end
@@ -43,12 +44,12 @@ for subN = 1:size(names, 2)
         % last half standard trials
         for validTrialN = 1:lengthL
             endI = eyeTrialData.frameLog.rdkOff(subN, validI(validTrialN+lengthF));
-            if endI>frameLength
-                startI = endI-frameLength+1;
+            if endI>frameLength(subN)
+                startI = endI-frameLength(subN)+1;
                 startIF = 1;
             else
                 startI = eyeTrialData.frameLog.fixationOn(subN, validI(validTrialN+lengthF));
-                startIF = frameLength-endI+1;
+                startIF = frameLength(subN)-endI+1;
             end
             frames{subN, probN}.lastStandard(validTrialN, startIF:end) = eyeTrialData.trial{subN, validI(validTrialN+lengthF)}.DX_interpolSac(startI:endI);
         end
@@ -65,12 +66,12 @@ for subN = 1:size(names, 2)
         % use interpolate points for a better velocity trace
         for validTrialN = 1:lengthF
             endI = eyeTrialData.frameLog.rdkOff(subN, validI(validTrialN));
-            if endI>frameLength
-                startI = endI-frameLength+1;
+            if endI>frameLength(subN)
+                startI = endI-frameLength(subN)+1;
                 startIF = 1;
             else
                 startI = eyeTrialData.frameLog.fixationOn(subN, validI(validTrialN));
-                startIF = frameLength-endI+1;
+                startIF = frameLength(subN)-endI+1;
             end
             frames{subN, probN}.firstPerceptual(validTrialN, startIF:end) = eyeTrialData.trial{subN, validI(validTrialN)}.DX_interpolSac(startI:endI);
         end
@@ -78,12 +79,12 @@ for subN = 1:size(names, 2)
         % last half standard trials
         for validTrialN = 1:lengthL
             endI = eyeTrialData.frameLog.rdkOff(subN, validI(validTrialN+lengthF));
-            if endI>frameLength
-                startI = endI-frameLength+1;
+            if endI>frameLength(subN)
+                startI = endI-frameLength(subN)+1;
                 startIF = 1;
             else
                 startI = eyeTrialData.frameLog.fixationOn(subN, validI(validTrialN+lengthF));
-                startIF = frameLength-endI+1;
+                startIF = frameLength(subN)-endI+1;
             end
             frames{subN, probN}.lastPerceptual(validTrialN, startIF:end) = eyeTrialData.trial{subN, validI(validTrialN+lengthF)}.DX_interpolSac(startI:endI);
         end
@@ -134,6 +135,7 @@ for probN = 1:size(probCons, 2)
 %     xlabel('Time (ms)')
 %     ylabel('Horizontal velocity (deg/s)')
 %     ylim([-2 12])
+
 figure
     plot(timePoints, velMean{probN}.firstStandard, 'k--')
     hold on
@@ -146,16 +148,15 @@ figure
     xlabel('Time (ms)')
     ylabel('Horizontal velocity (deg/s)')
     ylim([minVel maxVel])
-    saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_rightwardTrials.pdf'])
+    saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_rightwardTrials_', names{subN}, '.pdf'])
 end
 
-color = [255 0 0; 0 255 0; 0 0 255]/255;
 figure % plot mean traces in all probabilities, just a rough check...
 subplot(2, 1, 1)
  for probN = 1:size(probCons, 2)
-     plot(timePoints, velMean{probN}.firstStandard, '--', 'color', color(probN, :))
+     plot(timePoints, velMean{probN}.firstStandard, '--', 'color', colorPlotting(probN, :))
      hold on
-     p{probN} = plot(timePoints, velMean{probN}.lastStandard, '-', 'color', color(probN, :))
+     p{probN} = plot(timePoints, velMean{probN}.lastStandard, '-', 'color', colorPlotting(probN, :))
  end
  line([-300 -300], [minVel maxVel],'Color','m','LineStyle','--')
  legend([p{1}, p{2}, p{3}], {'50', '70', '90'}, 'Location', 'NorthWest')
@@ -166,9 +167,9 @@ subplot(2, 1, 1)
  
  subplot(2, 1, 2)
  for probN = 1:size(probCons, 2)
-     plot(timePoints, velMean{probN}.firstPerceptual, '--', 'color', color(probN, :))
+     plot(timePoints, velMean{probN}.firstPerceptual, '--', 'color', colorPlotting(probN, :))
      hold on
-     p{probN} = plot(timePoints, velMean{probN}.lastPerceptual, '-', 'color', color(probN, :))
+     p{probN} = plot(timePoints, velMean{probN}.lastPerceptual, '-', 'color', colorPlotting(probN, :))
  end
  line([-300 -300], [minVel maxVel],'Color','m','LineStyle','--')
  legend([p{1}, p{2}, p{3}], {'50', '70', '90'}, 'Location', 'NorthWest')
@@ -176,9 +177,9 @@ subplot(2, 1, 1)
  xlabel('Time (ms)')
  ylabel('Horizontal velocity (deg/s)')
  ylim([minVel maxVel])
- saveas(gca, 'rightwardTrials_velocity.pdf')
- 
-% for probN = 1:size(probCons, 2)
+ saveas(gca, ['rightwardTrials_velocity_', names{subN}, '.pdf'])
+
+ % for probN = 1:size(probCons, 2)
 %     subplot(3, 1, probN)
 %     % filtered mean velocity trace
 %     plot(timePoints, velMean{probN}.firstStandard, 'k--')

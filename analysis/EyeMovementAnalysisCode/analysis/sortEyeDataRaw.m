@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'t2'};
+names = {'tW'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
@@ -14,9 +14,9 @@ trialPerCon = 26; % for each coherence level in each direction
 sampleRate = 1000;
 screenSizeX = 39.7;
 screenSizeY = 29.5;
-screenResX = 1280;
-screenResY = 1024;
-distance = 57; % 55 for later experiments
+screenResX = 1600;
+screenResY = 1200;
+distance = 57.29; % 55 for later experiments
 % saccade algorithm threshold --> depends on your stimulus speed and
 % expected saccade size
 % note that this threshold is hard-coded! If you want to test different
@@ -70,4 +70,4 @@ for subN = 1:length(names)
     end
 end
 cd([analysisPath '\analysis'])
-save(['eyeData_t2.mat'], 'eyeTrialData');
+save(['eyeData_tW.mat'], 'eyeTrialData');
