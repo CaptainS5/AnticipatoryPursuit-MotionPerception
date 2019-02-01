@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'tW'};
+names = {'tA'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
@@ -16,7 +16,7 @@ screenSizeX = 39.7;
 screenSizeY = 29.5;
 screenResX = 1600;
 screenResY = 1200;
-distance = 57.29; % 55 for later experiments
+distance = 55; % 57.29 for tW
 % saccade algorithm threshold --> depends on your stimulus speed and
 % expected saccade size
 % note that this threshold is hard-coded! If you want to test different
@@ -68,6 +68,6 @@ for subN = 1:length(names)
         eyeTrialData.trial{subN, currentTrial} = trial;
         
     end
-end
 cd([analysisPath '\analysis'])
-save(['eyeData_tW.mat'], 'eyeTrialData');
+save(['eyeData_', names{subN}, '.mat'], 'eyeTrialData');
+end

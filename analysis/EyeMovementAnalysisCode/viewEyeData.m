@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1659; %chose trial you want to look at here; default =
+currentTrial = 761; %1659-t2; %chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -150,11 +150,11 @@ end
     
 % end
 %% OPTION ADJUST SACCADES
-% we have an implementation for adjusting/manually adding saccades. for
-% many experiments this won't be necessary. If you notice many undetected
-% saccades even after lowering the saccade threshold you can think about
-% adding this part. Requires the functions adjust.m, bselection.m, and
-% changeOnset.m
+% % we have an implementation for adjusting/manually adding saccades. for
+% % many experiments this won't be necessary. If you notice many undetected
+% % saccades even after lowering the saccade threshold you can think about
+% % adding this part. Requires the functions adjust.m, bselection.m, and
+% % changeOnset.m
 % adjustedSacs={}; 
 % adjust; 
 % 

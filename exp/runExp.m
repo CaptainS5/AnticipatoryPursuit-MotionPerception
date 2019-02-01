@@ -6,7 +6,7 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=3; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; 
+currentBlock=3; currentTrial = 1; prob = 70; eyeTracker=1; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
@@ -28,7 +28,7 @@ try
     setParameters;
     cd ..
     
-    cd('data\')
+    cd('data\') 
     prm.resultPath = pwd;
     cd ..
     cd('exp\')
@@ -37,7 +37,11 @@ try
     info = getInfo(currentBlock, currentTrial, eyeType, prob, eyeTracker);
     
     % creating saving path and filenames
-    prm.fileName.folder = [prm.resultPath, '\', info.subID{1}];
+    if currentBlock==0 % pracrice block, save in the practive folder
+        prm.fileName.folder = [prm.resultPath, '\', info.subID{1}, '\practice'];
+    else
+        prm.fileName.folder = [prm.resultPath, '\', info.subID{1}];
+    end
     mkdir(prm.fileName.folder)
     % save info for the current block
     save([prm.fileName.folder, '\Info', num2str(currentBlock), '_', info.fileNameTime], 'info')

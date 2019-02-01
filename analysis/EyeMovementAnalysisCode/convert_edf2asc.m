@@ -25,7 +25,7 @@ currentSubject = {};
 
 %% STEP 2
 % Loop over all subjects and convert
-for i = 3:length(folderNames) % we are starting at 3 because matlab always has 2 empty entries for the dir command
+for i = 4:4%3:length(folderNames) % we are starting at 3 because matlab always has 2 empty entries for the dir command
     % define current subject/folder
     currentSubject{i-2} = folderNames(i).name;        
     currentFolder = [dataPath currentSubject{i-2}];
