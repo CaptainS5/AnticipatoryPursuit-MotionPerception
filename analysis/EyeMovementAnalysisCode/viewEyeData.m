@@ -12,7 +12,7 @@
 %               VPOM students
 % for questions email jolande.fooken@rwth-aachen.de
 
-clear all; clc
+clear all; %clc
 %% open a new figure
 % (size depends on your current screen size) 
 name = 'click through eye movement data';
