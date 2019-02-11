@@ -1,6 +1,6 @@
 function [key rt] = runTrial(blockN, trialN)
 
-global prm info resp list dots demoN imgDemo
+global prm info resp list demoN imgDemo
 
 % Initialization
 % fill the background
@@ -44,15 +44,15 @@ dots.diameterX = dots.diameterX*2;
 
 % Postion dots in a circular aperture using distanceToCenter and
 % positionTheta
-dots.distanceToCenterX{1, trialN} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
+dots.distanceToCenterX{1} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
 % dots.distanceToCenterX{1, trialN}(dots.distanceToCenterX{1, trialN}-dots.diameterX/2>=0, :) = dots.distanceToCenterX{1, trialN}-dots.diameterX/2; % make sure that dots do not overlap outer border
-% previously was dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0); 
+% previously was dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0);
 % just use the aperture...
 theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
-dots.positionTheta{1, trialN} = [cos(theta) sin(theta)];  % values between -1 and 1
-dots.position{1, trialN} = dots.positionTheta{1, trialN} .* [dots.distanceToCenterX{1, trialN} dots.distanceToCenterX{1, trialN}*prm.screen.pixelRatioWidthPerHeight];
+dots.positionTheta{1} = [cos(theta) sin(theta)];  % values between -1 and 1
+dots.position{1} = dots.positionTheta{1} .* [dots.distanceToCenterX{1} dots.distanceToCenterX{1}*prm.screen.pixelRatioWidthPerHeight];
 % initialize dot presentation time
-dots.showTime{1, trialN} = round(rand(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
+dots.showTime{1} = round(rand(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
 
 % dots movement distance in each frame, depends on coherence, updated
 % later in each frame
@@ -63,27 +63,66 @@ targetDotsN = round(coh*prm.rdk.dotNumber); % number of dots should be moving co
 % noise dots; noise dots moving in a new random direction after
 % reappearance,
 % while target dots always have the same moveTheta
-dots.label{1, trialN} = [ones(targetDotsN, 1); zeros(prm.rdk.dotNumber-targetDotsN, 1)]; % target = 1, noise = 0
+dots.label{1} = [ones(targetDotsN, 1); zeros(prm.rdk.dotNumber-targetDotsN, 1)]; % target = 1, noise = 0
 moveTheta(1:targetDotsN, 1) = 0; % assign the signal dots to be coherently moving rightwards
 moveTheta = [cos(moveTheta) sin(moveTheta)];
 % to use Brownian motion, dots.label is updated later in each frame
 
 [moveDistance, ] = dva2pxl(prm.rdk.speed, prm.rdk.speed);
 moveDistance = repmat(moveDistance, prm.rdk.dotNumber, 1);
-dots.movementNextFrame{1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+dots.movementNextFrame{1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+
+% generate the dot matrices of the RDK for the whole trial
+for frameN = 1:rdkFrames
+    % set up dot position to present in the next frame(dots.position{frameN+1, trialN}),
+    % which will be current position(dots.position{frameN, trialN}) plus
+    % movement in this frame(dots.movementNextFrame{frameN, trialN})
+    % Update positions
+    dots.position{frameN+1} = dots.position{frameN} + dots.movementNextFrame{frameN};
+    % Update lifetime
+    dots.showTime{frameN+1} = dots.showTime{frameN}-1;
+    % still needs to replace expired dots and move dots out of the aperture into the aperture again, from the opposite edge
+    
+    % first initialize the new parameters to use for next frame
+    dots.distanceToCenterX{frameN+1} = dots.distanceToCenterX{frameN}; % for new random positions
+    dots.movementNextFrame{frameN+1} = dots.movementNextFrame{frameN}; % for new moving directions
+    % new random position angle
+    theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
+    dots.positionTheta{frameN+1} = [cos(theta) sin(theta)];  % values between -1 and 1
+    % new random movement direction
+    moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, the horizontal right
+    moveTheta = [cos(moveTheta) sin(moveTheta)];
+    
+    % Replace dots with expired lifetime
+    expiredDots = find(dots.showTime{frameN+1}' <= 0);
+    dots.distanceToCenterX{frameN+1}(expiredDots) = apertureRadiusX * sqrt((rand(length(expiredDots),1)));
+    % generate new positions and update lifetime
+    dots.position{frameN+1}(expiredDots, :) = dots.positionTheta{frameN+1}(expiredDots, :) .* [dots.distanceToCenterX{frameN+1}(expiredDots) dots.distanceToCenterX{frameN+1}(expiredDots)*prm.screen.pixelRatioWidthPerHeight];
+    dots.showTime{frameN+1}(expiredDots) = round(sec2frm(prm.rdk.lifeTime));
+    % transparent motion,  update new direction only for expired noise dots
+    expiredNoiseDots = find(dots.label{1}==0 & dots.showTime{frameN+1}' <= 0); % noise dots expired
+    if expiredNoiseDots
+        dots.movementNextFrame{frameN+1}(expiredNoiseDots, :) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistance(expiredNoiseDots) moveDistance(expiredNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
+    end
+    
+    % Relocate dots out of the aperture
+    dotDist = dots.position{frameN+1}(:, 1).^2 + (dots.position{frameN+1}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
+    outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
+    % move dots in the aperture from the opposite edge, continue the assigned motion
+    dots.position{frameN+1}(outDots, :) = -dots.position{frameN+1}(outDots, :)+dots.movementNextFrame{frameN}(outDots, :);
+    
+    %% default is transparent motion; add these lines for Brownian motion
+    % update labels and directions for all dots
+    dots.label{frameN+1} = dots.label{frameN}; % initialize new labels
+    labelOrder = randperm(size(dots.label{frameN+1}, 1));
+    dots.label{frameN+1}(:, 1) = dots.label{frameN+1}(labelOrder, 1); % randomly assign new labels
+    moveTheta(dots.label{frameN+1}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
+    dots.movementNextFrame{frameN+1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+end
 
 % set up mask
 maskFrameN = round(sec2frm(prm.mask.duration));
 resp.maskFrameN(trialN, 1) = maskFrameN;
-
-% % Make an aperture
-% Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
-% apertureRect = [prm.screen.center(1)-apertureRadiusX,...
-%     prm.screen.center(2)-apertureRadiusY,...
-%     prm.screen.center(1)+apertureRadiusX,...
-%     prm.screen.center(2)+apertureRadiusY];
-% aperture = Screen('OpenOffscreenwindow', prm.screen.windowPtr, prm.screen.backgroundColour, prm.screen.size);
-% Screen('FillOval', aperture, prm.screen.backgroundColour, apertureRect);
 
 % set up eye position tolerance spatial windows
 % tolerance of fixation
@@ -164,11 +203,11 @@ while frameN<=fixFrames
                 % if data is valid, compare gaze position with the limits of the tolerance window
                 diffFix = sqrt((xeye-prm.screen.center(1))^2+((yeye-prm.screen.center(2))/prm.screen.pixelRatioWidthPerHeight)^2);
                 if diffFix <= fixRangeRadiusX % fixation ok
-                    if trialType==1
+%                     if trialType==1
                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.stdColour, rectFixDot);
-                    elseif trialType==0
-                        Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
-                    end
+%                     elseif trialType==0
+%                         Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
+%                     end
                 elseif diffFix > fixRangeRadiusX % fixation out of range, show warning
                     Snd('Play', prm.beep.sound, prm.beep.samplingRate, 16);
                     % Plays the sound in case of wrong fixation
@@ -209,11 +248,11 @@ while frameN<=fixFrames
             StopCommand = 1;
         end % if sample available
     else
-        if trialType==1
+%         if trialType==1
             Screen('FillOval', prm.screen.windowPtr, prm.fixation.stdColour, rectFixDot);
-        elseif trialType==0
-            Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
-        end
+%         elseif trialType==0
+%             Screen('FillOval', prm.screen.windowPtr, prm.fixation.testColour, rectFixDot);
+%         end
         if demoN > 0
             imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
             demoN = demoN + 1;
@@ -272,7 +311,7 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 for frameN = 1:rdkFrames
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
-    Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position{frameN, trialN}),...
+    Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position{frameN}),...
         dots.diameterX, prm.rdk.colour, prm.screen.center, 1);  % change 1 to 0 to draw square dots
     Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
     if demoN > 0
@@ -291,117 +330,71 @@ for frameN = 1:rdkFrames
     else
         Screen('Flip', prm.screen.windowPtr);
     end
-
-    % set up dot position to present in the next frame(dots.position{frameN+1, trialN}), 
-    % which will be current position(dots.position{frameN, trialN}) plus 
-    % movement in this frame(dots.movementNextFrame{frameN, trialN})
-    % Update positions
-    dots.position{frameN+1, trialN} = dots.position{frameN, trialN} + dots.movementNextFrame{frameN, trialN};
-    % Update lifetime
-    dots.showTime{frameN+1, trialN} = dots.showTime{frameN, trialN}-1;
-    % still needs to replace expired dots and move dots out of the aperture into the aperture again, from the opposite edge   
-    
-    % first initialize the new parameters to use for next frame
-    dots.distanceToCenterX{frameN+1, trialN} = dots.distanceToCenterX{frameN, trialN}; % for new random positions
-    dots.movementNextFrame{frameN+1, trialN} = dots.movementNextFrame{frameN, trialN}; % for new moving directions
-    % new random position angle
-    theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
-    dots.positionTheta{frameN+1, trialN} = [cos(theta) sin(theta)];  % values between -1 and 1
-    % new random movement direction
-    moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, the horizontal right
-    moveTheta = [cos(moveTheta) sin(moveTheta)];   
-    
-    % Replace dots with expired lifetime
-    expiredDots = find(dots.showTime{frameN+1, trialN} <= 0);
-    dots.distanceToCenterX{frameN+1, trialN}(expiredDots) = apertureRadiusX * sqrt((rand(length(expiredDots),1)));
-    % generate new positions and update lifetime
-    dots.position{frameN+1, trialN}(expiredDots, :) = dots.positionTheta{frameN+1, trialN}(expiredDots, :) .* [dots.distanceToCenterX{frameN+1, trialN}(expiredDots) dots.distanceToCenterX{frameN+1, trialN}(expiredDots)*prm.screen.pixelRatioWidthPerHeight];
-    dots.showTime{frameN+1, trialN}(expiredDots) = round(sec2frm(prm.rdk.lifeTime));
-    % transparent motion,  update new direction only for expired noise dots
-    expiredNoiseDots = find(dots.label{1, trialN}==0 & dots.showTime{frameN+1, trialN} <= 0); % noise dots expired
-    if expiredNoiseDots
-        dots.movementNextFrame{frameN+1, trialN}(expiredNoiseDots, :) = moveTheta(expiredNoiseDots)/prm.screen.refreshRate.*[moveDistance(expiredNoiseDots) moveDistance(expiredNoiseDots)*prm.screen.pixelRatioWidthPerHeight]; % new random direction for noise dots
-    end
-    
-    % Relocate dots out of the aperture
-    dotDist = dots.position{frameN+1, trialN}(:, 1).^2 + (dots.position{frameN+1, trialN}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
-    outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
-    % move dots in the aperture from the opposite edge, continue the assigned motion
-    dots.position{frameN+1, trialN}(outDots, :) = -dots.position{frameN+1, trialN}(outDots, :)+dots.movementNextFrame{frameN, trialN}(outDots, :);    
-    
-    %% default is transparent motion; add these lines for Brownian motion
-    % update labels and directions for all dots
-    dots.label{frameN+1, trialN} = dots.label{frameN, trialN}; % initialize new labels
-    labelOrder = randperm(size(dots.label{frameN+1, trialN}, 1));
-    dots.label{frameN+1, trialN}(:, 1) = dots.label{frameN+1, trialN}(labelOrder, 1); % randomly assign new labels
-    moveTheta(dots.label{frameN+1, trialN}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
-    dots.movementNextFrame{frameN+1, trialN} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
-    %%
 end
 
 % if trialType==1 % present dynamic mask if it's standard trial
-    %% Mask
-    % random order of the textures
-    maskIdx = randperm(maskFrameN);
-    for maskF = 1:maskFrameN
-        Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
-        Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
-        
-        if demoN > 0
-            imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
-            demoN = demoN + 1;
-        end
-        
-        if maskF==1
-            if info.eyeTracker==1
-                Eyelink('message', 'rdkOff');
-            end
-            % rdkOffsetTime = GetSecs; % here is actually the offset time
-            [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
-            resp.rdkOffTime(trialN, 1) = rdkOffTime;
-        else
-            Screen('Flip', prm.screen.windowPtr);
-        end
+%% Mask
+% random order of the textures
+maskIdx = randperm(maskFrameN);
+for maskF = 1:maskFrameN
+    Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
+    Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
+    
+    if demoN > 0
+        imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+        demoN = demoN + 1;
     end
     
-if trialType==0 % record response in test trials
-    %% Response
-    while KbCheck; end % Wait until all keys are released
-    % response instruction
-    %     textResp = ['LEFT or RIGHT?'];
-    %     Screen('TextSize', prm.screen.windowPtr, 55);
-    textResp = ['?'];
-    Screen('TextSize', prm.screen.windowPtr, prm.textSize);
-    DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen.blackColour);
-    
-    [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
-    
-    % record response, won't continue until a response is recorded
-    recordFlag=0;
-    startSecs = GetSecs;
-    while recordFlag==0
-        %% button response
-        [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
-        if keyIsDown
-            key = KbName(keyCode);
-            % wait until the valid keys are pressed
-            if strcmp(key, prm.leftKey) || strcmp(key, prm.rightKey) || strcmp(key, prm.stopKey)
-                rt = secs-rdkOffTime;
-                recordFlag = 1;
-            else % invalid key
-                % feedback on the screen
-                respText = 'Invalid Key \n Press again';
-                DrawFormattedText(prm.screen.windowPtr, respText,...
-                    'center', 'center', prm.textColour);
-                Screen('Flip', prm.screen.windowPtr);
-                clear KbCheck
-            end
+    if maskF==1
+        if info.eyeTracker==1
+            Eyelink('message', 'rdkOff');
         end
-        %% end of button response
+        % rdkOffsetTime = GetSecs; % here is actually the offset time
+        [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+        resp.rdkOffTime(trialN, 1) = rdkOffTime;
+    else
+        Screen('Flip', prm.screen.windowPtr);
     end
-else % standard trials
-    key = 'std'; rt = 0;
 end
+
+% if trialType==0 % record response in test trials
+%% Response
+while KbCheck; end % Wait until all keys are released
+% response instruction
+%     textResp = ['LEFT or RIGHT?'];
+%     Screen('TextSize', prm.screen.windowPtr, 55);
+textResp = ['?'];
+Screen('TextSize', prm.screen.windowPtr, prm.textSize);
+DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen.blackColour);
+
+[VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+
+% record response, won't continue until a response is recorded
+recordFlag=0;
+startSecs = GetSecs;
+while recordFlag==0
+    %% button response
+    [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
+    if keyIsDown
+        key = KbName(keyCode);
+        % wait until the valid keys are pressed
+        if strcmp(key, prm.leftKey) || strcmp(key, prm.rightKey) || strcmp(key, prm.stopKey)
+            rt = secs-rdkOffTime;
+            recordFlag = 1;
+        else % invalid key
+            % feedback on the screen
+            respText = 'Invalid Key \n Press again';
+            DrawFormattedText(prm.screen.windowPtr, respText,...
+                'center', 'center', prm.textColour);
+            Screen('Flip', prm.screen.windowPtr);
+            clear KbCheck
+        end
+    end
+    %% end of button response
+end
+% else % standard trials
+%     key = 'std'; rt = 0;
+% end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
 % %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
@@ -418,38 +411,38 @@ end
 if info.eyeTracker==1 && rem(trialN, prm.eyeLink.nDrift)==0
     % do a periodic driftcorrection
     EyelinkDoDriftCorrection(prm.eyeLink.el);
-elseif trialType==1 % standard trials
-    % % just draw the calibration target
-    %     size=round(2.5/100*prm.screen.size(3));
-    %     inset=round(1/100*prm.screen.size(3));
-    %
-    %     rect=CenterRectOnPoint([0 0 size size], prm.screen.center(1), prm.screen.center(2));
-    %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.blackColour,  rect);
-    %     rect=InsetRect(rect, inset, inset);
-    %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.backgroundColour, rect);
-    %
-    %     Screen( 'Flip',  prm.screen.windowPtr);
-    Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
-    % % draw a down arrow
-    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)-10, ...
-    %         prm.screen.center(1), prm.screen.center(2)+10, 2); % vertical line for a down arrow
-    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
-    %         prm.screen.center(1)-8, prm.screen.center(2)+5, 3); % left half of the arrow
-    %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
-    %         prm.screen.center(1)+8, prm.screen.center(2)+5, 3); % left half of the arrow
-    Screen('Flip', prm.screen.windowPtr);
-    recordFlag=0;
-    while recordFlag==0
-        %% button response
-        [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
-        if keyIsDown
-            key = KbName(keyCode);
-            % wait until the valid keys are pressed
-            if strcmp(key, 'DownArrow') || strcmp(key, prm.stopKey)
-                recordFlag = 1;
-            end
-        end
-    end
+% elseif trialType==1 % standard trials
+%     % % just draw the calibration target
+%     %     size=round(2.5/100*prm.screen.size(3));
+%     %     inset=round(1/100*prm.screen.size(3));
+%     %
+%     %     rect=CenterRectOnPoint([0 0 size size], prm.screen.center(1), prm.screen.center(2));
+%     %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.blackColour,  rect);
+%     %     rect=InsetRect(rect, inset, inset);
+%     %     Screen( 'FillOval', prm.screen.windowPtr, prm.screen.backgroundColour, rect);
+%     %
+%     %     Screen( 'Flip',  prm.screen.windowPtr);
+%     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
+%     % % draw a down arrow
+%     %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)-10, ...
+%     %         prm.screen.center(1), prm.screen.center(2)+10, 2); % vertical line for a down arrow
+%     %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
+%     %         prm.screen.center(1)-8, prm.screen.center(2)+5, 3); % left half of the arrow
+%     %     Screen('DrawLine', prm.screen.windowPtr, prm.screen.blackColour, prm.screen.center(1), prm.screen.center(2)+15, ...
+%     %         prm.screen.center(1)+8, prm.screen.center(2)+5, 3); % left half of the arrow
+%     Screen('Flip', prm.screen.windowPtr);
+%     recordFlag=0;
+%     while recordFlag==0
+%         %% button response
+%         [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
+%         if keyIsDown
+%             key = KbName(keyCode);
+%             % wait until the valid keys are pressed
+%             if strcmp(key, 'DownArrow') || strcmp(key, prm.stopKey)
+%                 recordFlag = 1;
+%             end
+%         end
+%     end
 end
 
 % blank screen

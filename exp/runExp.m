@@ -6,14 +6,14 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=3; currentTrial = 1; prob = 70; eyeTracker=1; eyeType = 1; 
+currentBlock=1; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
 % may need to change screen id in line 12 in openScreen.m
 
 try
-    global prm list resp info dots demoN imgDemo
+    global prm list resp info demoN imgDemo
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
@@ -164,13 +164,6 @@ try
             Screen('TextSize', prm.screen.windowPtr, prm.textSize);
             DrawFormattedText(prm.screen.windowPtr, textBlock,...
                 'center', 'center', prm.textColour);        % if info.eyeType==0
-            %     reportInstruction = 'Report LOWER';
-            % elseif info.eyeType==1
-            %     reportInstruction = 'Report HIGHER';
-            % else
-            %     eyeType = 'Wrong! Get experimenter.'
-            % end
-            %         Screen('DrawText', prm.screen.windowPtr, reportInstruction, prm.screen.center(1)-100, prm.screen.center(2)+50, prm.screen.whiteColour);
             Screen('Flip', prm.screen.windowPtr);
             
             KbWait();
@@ -196,7 +189,7 @@ try
             % present the stimuli and recording response
             [key rt] = runTrial(info.block, trialN);
             % trialN is the index for looking up in list;
-            % tempN is the actual trial number, including invalid trials
+
             %
             if info.eyeTracker==1
                 % eye recording output
@@ -226,16 +219,6 @@ try
                 break
             elseif strcmp(key, 'std') % standard trials, no response
                 resp.choice(trialN, 1) = 999;
-%             else% wrong key
-%                 % % repeat this trial at the end of the block
-%                 % makeUpN = makeUpN + 1;
-%                 % trialMakeUp(makeUpN) = trialN;
-%                 resp.choice(trialN, 1) = 999;
-%                 % feedback on the screen
-%                 respText = 'Invalid Key';
-%                 DrawFormattedText(prm.screen.windowPtr, respText,...
-%                     'center', 'center', prm.textColour);
-%                 Screen('Flip', prm.screen.windowPtr);
             end
             resp.RTms(trialN, 1) = rt*1000; % in ms
             resp.prob(trialN, 1) = info.prob;
@@ -244,36 +227,14 @@ try
             save(prm.fileName.resp, 'resp');
             
             trialN = trialN+1
-            %             tempN = tempN+1;
-            
-%             % ITI
-%             WaitSecs(prm.ITI);
         end
         
-        text =['Finished! \n Be patient and it will exit automatically...'];
+        text =['Finished! \n It will exit automatically...'];
         Screen('TextSize', prm.screen.windowPtr, prm.textSize);
         DrawFormattedText(prm.screen.windowPtr, text,...
             'center', 'center', prm.textColour);
         Screen('Flip', prm.screen.windowPtr);
-        
-        %         if eyeTracker==1
-        %             % eye recording output
-        %             Eyelink('Command', 'set_idle_mode');
-        %             WaitSecs(0.05);
-        %             Eyelink('CloseFile');
-        %             try
-        %                 fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
-        %                 status=Eyelink('ReceiveFile');
-        %                 if status > 0
-        %                     fprintf('ReceiveFile status %d\n', status);
-        %                 end
-        %                 if 2==exist(prm.eyeLink.edfName, 'file')
-        %                     fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
-        %                 end
-        %             catch
-        %                 fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
-        %             end
-        %         end
+
     end
     
     if demoN>0
@@ -285,7 +246,8 @@ try
     
     prm.fileName.prm = [prm.fileName.folder, '\parameters', num2str(info.block), '_', info.fileNameTime];
     save(prm.fileName.prm, 'prm');
-    save([prm.fileName.folder '\dotMatrices', num2str(info.block), '_', info.fileNameTime], 'dots');
+%     save([prm.fileName.folder '\dotMatrices', num2str(info.block), '_', info.fileNameTime], 'dots'); % safe dot matrices if needed; very
+%     large files...
     if info.eyeTracker==1
         Eyelink('ShutDown');
     end

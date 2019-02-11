@@ -90,9 +90,9 @@ previousOffsets = earlyOnsets - 1;
 onsets(earlyOnsets) = [];
 offsets(previousOffsets) = [];
 
-for i = 1:length(onsets) % if there is pursuit right after saccades before the sign switch, find earlier offset
-    if abs(speed(offsets(i)-startFrame)-speed(onsets(i)-startFrame))>8
-        offsets(i) = max(find(abs(speed(onsets(i)-startFrame:offsets(i)-startFrame)-speed(onsets(i)-startFrame))<=2))+onsets(i)-1; % just define the offset to be around the same speed as the onset
-    end
-end
+% for i = 1:length(onsets) % if there is pursuit right after saccades before the sign switch, find earlier offset
+%     if abs(speed(offsets(i)-startFrame)-speed(onsets(i)-startFrame))>8
+%         offsets(i) = max(find(abs(speed(onsets(i)-startFrame:offsets(i)-startFrame)-speed(onsets(i)-startFrame))<=2))+onsets(i)-1; % just define the offset to be around the same speed as the onset
+%     end
+% end
 end
