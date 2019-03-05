@@ -17,6 +17,7 @@
 
 %% Eye Data
 %  eye data need to have been converted using convert_edf2asc.m
+global trial
 ascFile = eyeFiles(currentTrial,1).name;
 trialStartIdx = eventLog.fixationOn(currentTrial, 1); % different trial start can be specified using e.g. parameters
 eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStartIdx);
@@ -35,7 +36,7 @@ offset = min(trial.stim_offset+ms2frames(300), size(trial.eyeDX_filt, 1)); % to 
 if trial.log.coh==0
     stimulusVelocityX = 0;
 else
-    stimulusVelocityX = 10*trial.log.rdkDir; % deg/s
+    stimulusVelocityX = 10*trial.log.coh; % deg/s, became slower with low coherence
 end
 stimulusVelocityY = 0;
 [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);

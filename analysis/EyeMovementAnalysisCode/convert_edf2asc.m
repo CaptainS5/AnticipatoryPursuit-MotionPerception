@@ -24,7 +24,6 @@ folderNames = dir(dataPath); % this will be a list of all folders in the data fo
 currentSubject = {};
 
 %% STEP 2
-<<<<<<< HEAD
 % select folder by hand
 cd(startFolder)
 currentFolder = selectSubject(dataPath);
@@ -36,14 +35,6 @@ cd(currentFolder);
 %     currentSubject{i-2} = folderNames(i).name;        
 %     currentFolder = [dataPath currentSubject{i-2}];
 %     cd(currentFolder);  
-=======
-% Loop over all subjects and convert
-for i = 3:length(folderNames) % we are starting at 3 because matlab always has 2 empty entries for the dir command
-    % define current subject/folder
-    currentSubject{i-2} = folderNames(i).name;        
-    currentFolder = [dataPath currentSubject{i-2}];
-    cd(currentFolder);  
->>>>>>> parent of 02672d1... improve saccade...
     % Step 2.1
     % this step converts edf to asc containing all information
     [res, stat] = system([startFolder 'edf2asc -y ' currentFolder '\*.edf']);
