@@ -5,7 +5,11 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
+<<<<<<< HEAD
 names = {'YZ'};
+=======
+names = {'t2'};
+>>>>>>> parent of 02672d1... improve saccade...
 data = table();
 
 %%

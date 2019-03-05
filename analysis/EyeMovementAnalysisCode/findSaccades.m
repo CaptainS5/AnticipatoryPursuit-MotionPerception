@@ -17,23 +17,19 @@
 %         offsets --> saccade offsets
 
 function [onsets, offsets] = findSaccades(stim_onset, stim_offset, speed, acceleration, threshold, stimulusSpeed)
-global trial
 % set up data
-startFrame = stim_onset; % fixation onset
-rdkFrame = trial.stim_onset+ms2frames(100); % rdk onset
+startFrame = stim_onset;
 endFrame = stim_offset;
 upperThreshold = stimulusSpeed + threshold;
 lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
-endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
 % relevant frames, i.e. the frames in which the eye supposedly is in a
 % saccade
-middle(1:rdkFrame-startFrame, 1) = speed(1:rdkFrame-startFrame)<-threshold | speed(1:rdkFrame-startFrame)>threshold; % when there isn't motion
-middle(rdkFrame-startFrame+1:endSpeedF, 1) = speed(rdkFrame-startFrame+1:end)<lowerThreshold | speed(rdkFrame-startFrame+1:end)>upperThreshold; % when there is motion
+middle = speed<lowerThreshold | speed>upperThreshold;
 predecessor = [middle(2:end); 0];
 successor = [0; middle(1:end-1)];
 
@@ -62,7 +58,7 @@ speedOffsets = find(speedOffsets);
 % now check eye acceleration to next find exact onset and offset
 middle = acceleration/1000;
 predecessor = [middle(2:end); 0];
-signSwitches = find((middle .* predecessor) <= 0)+1; % either sign switch, or rapid change of speed
+signSwitches = find((middle .* predecessor) < 0)+1;
 
 onsets = NaN(1,length(speedOnsets));
 offsets = NaN(1,length(speedOnsets));
@@ -77,7 +73,6 @@ for i = 1:length(speedOnsets)
     
     onsets(i) = max(signSwitches(signSwitches <= speedOnsets(i)));
     offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i))-1); %the -1 is a subjective adjustment
-
 end
 
 % trim to delete NaNs
@@ -90,9 +85,12 @@ previousOffsets = earlyOnsets - 1;
 onsets(earlyOnsets) = [];
 offsets(previousOffsets) = [];
 
+<<<<<<< HEAD
 % for i = 1:length(onsets) % if there is pursuit right after saccades before the sign switch, find earlier offset
 %     if abs(speed(offsets(i)-startFrame)-speed(onsets(i)-startFrame))>8
 %         offsets(i) = max(find(abs(speed(onsets(i)-startFrame:offsets(i)-startFrame)-speed(onsets(i)-startFrame))<=2))+onsets(i)-1; % just define the offset to be around the same speed as the onset
 %     end
 % end
+=======
+>>>>>>> parent of 02672d1... improve saccade...
 end

@@ -7,7 +7,11 @@ info.dateTime = clock;
 
 % questions and defaults
 n = 1;
+<<<<<<< HEAD
 q{n} = 'subID'; defaults{n} = 't'; n = n+1;
+=======
+q{n} = 'subID'; defaults{n} = 't2'; n = n+1;
+>>>>>>> parent of 02672d1... improve saccade...
 q{n} = 'Eyetracker(1) or not(0)'; defaults{n} = num2str(eyeTracker); n = n+1;
 q{n} = 'Probability of right (%)'; defaults{n} = num2str(prob); n = n+1; %L-lower; H-higher
 q{n} = 'Block'; defaults{n} = num2str(currentBlock); n = n+1;
