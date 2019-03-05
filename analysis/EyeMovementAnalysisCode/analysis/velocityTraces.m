@@ -1,7 +1,7 @@
 % plot velocity traces, generate csv file for plotting in R
 clear all; close all; clc
 
-names = {'t2'};
+names = {'YZ'};
 sampleRate = 1000;
 % for plotting
 minVel = [-12 -1];
@@ -19,12 +19,12 @@ for dirN = 1:size(dirCons, 2)
     for subN = 1:size(names, 2)
         cd(folder)
         load(['eyeData_' names{subN} '.mat']);
-        probCons = unique(eyeTrialData.prob);
+        probCons = unique(eyeTrialData.prob(eyeTrialData.errorStatus==0));
         %     maxFrames = max(eyeTrialData.frameLog.rdkOff(subN, :));
         frameLength(subN) = min(max(eyeTrialData.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate);
         
         for probN = 1:size(probCons, 2)
-            validI = find(eyeTrialData.errorStatus(subN, :)~=1 & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.rdkDir(subN, :)==dirCons(dirN) & eyeTrialData.prob(subN, :)==probCons(probN));
+            validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.rdkDir(subN, :)==dirCons(dirN) & eyeTrialData.prob(subN, :)==probCons(probN));
             lengthF = round(length(validI)/2); % first half of the trials
             lengthL = length(validI)-lengthF; % last half of the trials
             frames{subN, probN}.firstStandard = NaN(lengthF, frameLength(subN)); % align the reversal; filled with NaN
@@ -59,7 +59,7 @@ for dirN = 1:size(dirCons, 2)
             end
             
             % then perceptual trials
-            validI = find(eyeTrialData.errorStatus(subN, :)~=1 & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.rdkDir(subN, :)==dirCons(dirN) & eyeTrialData.prob(subN, :)==probCons(probN));
+            validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.rdkDir(subN, :)==dirCons(dirN) & eyeTrialData.prob(subN, :)==probCons(probN));
             lengthF = round(length(validI)/2); % first half of the trials
             lengthL = length(validI)-lengthF; % last half of the trials
             frames{subN, probN}.firstPerceptual = NaN(lengthF, frameLength(subN)); % align the reversal; filled with NaN
@@ -163,7 +163,7 @@ for dirN = 1:size(dirCons, 2)
     for probN = 1:size(probCons, 2)
         plot(timePoints, velMean{probN}.firstStandard, '--', 'color', colorPlotting(probN, :))
         hold on
-        p{probN} = plot(timePoints, velMean{probN}.lastStandard, '-', 'color', colorPlotting(probN, :))
+        p{probN} = plot(timePoints, velMean{probN}.lastStandard, '-', 'color', colorPlotting(probN, :));
     end
     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -180,7 +180,7 @@ for dirN = 1:size(dirCons, 2)
     for probN = 1:size(probCons, 2)
         plot(timePoints, velMean{probN}.firstPerceptual, '--', 'color', colorPlotting(probN, :))
         hold on
-        p{probN} = plot(timePoints, velMean{probN}.lastPerceptual, '-', 'color', colorPlotting(probN, :))
+        p{probN} = plot(timePoints, velMean{probN}.lastPerceptual, '-', 'color', colorPlotting(probN, :));
     end
     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')

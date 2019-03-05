@@ -6,7 +6,7 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=1; currentTrial = 1; prob = 90; eyeTracker=1; eyeType = 1; 
+currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m

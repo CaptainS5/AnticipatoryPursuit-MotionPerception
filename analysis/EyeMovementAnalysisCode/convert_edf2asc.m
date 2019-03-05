@@ -24,12 +24,17 @@ folderNames = dir(dataPath); % this will be a list of all folders in the data fo
 currentSubject = {};
 
 %% STEP 2
-% Loop over all subjects and convert
-for i = 3:3%3:length(folderNames) % we are starting at 3 because matlab always has 2 empty entries for the dir command
-    % define current subject/folder
-    currentSubject{i-2} = folderNames(i).name;        
-    currentFolder = [dataPath currentSubject{i-2}];
-    cd(currentFolder);  
+% select folder by hand
+cd(startFolder)
+currentFolder = selectSubject(dataPath);
+cd(currentFolder);
+
+% or Loop over all subjects and convert
+% for i = 3:3%3:length(folderNames) % we are starting at 3 because matlab always has 2 empty entries for the dir command
+%     % define current subject/folder
+%     currentSubject{i-2} = folderNames(i).name;        
+%     currentFolder = [dataPath currentSubject{i-2}];
+%     cd(currentFolder);  
     % Step 2.1
     % this step converts edf to asc containing all information
     [res, stat] = system([startFolder 'edf2asc -y ' currentFolder '\*.edf']);
@@ -71,4 +76,4 @@ for i = 3:3%3:length(folderNames) % we are starting at 3 because matlab always h
     % STEP 2.3
     % convert data into samples only and replace missing values with 9999
     [res, stat] = system([startFolder 'edf2asc -y -s -miss 9999 -nflags ' currentFolder '\*.edf']);
-end
+% end

@@ -51,8 +51,9 @@ dots.distanceToCenterX{1} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1)))
 theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
 dots.positionTheta{1} = [cos(theta) sin(theta)];  % values between -1 and 1
 dots.position{1} = dots.positionTheta{1} .* [dots.distanceToCenterX{1} dots.distanceToCenterX{1}*prm.screen.pixelRatioWidthPerHeight];
-% initialize dot presentation time
-dots.showTime{1} = round(rand(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
+% initialize dot presentation time and label time
+dots.showTime{1} = round(ones(1, prm.rdk.dotNumber)*sec2frm(prm.rdk.lifeTime)); % in frames
+dots.labelTime{1} = round(sec2frm(prm.rdk.labelUpdateTime)); % in frames
 
 % dots movement distance in each frame, depends on coherence, updated
 % later in each frame
@@ -73,17 +74,19 @@ moveDistance = repmat(moveDistance, prm.rdk.dotNumber, 1);
 dots.movementNextFrame{1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
 
 % generate the dot matrices of the RDK for the whole trial
-for frameN = 1:rdkFrames
+for frameN = 1:rdkFrames-1
     % set up dot position to present in the next frame(dots.position{frameN+1, trialN}),
     % which will be current position(dots.position{frameN, trialN}) plus
     % movement in this frame(dots.movementNextFrame{frameN, trialN})
     % Update positions
     dots.position{frameN+1} = dots.position{frameN} + dots.movementNextFrame{frameN};
-    % Update lifetime
+    % Update lifetime and label time
     dots.showTime{frameN+1} = dots.showTime{frameN}-1;
+    dots.labelTime{frameN+1} = dots.labelTime{frameN}-1;
     % still needs to replace expired dots and move dots out of the aperture into the aperture again, from the opposite edge
     
     % first initialize the new parameters to use for next frame
+    dots.label{frameN+1} = dots.label{frameN};
     dots.distanceToCenterX{frameN+1} = dots.distanceToCenterX{frameN}; % for new random positions
     dots.movementNextFrame{frameN+1} = dots.movementNextFrame{frameN}; % for new moving directions
     % new random position angle
@@ -93,6 +96,16 @@ for frameN = 1:rdkFrames
     moveTheta = 2 * pi * rand(prm.rdk.dotNumber, 1); % all random directions except 0/2pi, the horizontal right
     moveTheta = [cos(moveTheta) sin(moveTheta)];
     
+    % renew labels of dots
+    if dots.labelTime{frameN+1} <= 0 % generate new random label
+        labelOrder = randperm(size(dots.label{frameN+1}, 1));
+        dots.label{frameN+1}(:, 1) = dots.label{frameN+1}(labelOrder, 1); % randomly assign new labels
+        % change moving directions with label change; also assign new noise directions
+        moveTheta(dots.label{frameN+1}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
+        dots.movementNextFrame{frameN+1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+        dots.labelTime{frameN+1} = round(sec2frm(prm.rdk.labelUpdateTime));
+    end
+
     % Replace dots with expired lifetime
     expiredDots = find(dots.showTime{frameN+1}' <= 0);
     dots.distanceToCenterX{frameN+1}(expiredDots) = apertureRadiusX * sqrt((rand(length(expiredDots),1)));
@@ -109,15 +122,7 @@ for frameN = 1:rdkFrames
     dotDist = dots.position{frameN+1}(:, 1).^2 + (dots.position{frameN+1}(:, 2)/prm.screen.pixelRatioWidthPerHeight).^2;
     outDots = find(dotDist>apertureRadiusX^2); % all dots out of the aperture
     % move dots in the aperture from the opposite edge, continue the assigned motion
-    dots.position{frameN+1}(outDots, :) = -dots.position{frameN+1}(outDots, :)+dots.movementNextFrame{frameN}(outDots, :);
-    
-    %% default is transparent motion; add these lines for Brownian motion
-    % update labels and directions for all dots
-    dots.label{frameN+1} = dots.label{frameN}; % initialize new labels
-    labelOrder = randperm(size(dots.label{frameN+1}, 1));
-    dots.label{frameN+1}(:, 1) = dots.label{frameN+1}(labelOrder, 1); % randomly assign new labels
-    moveTheta(dots.label{frameN+1}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
-    dots.movementNextFrame{frameN+1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
+    dots.position{frameN+1}(outDots, :) = -dots.position{frameN+1}(outDots, :)+dots.movementNextFrame{frameN}(outDots, :);    
 end
 
 % set up mask

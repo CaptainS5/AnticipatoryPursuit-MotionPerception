@@ -16,7 +16,7 @@
 
 function [] = updatePlots(trial)
 % define window for which you want to plot your data
-startFrame = 1;
+startFrame = max(1, trial.log.fixationOff-ms2frames(900));
 endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this is all recorded eye movement data
 % if the interval looking at micro-saccades differs define it here
 % msStart = trial.log.microSaccade.onset; 
@@ -24,8 +24,8 @@ endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this i
 stimOnset = trial.log.trialStart; % this may have to be changed depending on terminology
 stimOffset = trial.log.trialEnd;
 % range in degrees you want to plot eye position and velocity
-minPosAbs = -15;
-maxPosAbs = 15;
+minPosAbs = -10;
+maxPosAbs = 10;
 minPosX = -25;
 maxPosX = 25;
 minPosY = -25;

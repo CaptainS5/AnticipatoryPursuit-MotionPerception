@@ -32,7 +32,14 @@ prm.gap.duration = 0.3;
 % RDK stimulus
 prm.rdk.duration = 0.7; % display duration of the whole RDK
 prm.rdk.dotDensity = 2; % dot per dva
-prm.rdk.lifeTime = 0.7;
+prm.rdk.lifeTime = 0.7; % noise dots change direction every new life time
+prm.rdk.labelUpdateTime = 0.1; % change labels and assign new directions for all
+% for Transparent motion, label update time >= the whole rdk duration;
+% for Brownian motion, label update time = one frame
+% ========================================================================
+% Notice that whenever label changes, new directions will also be assigned,
+% so be careful with the relationship between lifeTime and labelUpdateTime
+% ========================================================================
 prm.rdk.dotRadius = 0.14/2;
 prm.rdk.apertureRadius = 10;
 prm.rdk.speed = 10; % dva per sec
