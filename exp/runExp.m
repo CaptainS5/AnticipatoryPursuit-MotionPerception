@@ -6,7 +6,7 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1; 
+currentBlock=1; currentTrial = 1; prob = 50; eyeTracker=0; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
@@ -56,7 +56,7 @@ try
         load('testList.mat')
     elseif info.prob == -100 % demo trials
         load('demoList.mat')
-        demoN = 1;
+        demoN = 0;
     else
         error('ERROR: condition table does not exist')
     end
@@ -67,7 +67,7 @@ try
     prm.rdk.colour = prm.screen.whiteColour;
     prm.textColour = prm.screen.blackColour;
     
-    HideCursor;
+%     HideCursor;
     
     % make the aperture
     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
