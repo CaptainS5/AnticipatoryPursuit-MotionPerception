@@ -9,9 +9,9 @@ Screen('Preference', 'SkipSyncTests', 1);
 
 % open window
 prm.screen.whichscreen = max(Screen('Screens'));
-[prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen);
+% [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen);
 % % for debug
-% [prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen, [], [100, 100, 900, 700]);
+[prm.screen.windowPtr, prm.screen.size] = Screen('OpenWindow', prm.screen.whichscreen, [], [100, 100, 900, 700]);
 % Screen(prm.screen.window,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 prm.screen.blackColour = BlackIndex(prm.screen.windowPtr);
@@ -28,6 +28,7 @@ prm.screen.resolution = Screen(prm.screen.windowPtr,'Resolution');
 [prm.screen.center(1), prm.screen.center(2)] = RectCenter(prm.screen.size);
 prm.screen.refreshRate = 1/Screen('GetFlipInterval', prm.screen.windowPtr); % refresh rate of the monitor
 % in Hz (frames per second: fps)
+prm.screen.ifi = Screen('GetFlipInterval', prm.screen.windowPtr);
 
 % for a pixel, the ration of its physical width to its height
 prm.screen.pixelRatioWidthPerHeight = (prm.screen.monitorWidth/(prm.screen.size(3)-prm.screen.size(1)))/(prm.screen.monitorHeight/(prm.screen.size(4)-prm.screen.size(2)));

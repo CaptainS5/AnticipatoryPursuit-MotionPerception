@@ -370,7 +370,7 @@ while frameN<=fixFrames
 
                     end
 
-                    [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
+                    [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr);
 
                     initialF = 1;
 
@@ -440,7 +440,7 @@ while frameN<=fixFrames
 
         if initialF==0
 
-            [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
+            [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr);
 
             initialF = 1;
 
@@ -506,7 +506,7 @@ for frameN = 1:gapFrames
 
         end
 
-        [VBL fixOffTime] = Screen('Flip', prm.screen.windowPtr);
+        [vbl fixOffTime] = Screen('Flip', prm.screen.windowPtr);
 
         initialG = 1;
 
@@ -539,7 +539,8 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 %% RDK
 
 
-
+vbl = Screen('Flip', prm.screen.windowPtr);
+prm.screen.waitFrames = 1;
 for frameN = 1:rdkFrames
 
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
@@ -573,13 +574,13 @@ for frameN = 1:rdkFrames
 
         end
 
-        [VBL rdkOnTime] = Screen('Flip', prm.screen.windowPtr);
+        [vbl rdkOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
 
         resp.rdkOnTime(trialN, 1) = rdkOnTime;
 
     else
 
-        Screen('Flip', prm.screen.windowPtr);
+        vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
 
     end
 
@@ -715,7 +716,7 @@ end
 
             % rdkOffsetTime = GetSecs; % here is actually the offset time
 
-            [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+            [vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 
             resp.rdkOffTime(trialN, 1) = rdkOffTime;
 
@@ -749,7 +750,7 @@ if trialType==0 % record response in test trials
 
     
 
-    [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+    [vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 
     
 
