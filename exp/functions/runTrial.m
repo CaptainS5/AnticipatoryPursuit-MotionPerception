@@ -1,7 +1,6 @@
 function [key rt] = runTrial(blockN, trialN)
 
 global prm info resp list demoN imgDemo
-
 % Initialization
 % fill the background
 Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
@@ -310,7 +309,7 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 
 %% RDK
 vbl = Screen('Flip', prm.screen.windowPtr);
-prm.screen.waitFrames = 2;
+prm.screen.waitFrames = 1;
 for frameN = 1:rdkFrames
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
@@ -321,6 +320,8 @@ for frameN = 1:rdkFrames
         imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
         demoN = demoN + 1;
     end
+%     KbWait();
+%     clear KbCheck
     
     if frameN==1
         if info.eyeTracker==1
@@ -328,10 +329,11 @@ for frameN = 1:rdkFrames
             Eyelink('Message', 'SYNCTIME');
             Eyelink('message', 'rdkOn');
         end
-        [vbl rdkOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        [vbl rdkOnTime prm.flipT(trialN, frameN)] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
     else
-        vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        [vbl ll prm.flipT(trialN, frameN)] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
     end
+%     Eyelink('message', 'rdkOn');
     prm.vbl(trialN, frameN) = vbl;
 end
 resp.rdkOnTime(trialN, 1) = rdkOnTime;

@@ -63,7 +63,7 @@ try
     prm.trialPerBlock = size(list, 1);
     
     openScreen; % modify background color here
-    prm.rdk.colour = prm.screen.whiteColour;
+    prm.rdk.colour = 0;%prm.screen.whiteColour;
     prm.textColour = prm.screen.blackColour;
     
 %     HideCursor;
@@ -169,45 +169,28 @@ try
             WaitSecs(prm.ITI);
         end
         
+        if info.eyeTracker==1
+            % prepare eye recording
+            prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), '.edf'];
+%             prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN, '%03d'), '.edf'];
+            if (size(prm.eyeLink.edfName, 2)-4>8)
+                error('edf filename is too long!'); % Security loop against Eyelink
+                % Un-registration of data if namefile
+            end
+            % open file to record data to
+            cd([prm.fileName.folder, '\'])
+            Eyelink('Openfile', prm.eyeLink.edfName);
+        end
+        
         % run trials
+        Priority(2)
         while trialN<=prm.trialPerBlock
             clear KbCheck
-            
-            if info.eyeTracker==1
-                % prepare eye recording
-                prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN, '%03d'), '.edf'];
-                if (size(prm.eyeLink.edfName, 2)-4>8)
-                    error('edf filename is too long!'); % Security loop against Eyelink
-                    % Un-registration of data if namefile
-                end
-                % open file to record data to
-                cd([prm.fileName.folder, '\'])
-                Eyelink('Openfile', prm.eyeLink.edfName);
-            end
+           
             %
             % present the stimuli and recording response
             [key rt] = runTrial(info.block, trialN);
             % trialN is the index for looking up in list;
-
-            %
-            if info.eyeTracker==1
-                % eye recording output
-                Eyelink('Command', 'set_idle_mode');
-                WaitSecs(0.05);
-                Eyelink('CloseFile');
-                try
-                    fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
-                    status=Eyelink('ReceiveFile');
-                    if status > 0
-                        fprintf('ReceiveFile status %d\n', status);
-                    end
-                    if 2==exist(prm.eyeLink.edfName, 'file')
-                        fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
-                    end
-                catch
-                    fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
-                end
-            end
             
             % record responses
             if strcmp(key, prm.leftKey)
@@ -227,12 +210,34 @@ try
             
             trialN = trialN+1
         end
+        Priority(0)
         
         text =['Finished! \n It will exit automatically...'];
         Screen('TextSize', prm.screen.windowPtr, prm.textSize);
         DrawFormattedText(prm.screen.windowPtr, text,...
             'center', 'center', prm.textColour);
         Screen('Flip', prm.screen.windowPtr);
+        
+        %
+        if info.eyeTracker==1
+            % eye recording output
+            Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+            Eyelink('Command', 'set_idle_mode');
+            WaitSecs(0.5);
+            Eyelink('CloseFile');
+            try
+                fprintf('Receiving data file ''%s''\n', prm.eyeLink.edfName);
+                status=Eyelink('ReceiveFile');
+                if status > 0
+                    fprintf('ReceiveFile status %d\n', status);
+                end
+                if 2==exist(prm.eyeLink.edfName, 'file')
+                    fprintf('Data file ''%s'' can be found in ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
+                end
+            catch
+                fprintf('Problem receiving data file ''%s''\n', prm.eyeLink.edfName, prm.fileName.folder);
+            end
+        end
 
     end
     
