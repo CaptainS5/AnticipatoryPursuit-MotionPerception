@@ -370,7 +370,7 @@ while frameN<=fixFrames
 
                     end
 
-                    [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr);
+                    [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
 
                     initialF = 1;
 
@@ -440,7 +440,7 @@ while frameN<=fixFrames
 
         if initialF==0
 
-            [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr);
+            [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
 
             initialF = 1;
 
@@ -506,7 +506,7 @@ for frameN = 1:gapFrames
 
         end
 
-        [vbl fixOffTime] = Screen('Flip', prm.screen.windowPtr);
+        [VBL fixOffTime] = Screen('Flip', prm.screen.windowPtr);
 
         initialG = 1;
 
@@ -539,8 +539,7 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 %% RDK
 
 
-vbl = Screen('Flip', prm.screen.windowPtr);
-prm.screen.waitFrames = 1;
+
 for frameN = 1:rdkFrames
 
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
@@ -574,13 +573,13 @@ for frameN = 1:rdkFrames
 
         end
 
-        [vbl rdkOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        [VBL rdkOnTime] = Screen('Flip', prm.screen.windowPtr);
 
         resp.rdkOnTime(trialN, 1) = rdkOnTime;
 
     else
 
-        vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        Screen('Flip', prm.screen.windowPtr);
 
     end
 
@@ -677,7 +676,7 @@ for frameN = 1:rdkFrames
     %%
 
 end
-
+prm.dots{trialN} = dots;
 
 
 % if trialType==1 % present dynamic mask if it's standard trial
@@ -716,7 +715,7 @@ end
 
             % rdkOffsetTime = GetSecs; % here is actually the offset time
 
-            [vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+            [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 
             resp.rdkOffTime(trialN, 1) = rdkOffTime;
 
@@ -750,7 +749,7 @@ if trialType==0 % record response in test trials
 
     
 
-    [vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+    [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 
     
 

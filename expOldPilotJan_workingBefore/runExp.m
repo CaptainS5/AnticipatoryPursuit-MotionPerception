@@ -11,6 +11,7 @@ currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1;
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
 % may need to change screen id in line 12 in openScreen.m
+
 try
     global prm list resp info demoN imgDemo
     % prm--parameters, mostly defined in setParameters
@@ -30,7 +31,7 @@ try
     cd('data\') 
     prm.resultPath = pwd;
     cd ..
-    cd('exp\')
+    cd('expOld\')
     prm.expPath = pwd;
     
     info = getInfo(currentBlock, currentTrial, eyeType, prob, eyeTracker);

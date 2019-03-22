@@ -83,13 +83,12 @@ for frameN = 1:rdkFrames-1
     dots.position{frameN+1} = dots.position{frameN} + dots.movementNextFrame{frameN};
     % Update lifetime and label time
     dots.showTime{frameN+1} = dots.showTime{frameN}-1;
-    dots.labelTime{frameN+1} = dots.labelTime{frameN}-1;
+%     dots.labelTime{frameN+1} = dots.labelTime{frameN}-1;
     % still needs to replace expired dots and move dots out of the aperture into the aperture again, from the opposite edge
     
     % first initialize the new parameters to use for next frame
     dots.distanceToCenterX{frameN+1} = dots.distanceToCenterX{frameN}; % for new random positions
     dots.movementNextFrame{frameN+1} = dots.movementNextFrame{frameN}; % for new moving directions
-    dots.label{frameN+1} = dots.label{frameN};
     % new random position angle
     theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
     dots.positionTheta{frameN+1} = [cos(theta) sin(theta)];  % values between -1 and 1
@@ -98,14 +97,14 @@ for frameN = 1:rdkFrames-1
     moveTheta = [cos(moveTheta) sin(moveTheta)];
     
     % renew labels of dots
-    if dots.labelTime{frameN+1} <= 0 % generate new random label
+%     if dots.labelTime{frameN+1} <= 0 % generate new random label
         labelOrder = randperm(size(dots.label{frameN}, 1));
         dots.label{frameN+1}(:, 1) = dots.label{frameN}(labelOrder, 1); % randomly assign new labels
         % change moving directions with label change; also assign new noise directions
         moveTheta(dots.label{frameN+1}==1, :) = repmat([1 0], targetDotsN, 1); % signal dots moving horizontally
         dots.movementNextFrame{frameN+1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
-        dots.labelTime{frameN+1} = round(sec2frm(prm.rdk.labelUpdateTime));
-    end
+%         dots.labelTime{frameN+1} = round(sec2frm(prm.rdk.labelUpdateTime));
+%     end
 
     % Replace dots with expired lifetime
     expiredDots = find(dots.showTime{frameN+1}' <= 0);
@@ -169,7 +168,6 @@ end
 frameN = 1;
 initialF = 0;
 StopCommand = 0;
-vbl = Screen('Flip', prm.screen.windowPtr);
 while frameN<=fixFrames
     % check for keyboard press
     [keyIsDown, secs, keyCode] = KbCheck;
@@ -230,10 +228,10 @@ while frameN<=fixFrames
                     if info.eyeTracker==1
                         Eyelink('message', 'fixationOn');
                     end
-                    [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+                    [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
                     initialF = 1;
                 else
-                    vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+                    Screen('Flip', prm.screen.windowPtr);
                 end
                 frameN = frameN + 1;
             else
@@ -244,7 +242,7 @@ while frameN<=fixFrames
                     imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
                     demoN = demoN + 1;
                 end
-                vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+                Screen('Flip', prm.screen.windowPtr);
                 frameN = 1;
             end
         else
@@ -265,11 +263,11 @@ while frameN<=fixFrames
             demoN = demoN + 1;
         end
         if initialF==0
-            [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+            [VBL fixOnTime] = Screen('Flip', prm.screen.windowPtr);
             initialF = 1;
             resp.fixationOnTime(trialN, 1) = fixOnTime;
         else
-            vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+            Screen('Flip', prm.screen.windowPtr);
         end
         frameN = frameN + 1;
     end
@@ -286,10 +284,7 @@ end
 % imwrite(imgF, 'fixation.jpg')
 
 %% Gap period
-if info.eyeTracker==1
-    Eyelink('message', 'fixationOff');
-end
-[vbl fixOffTime] = Screen('Flip', prm.screen.windowPtr);
+initialG = 0;
 for frameN = 1:gapFrames
     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
     if demoN > 0
@@ -297,7 +292,15 @@ for frameN = 1:gapFrames
         demoN = demoN + 1;
     end
     
-    vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+    if initialG == 0
+        if info.eyeTracker==1
+            Eyelink('message', 'fixationOff');
+        end
+        [VBL fixOffTime] = Screen('Flip', prm.screen.windowPtr);
+        initialG = 1;
+    else
+        Screen('Flip', prm.screen.windowPtr);
+    end
 end
 resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
 resp.fixationOffTime(trialN, 1) = fixOffTime;
@@ -309,8 +312,6 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 % end
 
 %% RDK
-vbl = Screen('Flip', prm.screen.windowPtr);
-prm.screen.waitFrames = 2;
 for frameN = 1:rdkFrames
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
@@ -328,23 +329,18 @@ for frameN = 1:rdkFrames
             Eyelink('Message', 'SYNCTIME');
             Eyelink('message', 'rdkOn');
         end
-        [vbl rdkOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        [VBL rdkOnTime] = Screen('Flip', prm.screen.windowPtr);        
     else
-        vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+        Screen('Flip', prm.screen.windowPtr);
     end
-    prm.vbl(trialN, frameN) = vbl;
+%     KbWait()
+%     clear KbCheck
 end
 resp.rdkOnTime(trialN, 1) = rdkOnTime;
-prm.screen.waitFrames = 1;
 
 %% Mask
 % random order of the textures
 maskIdx = randperm(maskFrameN);
-if info.eyeTracker==1
-    Eyelink('message', 'rdkOff');
-end
-[vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
-resp.rdkOffTime(trialN, 1) = rdkOffTime;
 for maskF = 1:maskFrameN
     Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
     Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
@@ -353,7 +349,17 @@ for maskF = 1:maskFrameN
         imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
         demoN = demoN + 1;
     end
-    vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+    
+    if maskF==1
+        if info.eyeTracker==1
+            Eyelink('message', 'rdkOff');
+        end
+        % rdkOffsetTime = GetSecs; % here is actually the offset time
+        [VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
+        resp.rdkOffTime(trialN, 1) = rdkOffTime;
+    else
+        Screen('Flip', prm.screen.windowPtr);
+    end
 end
 
 % if trialType==0 % record response in test trials
@@ -366,7 +372,7 @@ textResp = ['?'];
 Screen('TextSize', prm.screen.windowPtr, prm.textSize);
 DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen.blackColour);
 
-Screen('Flip', prm.screen.windowPtr);
+[VBL rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 
 % record response, won't continue until a response is recorded
 recordFlag=0;
