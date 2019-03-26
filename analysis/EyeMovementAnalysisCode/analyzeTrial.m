@@ -18,9 +18,17 @@
 %% Eye Data
 %  eye data need to have been converted using convert_edf2asc.m
 global trial
-ascFile = eyeFiles(currentTrial,1).name;
+% if currentTrial<=682
+%     ascFile = eyeFiles(1,1).name;
+% elseif currentTrial<=1364
+%     ascFile = eyeFiles(2,1).name;
+% else
+%     ascFile = eyeFiles(3,1).name;
+% end
+ascFile = [currentSubject 't' num2str(currentTrial, '%03d') '.mat']; % mat file, one file for each trial
 trialStartIdx = eventLog.fixationOn(currentTrial, 1); % different trial start can be specified using e.g. parameters
-eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStartIdx);
+trialEndIdx = eventLog.rdkOff(currentTrial, 1)+ms2frames(600);
+eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStartIdx, trialEndIdx);
 eyeData = processEyeData(eyeData); 
 
 %% extract all relevant experimental data and store it in trial variable

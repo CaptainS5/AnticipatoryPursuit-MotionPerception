@@ -136,7 +136,7 @@ fixRange = [(prm.screen.center(1)-fixRangeRadiusX) (prm.screen.center(2)-fixRang
 [xSizeM ySizeM]= dva2pxl(prm.motionRange.xLength/2, prm.motionRange.yLength/2);
 motionRange = [(prm.screen.center(1)-xSizeM) (prm.screen.center(2)-ySizeM) (prm.screen.center(1)+xSizeM) (prm.screen.center(2)+ySizeM)];
 
-trialInfo = sprintf('%d %d %d',trialN, list.coh(trialN,1), list.rdkDir(trialN,1));
+trialInfo = sprintf('%d %d %d', trialN+(blockN-1)*682, list.coh(trialN,1), list.rdkDir(trialN,1));
 %% start display
 % blank screen
 Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
@@ -309,7 +309,7 @@ resp.fixationOffTime(trialN, 1) = fixOffTime;
 
 %% RDK
 vbl = Screen('Flip', prm.screen.windowPtr);
-prm.screen.waitFrames = 1;
+% prm.screen.waitFrames = 1;
 for frameN = 1:rdkFrames
     % Draw dots on screen, dot position in the current frame is dots.position{frameN, trialN}
     % DKP changed to get antialiased dots  Try 1 or 2 (1 may give less jitter)
@@ -337,7 +337,7 @@ for frameN = 1:rdkFrames
     prm.vbl(trialN, frameN) = vbl;
 end
 resp.rdkOnTime(trialN, 1) = rdkOnTime;
-prm.screen.waitFrames = 1;
+% prm.screen.waitFrames = 1;
 
 %% Mask
 % random order of the textures
@@ -357,10 +357,10 @@ for maskF = 1:maskFrameN
     end
     vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
 end
+Screen('Flip', prm.screen.windowPtr);
 
 % if trialType==0 % record response in test trials
 %% Response
-while KbCheck; end % Wait until all keys are released
 % response instruction
 %     textResp = ['LEFT or RIGHT?'];
 %     Screen('TextSize', prm.screen.windowPtr, 55);
@@ -370,6 +370,7 @@ DrawFormattedText(prm.screen.windowPtr, textResp, 'center', 'center', prm.screen
 
 Screen('Flip', prm.screen.windowPtr);
 
+while KbCheck; end % Wait until all keys are released
 % record response, won't continue until a response is recorded
 recordFlag=0;
 startSecs = GetSecs;
@@ -451,7 +452,7 @@ Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill ba
 Screen('Flip', prm.screen.windowPtr);
 
 if info.eyeTracker==1
-    Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+    Eyelink('Command','clear_screen 0'); % clears the box from the Eyelink-operator screen
     Eyelink('Command', 'set_idle_mode');
     WaitSecs(0.05);
     Eyelink('StopRecording');

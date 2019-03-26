@@ -1,4 +1,4 @@
-% function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
+%qq function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; 
 % initialize exp info here: (subID--longest 2 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
 % currentBlock: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
@@ -6,7 +6,7 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=0; eyeType = 1; 
+currentBlock=1; currentTrial = 1; prob = 90; eyeTracker=0; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
@@ -48,7 +48,7 @@ try
     % load trial info for the current block
     demoN = 0; % default not to record demo images
     if info.prob > 0
-        load(['list', num2str(info.prob), 'probNew.mat'])
+        load(['list', num2str(info.prob), 'prob.mat'])
     elseif info.prob == 0  % practice trials
         load('practiceList.mat')
     elseif info.prob == -1  % test trials
@@ -63,7 +63,7 @@ try
     prm.trialPerBlock = size(list, 1);
     
     openScreen; % modify background color here
-    prm.rdk.colour = 0;%prm.screen.whiteColour;
+    prm.rdk.colour = prm.screen.whiteColour;
     prm.textColour = prm.screen.blackColour;
     
 %     HideCursor;
@@ -221,7 +221,7 @@ try
         %
         if info.eyeTracker==1
             % eye recording output
-            Eyelink('command','clear_screen'); % clears the box from the Eyelink-operator screen
+            Eyelink('Command','clear_screen 0'); % clears the box from the Eyelink-operator screen
             Eyelink('Command', 'set_idle_mode');
             WaitSecs(0.5);
             Eyelink('CloseFile');
