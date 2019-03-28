@@ -87,7 +87,7 @@ cd(currentFolder)
 eyeFiles = dir('*.asc');
 nameEndI = strfind(eyeFiles(1, 1).name, 'b');
 currentSubject = eyeFiles(1, 1).name(1:nameEndI-1);
-for ascN = 1:3
+for ascN = 1:size(eyeFiles.name, 1)
     ascFile = eyeFiles(ascN,1).name;
     rawAsc = load(ascFile);
     for trial = 1:682

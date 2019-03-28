@@ -1,4 +1,4 @@
-%qq function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
+%function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
 clear all; close all; clc; 
 % initialize exp info here: (subID--longest 2 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
 % currentBlock: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
@@ -6,7 +6,7 @@ clear all; close all; clc;
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=1; currentTrial = 1; prob = 90; eyeTracker=0; eyeType = 1; 
+currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=1; eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
@@ -54,7 +54,7 @@ try
     elseif info.prob == -1  % test trials
         load('testList.mat')
     elseif info.prob == -100 % demo trials
-        load('demoList.mat')
+        load('demoList15.mat')
         demoN = 0;
     else
         error('ERROR: condition table does not exist')
@@ -66,7 +66,7 @@ try
     prm.rdk.colour = prm.screen.whiteColour;
     prm.textColour = prm.screen.blackColour;
     
-%     HideCursor;
+    HideCursor;
     
     % make the aperture
     Screen('BlendFunction', prm.screen.windowPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
@@ -133,6 +133,9 @@ try
             
             % make sure that we get gaze data from the Eyelink
             Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
+            Eyelink('Command', 'link_update_interval = 50'); % extends the keep alive 
+            % time for the network connection to make sure the connection stays active 
+            % even during long pauses, nly need to set it once at the start of the experiment
             
             %             % open file to record data to
             %             if eyeTracker==1
@@ -221,8 +224,8 @@ try
         %
         if info.eyeTracker==1
             % eye recording output
-            Eyelink('Command','clear_screen 0'); % clears the box from the Eyelink-operator screen
-            Eyelink('Command', 'set_idle_mode');
+%             Eyelink('Command','clear_screen 0'); % clears the box from the Eyelink-operator screen
+%             Eyelink('Command', 'set_idle_mode');
             WaitSecs(0.5);
             Eyelink('CloseFile');
             try
