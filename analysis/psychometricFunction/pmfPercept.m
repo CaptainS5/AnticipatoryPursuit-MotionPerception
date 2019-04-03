@@ -2,7 +2,7 @@
 % Xiuyun Wu, 01/10/2018
 clear all; close all; clc
 
-names = {'YZ'};
+names = {'XW0'};
 trialN = 26; % number of trials for each coherence level in each direction
 colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 

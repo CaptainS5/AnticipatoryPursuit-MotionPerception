@@ -1,50 +1,24 @@
-%function currentBlock = runExp(currentBlock, eyeType, prob, eyeTracker)
-clear all; close all; clc; 
-% initialize exp info here: (subID--longest 2 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
-% currentBlock: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
+function runExp()
+% clear all; close all; clc; 
+% initialize exp info here: (subID--longest 4 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
+% info.block: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
 % currentTrial: can start with any trial number you like (in case being terminated before finishing the whole block), from 1-682
 % prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-currentBlock=1; currentTrial = 1; prob = -1; eyeTracker=1; eyeType = 1; 
+% info.block=3; info.currentTrial = 1; info.prob = 70; info.eyeTracker=1; info.eyeType = 1; 
 
 % to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
 % may need to change screen id in line 12 in openScreen.m
 try
-    global prm list resp info demoN imgDemo
+    global prm info list resp demoN imgDemo
     % prm--parameters, mostly defined in setParameters
     % display--all parameters (some pre-arranged) in the experiment, each block,
     % trial by trial
     % resp--the response, each block, trial by trial, what actually was
     % presented, including trials with invalid response/loss of fixation etc.
-    addpath(genpath(pwd))
-    AssertOpenGL;
-    % Key
-    KbCheck;
-    KbName('UnifyKeyNames');
-    
-    setParameters;
-    cd ..
-    
-    cd('data\') 
-    prm.resultPath = pwd;
-    cd ..
-    cd('exp\')
-    prm.expPath = pwd;
-    
-    info = getInfo(currentBlock, currentTrial, eyeType, prob, eyeTracker);
-    
-    % creating saving path and filenames
-    if currentBlock==0 % pracrice block, save in the practive folder
-        prm.fileName.folder = [prm.resultPath, '\', info.subID{1}, '\practice'];
-    else
-        prm.fileName.folder = [prm.resultPath, '\', info.subID{1}];
-    end
-    mkdir(prm.fileName.folder)
-    % save info for the current block
-    save([prm.fileName.folder, '\Info', num2str(currentBlock), '_', info.fileNameTime], 'info')
-    
+
     % load trial info for the current block
     demoN = 0; % default not to record demo images
     if info.prob > 0
@@ -54,7 +28,7 @@ try
     elseif info.prob == -1  % test trials
         load('testList.mat')
     elseif info.prob == -100 % demo trials
-        load('demoList15.mat')
+        load('demoList.mat')
         demoN = 0;
     else
         error('ERROR: condition table does not exist')
@@ -140,7 +114,7 @@ try
             %             % open file to record data to
             %             if eyeTracker==1
             %                 % prepare eye recording
-            %                 prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), '.edf'];
+            %                 prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(info.block), '.edf'];
             %                 if (size(prm.eyeLink.edfName, 2)-4>8)
             %                     error('edf filename is too long!'); % Security loop against Eyelink
             %                     % Un-registration of data if namefile
@@ -174,8 +148,8 @@ try
         
         if info.eyeTracker==1
             % prepare eye recording
-            prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), '.edf'];
-%             prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(currentBlock), 't', num2str(trialN, '%03d'), '.edf'];
+            prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(info.block), '.edf'];
+%             prm.eyeLink.edfName = [info.subID{:}, 'b', num2str(info.block), 't', num2str(trialN, '%03d'), '.edf'];
             if (size(prm.eyeLink.edfName, 2)-4>8)
                 error('edf filename is too long!'); % Security loop against Eyelink
                 % Un-registration of data if namefile
@@ -207,6 +181,7 @@ try
             end
             resp.RTms(trialN, 1) = rt*1000; % in ms
             resp.prob(trialN, 1) = info.prob;
+            resp.eyeType(trialN, 1) = info.eyeType;
             
             % save the response
             save(prm.fileName.resp, 'resp');

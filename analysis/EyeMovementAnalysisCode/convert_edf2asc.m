@@ -21,7 +21,7 @@ cd ..
 cd ..
 dataPath = fullfile(pwd,'data\'); %assuming that the data folder is in the start folder
 folderNames = dir(dataPath); % this will be a list of all folders in the data folder, e.g. a list of all subjects
-currentSubject = {'W50'};
+currentSubject = {'XW0'};
 
 %% STEP 2
 % select folder by hand
@@ -87,7 +87,7 @@ cd(currentFolder)
 eyeFiles = dir('*.asc');
 nameEndI = strfind(eyeFiles(1, 1).name, 'b');
 currentSubject = eyeFiles(1, 1).name(1:nameEndI-1);
-for ascN = 1:size(eyeFiles.name, 1)
+for ascN = 1:size(eyeFiles, 1)
     ascFile = eyeFiles(ascN,1).name;
     rawAsc = load(ascFile);
     for trial = 1:682
@@ -95,7 +95,7 @@ for ascN = 1:size(eyeFiles.name, 1)
         startI = find(rawAsc(:, 1)==eventLog.fixationOn(currentTrial, 1));
         endI = find(rawAsc(:, 1)==(eventLog.rdkOff(currentTrial, 1)+600)); % until mask off
         allData = rawAsc(startI:endI, :);
-        save([currentSubject 't' num2str(currentTrial, '%03d') '.mat'], 'allData')
+        save([currentSubject 't' num2str(currentTrial, '%04d') '.mat'], 'allData')
     end
 end
 

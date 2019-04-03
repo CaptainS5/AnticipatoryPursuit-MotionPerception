@@ -19,6 +19,10 @@ prm.screen.waitFrames = 1; % for display timing; flip every n frames
 % display settings
 % prm.screen.backgroundColour = []; % background, currently set in openScreen
 
+% probability conditions
+prm.probCons = [50 70 90]; 
+% will be randomized and saved for each participant when running the first block
+
 % fixation
 prm.fixation.dotRadius = 0.15; % in dva
 prm.fixation.stdColour = [255 0 0]; % fixation colour for standard trials
