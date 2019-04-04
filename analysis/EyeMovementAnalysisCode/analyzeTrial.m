@@ -25,7 +25,7 @@ global trial
 % else
 %     ascFile = eyeFiles(3,1).name;
 % end
-ascFile = [currentSubject 't' num2str(currentTrial, '%03d') '.mat']; % mat file, one file for each trial
+ascFile = [currentSubject 't' num2str(currentTrial, '%04d') '.mat']; % mat file, one file for each trial
 trialStartIdx = eventLog.fixationOn(currentTrial, 1); % different trial start can be specified using e.g. parameters
 trialEndIdx = eventLog.rdkOff(currentTrial, 1)+ms2frames(600);
 eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath, trialStartIdx, trialEndIdx);
