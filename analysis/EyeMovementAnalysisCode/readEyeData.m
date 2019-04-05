@@ -23,7 +23,7 @@ function [eyeData] = readEyeData(ascFile, dataPath, currentSubject, analysisPath
     currentSubjectPath = fullfile(dataPath, currentSubject);
     cd(currentSubjectPath);
     % load eye movement file
-    %     allData = load(ascFile);
+%     allData = load(ascFile);
     load(ascFile)
     trialStartIdx = find(allData(:, 1)==trialStartIdx);
     trialEndIdx = find(allData(:, 1)==trialEndIdx);

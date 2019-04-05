@@ -3,7 +3,7 @@
 
 clear all; close all; clc
 
-names = {'YZ'};
+names = {'XW0'};
 sampleRate = 1000;
 % for plotting
 minVel = [-6];

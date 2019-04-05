@@ -226,10 +226,10 @@ while frameN<=fixFrames
                     demoN = demoN + 1;
                 end
                 if initialF==0
+                    [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
                     if info.eyeTracker==1
                         Eyelink('message', 'fixationOn');
                     end
-                    [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
                     initialF = 1;
                 else
                     vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
@@ -285,10 +285,10 @@ end
 % imwrite(imgF, 'fixation.jpg')
 
 %% Gap period
+[vbl fixOffTime] = Screen('Flip', prm.screen.windowPtr);
 if info.eyeTracker==1
     Eyelink('message', 'fixationOff');
 end
-[vbl fixOffTime] = Screen('Flip', prm.screen.windowPtr);
 for frameN = 1:gapFrames
     Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
     if demoN > 0
@@ -323,13 +323,13 @@ for frameN = 1:rdkFrames
 %     KbWait();
 %     clear KbCheck
     
-    if frameN==1
+    if frameN==1        
+        [vbl rdkOnTime prm.flipT(trialN, frameN)] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
         if info.eyeTracker==1
             %mark zero-plot time in data file
             Eyelink('Message', 'SYNCTIME');
             Eyelink('message', 'rdkOn');
         end
-        [vbl rdkOnTime prm.flipT(trialN, frameN)] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
     else
         [vbl ll prm.flipT(trialN, frameN)] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
     end
@@ -342,10 +342,10 @@ resp.rdkOnTime(trialN, 1) = rdkOnTime;
 %% Mask
 % random order of the textures
 maskIdx = randperm(maskFrameN);
+[vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 if info.eyeTracker==1
     Eyelink('message', 'rdkOff');
 end
-[vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 resp.rdkOffTime(trialN, 1) = rdkOffTime;
 for maskF = 1:maskFrameN
     Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});

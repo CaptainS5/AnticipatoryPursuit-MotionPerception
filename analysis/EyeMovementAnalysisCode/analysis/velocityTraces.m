@@ -1,11 +1,12 @@
 % plot velocity traces, generate csv file for plotting in R
 clear all; close all; clc
 
-names = {'YZ'};
+names = {'XW0'};
 sampleRate = 1000;
 % for plotting
 minVel = [-12 -1];
 maxVel = [5 12];
+cd ..
 folder = pwd;
 
 dirCons = [-1 1]; % -1=left, 1=right

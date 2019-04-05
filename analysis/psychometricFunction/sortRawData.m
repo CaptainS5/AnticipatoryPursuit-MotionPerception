@@ -42,6 +42,7 @@ for sub = 1:size(names, 2)
         end
     end    
     dataRaw.sub = sub*ones(size(dataRaw, 1), 1);
+    dataRaw.eyeType = ones(size(dataRaw, 1), 1);
 %     dataRaw.fixDuration = [];
     cd(folder) 
     save(['dataRaw_', names{sub}], 'dataRaw')

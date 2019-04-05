@@ -18,13 +18,7 @@
 %% Eye Data
 %  eye data need to have been converted using convert_edf2asc.m
 global trial
-% if currentTrial<=682
-%     ascFile = eyeFiles(1,1).name;
-% elseif currentTrial<=1364
-%     ascFile = eyeFiles(2,1).name;
-% else
-%     ascFile = eyeFiles(3,1).name;
-% end
+% ascFile = eyeFiles(currentTrial, 1).name;
 ascFile = [currentSubject 't' num2str(currentTrial, '%04d') '.mat']; % mat file, one file for each trial
 trialStartIdx = eventLog.fixationOn(currentTrial, 1); % different trial start can be specified using e.g. parameters
 trialEndIdx = eventLog.rdkOff(currentTrial, 1)+ms2frames(600);
@@ -58,9 +52,9 @@ trial = removeSaccades(trial);
 
  %% OPTIONAL: find and analyze pursuit
 pursuit = findPursuit(trial); 
+% analyze pursuit
+pursuit = analyzePursuit(trial, pursuit);
 trial.pursuit = pursuit;
-% % analyze pursuit
-% pursuit = analyzePursuit(trial, pursuit);
 
 %% OPTIONAL: find micro saccades
 % % remove saccades
