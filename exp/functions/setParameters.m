@@ -79,7 +79,7 @@ prm.mask.minLum = 0.3;
 % block conditions
 prm.ITI = 0.05; % inter-trial interval
 prm.reminderTrialN = 50; % progress report every N trials
-prm.blockN = 3; % total number of blocks
+prm.blockN = 6; % total number of blocks
 
 % key bindings
 prm.stopKey = 'q';

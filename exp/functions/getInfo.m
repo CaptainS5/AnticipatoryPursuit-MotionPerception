@@ -7,8 +7,8 @@ info.dateTime = clock;
 
 % questions and defaults
 n = 1;
-q{n} = 'subID'; defaults{n} = 't'; n = n+1;
-q{n} = 'Eyetracker(1) or not(0)'; defaults{n} = num2str(0); n = n+1;
+q{n} = 'subID'; defaults{n} = 'p2'; n = n+1;
+q{n} = 'Eyetracker(1) or not(0)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Eye condition (0=fixation, 1-pursuit)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Block'; defaults{n} = num2str(currentBlock); n = n+1;
 q{n} = 'Trial'; defaults{n} = num2str(1); n = n+1;
@@ -41,6 +41,7 @@ if info.block==0
     info.prob = 0;
 else
     if info.block==1 && info.trial==1
+        rng shuffle
         probCons = prm.probCons;
         randIdx = randperm(length(probCons));
         probCons = probCons(randIdx);
