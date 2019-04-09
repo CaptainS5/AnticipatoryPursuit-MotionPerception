@@ -21,7 +21,7 @@ cd ..
 cd ..
 dataPath = fullfile(pwd,'data\'); %assuming that the data folder is in the start folder
 folderNames = dir(dataPath); % this will be a list of all folders in the data folder, e.g. a list of all subjects
-currentSubject = {'XW0'};
+% currentSubject = {'XW0'};
 
 %% STEP 2
 % select folder by hand

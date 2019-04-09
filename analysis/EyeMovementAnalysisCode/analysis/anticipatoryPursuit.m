@@ -9,6 +9,9 @@ sampleRate = 1000;
 minVel = [-6];
 maxVel = [12];
 folder = pwd;
+% for AP, ms
+negativeWindow = -50;
+positiveWindow = 50;
 
 % dirCons = [-1 1]; % -1=left, 1=right
 % dirNames = {'left' 'right'};
@@ -30,8 +33,8 @@ for subN = 1:size(names, 2)
         lengthI = length(validI);
         
         for validTrialN = 1:lengthI
-            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))-ms2frames(50);
-            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(50);
+            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
+            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
             anticipatoryP{subN}.standard(validTrialN, probN) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
         end
         
@@ -41,8 +44,8 @@ for subN = 1:size(names, 2)
         
         % last half standard trials
         for validTrialN = 1:lengthI
-            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))-ms2frames(50);
-            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(50);
+            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
+            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
             anticipatoryP{subN}.perceptual(validTrialN, probN) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
         end
     end

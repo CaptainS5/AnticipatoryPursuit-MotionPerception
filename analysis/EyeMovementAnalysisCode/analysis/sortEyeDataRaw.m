@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0'};
+names = {'XW0' 'p2'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
@@ -27,7 +27,7 @@ microSaccadeThreshold = 5;
 
 %% Perceptual trials
 
-for subN = 1:length(names)
+for subN = 2:length(names)
     currentSubject = names{subN};
     cd(dataPath)
     cd(currentSubject)
