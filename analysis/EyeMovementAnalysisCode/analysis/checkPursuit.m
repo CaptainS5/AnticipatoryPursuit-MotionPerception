@@ -14,7 +14,7 @@ positiveWindow = 50;
 % minVel = [-6];
 % maxVel = [12];
 folder = pwd;
-% load(['eyeData_alltAYZXW0.mat']);
+load(['eyeData_all.mat']);
 % dirCons = [-1 1]; % -1=left, 1=right
 % dirNames = {'left' 'right'};
 colorProb = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
@@ -22,7 +22,7 @@ colorProb = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colou
 %% first analyze AP for all trials
 for subN = 1:size(names, 2)
     cd(folder)
-    load(['eyeData_' names{subN} '.mat']);
+%     load(['eyeData_' names{subN} '.mat']);
     
     for trialI = 1:size(eyeTrialData.trialIdx, 2)
         if eyeTrialData.errorStatus(subN, trialI)==0

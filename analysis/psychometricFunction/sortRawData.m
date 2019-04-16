@@ -5,13 +5,13 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'XW0' 'p2'};
+names = {'XW0' 'p2' 'p3' 'p4'};
 data = table();
 
 %%
 % dataIdx = 1;    
 cd ..
-for sub = 2:size(names, 2)
+for sub = 4:size(names, 2)
     % Read all raw data
     cd ..
     % read Experiment data

@@ -27,7 +27,7 @@ microSaccadeThreshold = 5;
 
 %% Perceptual trials
 
-for subN = 2:length(names)
+for subN = 1:length(names)
     currentSubject = names{subN};
     cd(dataPath)
     cd(currentSubject)
@@ -37,34 +37,35 @@ for subN = 2:length(names)
     load eventLog
     cd(analysisPath)
     errors = load(['Errorfiles\Sub_' currentSubject '_errorFile.mat']);
+    clear eyeTrialData
     
     for currentTrial = 1:size(parameters, 1)
-        if currentTrial>1364
-            screenResX = 2000;
-            screenResY = 1500;
-        end
-        eyeTrialData.sub(subN, currentTrial) = subN;
-        eyeTrialData.trialIdx(subN, currentTrial) = currentTrial;
-        eyeTrialData.trialType(subN, currentTrial) = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
-        eyeTrialData.prob(subN, currentTrial) = parameters.prob(currentTrial, 1); % n%
-        eyeTrialData.rdkDir(subN, currentTrial) = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
-        eyeTrialData.coh(subN, currentTrial) = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
-        eyeTrialData.choice(subN, currentTrial) = parameters.choice(currentTrial, 1); % 0-left, 1-right
-        eyeTrialData.errorStatus(subN, currentTrial) = errors.errorStatus(currentTrial, 1);
+%         if currentTrial>1364
+%             screenResX = 2000;
+%             screenResY = 1500;
+%         end
+        eyeTrialDataLog.sub(subN, currentTrial) = subN;
+        eyeTrialDataLog.trialIdx(subN, currentTrial) = currentTrial;
+        eyeTrialDataLog.trialType(subN, currentTrial) = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
+        eyeTrialDataLog.prob(subN, currentTrial) = parameters.prob(currentTrial, 1); % n%
+        eyeTrialDataLog.rdkDir(subN, currentTrial) = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
+        eyeTrialDataLog.coh(subN, currentTrial) = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
+        eyeTrialDataLog.choice(subN, currentTrial) = parameters.choice(currentTrial, 1); % 0-left, 1-right
+        eyeTrialDataLog.errorStatus(subN, currentTrial) = errors.errorStatus(currentTrial, 1);
         if errors.errorStatus(currentTrial, 1)~=-1
             analyzeTrial;
             
-            eyeTrialData.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
-            eyeTrialData.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
-            eyeTrialData.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
-            eyeTrialData.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
-            eyeTrialData.trial{subN, currentTrial} = trial;
+            eyeTrialDataLog.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
+            eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
+            eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
+            eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
+            eyeTrialData.trial{1, currentTrial} = trial;
         else
-            eyeTrialData.frameLog.fixationOn(subN, currentTrial) = NaN;
-            eyeTrialData.frameLog.fixationOff(subN, currentTrial) = NaN;
-            eyeTrialData.frameLog.rdkOn(subN, currentTrial) = NaN;
-            eyeTrialData.frameLog.rdkOff(subN, currentTrial) = NaN;
-            eyeTrialData.trial{subN, currentTrial} = NaN;
+            eyeTrialDataLog.frameLog.fixationOn(subN, currentTrial) = NaN;
+            eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = NaN;
+            eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = NaN;
+            eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = NaN;
+            eyeTrialData.trial{1, currentTrial} = NaN;
         end
         % %         eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
         % %         eyeTrialData.stim.beforeFrames(subN, currentTrial) = trial.stim_reversalOnset-trial.stim_onset; % for later alignment of velocity traces
@@ -78,6 +79,7 @@ for subN = 2:length(names)
         % %         eyeTrialData.frameLog.quickphaseFrames{subN, currentTrial} = trial.quickphaseFrames;
         %         eyeTrialData.saccades{subN, currentTrial} = trial.saccades;
     end
-    cd([analysisPath '\analysis'])
-    save(['eyeData_', names{subN}, '.mat'], 'eyeTrialData');
+    cd([analysisPath '\analysis'])    
+    save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialData');
 end
+save(['eyeTrialDataLog_all.mat'], 'eyeTrialDataLog');

@@ -13,6 +13,10 @@
 %                     loop pursuit measures
 
 function [pursuit] = analyzePursuit(trial, pursuit)
+% define the window of anticipatory pursuit
+
+
+
 % define the window you want to analyze pursuit in
 openLoopLength = 140;
 openLoopDuration = ms2frames(openLoopLength);
