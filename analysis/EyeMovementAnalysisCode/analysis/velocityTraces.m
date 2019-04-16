@@ -80,39 +80,39 @@ for probN = 3:size(probCons, 2)
     velMean{probN}.leftPerceptual = nanmean(meanVel{probN}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end), 1);
     velMean{probN}.rightPerceptual = nanmean(meanVel{probN}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end), 1);
         
-    for subN = 1:size(names, 2)
-        figure % plot individual mean traces
-        p1 = plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'k');
-        hold on
-        plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'k');
-        p2 = plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'b');
-        plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'b');
-        legend([p1, p2], {'standard', 'perceptual'}, 'Location', 'NorthWest')
-        title(['prob ', num2str(probCons(probN)), '%'])
-        xlim([-500 700])
-        xlabel('Time (ms)')
-        ylabel('Horizontal velocity (deg/s)')
-        %     ylim([-2 12])
-        saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_', names{subN}, '.pdf'])
-    end
-    
-    figure % mean of participants
-    p1 = plot(timePoints, velMean{probN}.leftStandard, 'k');
-    hold on
-    plot(timePoints, velMean{probN}.rightStandard, 'k')
-    p2 = plot(timePoints, velMean{probN}.leftPerceptual, 'b');
-    plot(timePoints, velMean{probN}.rightPerceptual, 'b')
-    legend([p1, p2], {'standard', 'perceptual'}, 'Location', 'NorthWest')
-%     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
-%     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-%     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-    title(['prob ', num2str(probCons(probN)), '%'])
-    xlim([-500 700])
-    xlabel('Time (ms)')
-    ylabel('Horizontal velocity (deg/s)')
-%     ylim([-12 12])
-    box off
-    saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_all.pdf'])
+%     for subN = 1:size(names, 2)
+%         figure % plot individual mean traces
+%         p1 = plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'k');
+%         hold on
+%         plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'k');
+%         p2 = plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'b');
+%         plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'b');
+%         legend([p1, p2], {'standard', 'perceptual'}, 'Location', 'NorthWest')
+%         title(['prob ', num2str(probCons(probN)), '%'])
+%         xlim([-500 700])
+%         xlabel('Time (ms)')
+%         ylabel('Horizontal velocity (deg/s)')
+%         %     ylim([-2 12])
+%         saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_', names{subN}, '.pdf'])
+%     end
+%     
+%     figure % mean of participants
+%     p1 = plot(timePoints, velMean{probN}.leftStandard, 'k', 'LineWidth', 1.5);
+%     hold on
+%     plot(timePoints, velMean{probN}.rightStandard, 'k', 'LineWidth', 1.5)
+%     p2 = plot(timePoints, velMean{probN}.leftPerceptual, 'b', 'LineWidth', 1.5);
+%     plot(timePoints, velMean{probN}.rightPerceptual, 'b', 'LineWidth', 1.5)
+%     legend([p1, p2], {'standard', 'perceptual'}, 'Location', 'NorthWest')
+% %     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% %     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% %     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+%     title(['prob ', num2str(probCons(probN)), '%'])
+%     xlim([-500 700])
+%     xlabel('Time (ms)')
+%     ylabel('Horizontal velocity (deg/s)')
+% %     ylim([-12 12])
+%     box off
+%     saveas(gca, ['velocityTracesProb', num2str(probCons(probN)), '_all.pdf'])
 end
 
 % plot mean traces in all probabilities for all participants
@@ -120,9 +120,9 @@ for subN = 1:size(names, 2)
     figure 
     subplot(2, 1, 1)
     for probN = 3:size(probCons, 2)
-        plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :))
+        plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
         hold on
-        p{probN} = plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :));
+        p{probN} = plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
     end
     % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -137,9 +137,9 @@ for subN = 1:size(names, 2)
     
     subplot(2, 1, 2)
     for probN = 3:size(probCons, 2)
-        plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :))
+        plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
         hold on
-        p{probN} = plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :));
+        p{probN} = plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
     end
     % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -157,9 +157,9 @@ end
 figure % plot mean traces in all probabilities for all participants
 subplot(2, 1, 1)
 for probN = 3:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftStandard, 'color', colorPlotting(probN, :))
+    plot(timePoints, velMean{probN}.leftStandard, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
     hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorPlotting(probN, :));
+    p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
 end
 % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
 % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -174,9 +174,9 @@ box off
 
 subplot(2, 1, 2)
 for probN = 3:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorPlotting(probN, :))
+    plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
     hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorPlotting(probN, :));
+    p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
 end
 % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
 % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
