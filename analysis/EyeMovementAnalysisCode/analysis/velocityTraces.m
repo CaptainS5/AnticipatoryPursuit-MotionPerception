@@ -19,7 +19,7 @@ for subN = 1:size(names, 2)
     cd(folder)
     load(['eyeTrialData_' names{subN} '.mat']);
     frameLength(subN) = min(max(eyeTrialDataLog.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate);
-    lengthT = size(eyeTrialData.trial, 2);
+    lengthT = size(eyeTrialDataSub.trial, 2);
     frames{subN} = NaN(lengthT, frameLength(subN));
     
     for trialN = 1:lengthT        
@@ -31,7 +31,7 @@ for subN = 1:size(names, 2)
             startI = eyeTrialDataLog.frameLog.fixationOn(subN, trialN);
             startIF = frameLength(subN)-endI+1;
         end
-        frames{subN}(trialN, startIF:end) = eyeTrialData.trial{1, trialN}.DX_interpolSac(startI:endI);
+        frames{subN}(trialN, startIF:end) = eyeTrialDataSub.trial{1, trialN}.DX_interpolSac(startI:endI);
     end
 end
 maxFrameLength = max(frameLength);

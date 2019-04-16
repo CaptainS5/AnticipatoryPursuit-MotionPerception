@@ -59,13 +59,13 @@ for subN = 1:length(names)
             eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
             eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
             eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
-            eyeTrialData.trial{1, currentTrial} = trial;
+            eyeTrialDataSub.trial{1, currentTrial} = trial;
         else
             eyeTrialDataLog.frameLog.fixationOn(subN, currentTrial) = NaN;
             eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = NaN;
             eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = NaN;
             eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = NaN;
-            eyeTrialData.trial{1, currentTrial} = NaN;
+            eyeTrialDataSub.trial{1, currentTrial} = NaN;
         end
         % %         eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
         % %         eyeTrialData.stim.beforeFrames(subN, currentTrial) = trial.stim_reversalOnset-trial.stim_onset; % for later alignment of velocity traces
@@ -80,6 +80,6 @@ for subN = 1:length(names)
         %         eyeTrialData.saccades{subN, currentTrial} = trial.saccades;
     end
     cd([analysisPath '\analysis'])    
-    save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialData');
+    save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialDataSub');
 end
 save(['eyeTrialDataLog_all.mat'], 'eyeTrialDataLog');

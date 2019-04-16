@@ -14,19 +14,22 @@
 
 function [pursuit] = analyzePursuit(trial, pursuit)
 % define the window of anticipatory pursuit
+negativeAPwindow = ms2frames(-50);
+positiveAPwindow = ms2frames(50);
+% calculate AP...
 
-
-
-% define the window you want to analyze pursuit in
+% define the window you want to analyze open-loop pursuit in
 openLoopLength = 140;
 openLoopDuration = ms2frames(openLoopLength);
 pursuitOff = trial.stim_offset; % may want to adjust if target has already disappeard 
 % analyze open-loop phase first
-startFrame = nanmin([trial.stim_onset+ms2frames(50) pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
-if startFrame<trial.stim_onset+ms2frames(50)
-    startFrame = trial.stim_onset+ms2frames(50);
+startFrame = nanmin([trial.stim_onset+positiveAPwindow pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
+if startFrame<trial.stim_onset+positiveAPwindow % if onset is earlier that AP window, set it to AP window?
+    startFrame = trial.stim_onset+positiveAPwindow;
 end
-endFrame = nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+ms2frames(50)+openLoopDuration)]);
+endFrame = startFrame+openLoopDuration; %?nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
+pursuit.openLoopStartFrame = startFrame;
+pursuit.openLoopEndFrame = endFrame;
 % If subjects were fixating in the beginning (saccadeType = 2) or if purusit onset
 % was inside a saccade (saccadeType = -2) there is no open loop values
 if pursuit.saccadeType == 2 || pursuit.saccadeType == -2
@@ -118,11 +121,12 @@ else
 end
 % now analyze closed loop
 % if there is no pursuit onset, use stimulus onset as onset 
-if isnan(pursuit.onset)
-    startFrame = trial.stim_onset + openLoopLength;
-else
-    startFrame = pursuit.onset + openLoopLength;
-end
+% if isnan(pursuit.onset)
+%     startFrame = trial.stim_onset + positiveAPwindow + openLoopDuration;
+% else
+%     startFrame = pursuit.onset + openLoopDuration;
+% end
+startFrame = pursuit.openLoopEndFrame+1;
 endFrame = pursuitOff;
 closedLoop = startFrame:endFrame;
 pursuit.closedLoopMeanVel.X = nanmean(trial.DX_noSac(startFrame:endFrame));
