@@ -3,12 +3,13 @@
 
 clear all; close all; clc
 
-names = {'XW0'};
+names = {'XW0' 'p2'};
 sampleRate = 1000;
 % for plotting
 minVel = [-6];
 maxVel = [12];
 folder = pwd;
+load('eyeTrialDataLog_all.mat');
 % for AP, ms
 negativeWindow = -50;
 positiveWindow = 50;
@@ -21,36 +22,36 @@ colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one c
 % separate perceptual and standard trials
 for subN = 1:size(names, 2)
     cd(folder)
-    load(['eyeData_' names{subN} '.mat']);
-    probCons = unique(eyeTrialData.prob(eyeTrialData.errorStatus==0));
+    load(['eyeTrialData_' names{subN} '.mat']);
+    probCons = unique(eyeTrialDataLog.prob(subN, eyeTrialDataLog.errorStatus(subN, :)==0));
     cd ..
     
     anticipatoryP{subN}.standard = NaN(500, size(probCons, 2));
     anticipatoryP{subN}.perceptual = NaN(182, size(probCons, 2));
     for probN = 1:size(probCons, 2)
         % standard trials
-        validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
+        validI = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
         lengthI = length(validI);
         
         for validTrialN = 1:lengthI
-            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
-            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
-            anticipatoryP{subN}.standard(validTrialN, probN) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
+            startI = eyeTrialDataLog.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
+            endI = eyeTrialDataLog.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
+            anticipatoryP{subN}.standard(validTrialN, probN) = nanmean(eyeTrialData.trial{1, validI(validTrialN)}.DX_noSac(startI:endI));
         end
         
         % then perceptual trials
-        validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
-        lengthI = length(validI); 
+        validI = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==0 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        lengthI = length(validI);
         
         % last half standard trials
         for validTrialN = 1:lengthI
-            startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
-            endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
-            anticipatoryP{subN}.perceptual(validTrialN, probN) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
+            startI = eyeTrialDataLog.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(negativeWindow);
+            endI = eyeTrialDataLog.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(positiveWindow);
+            anticipatoryP{subN}.perceptual(validTrialN, probN) = nanmean(eyeTrialData.trial{1, validI(validTrialN)}.DX_noSac(startI:endI));
         end
     end
     
-    cd(folder)
+    cd('pursuitPlots')
     % boxplots
     figure % plot mean anticipatory pursuit in all probabilities, just a rough check...
     subplot(1, 2, 1)
@@ -59,7 +60,7 @@ for subN = 1:size(names, 2)
     legend({'50' '70' '90'}, 'box', 'off')
     title('standard trials')
     ylabel('Horizontal eye velocity (deg/s)')
-%     ylim([minVel maxVel])
+    %     ylim([minVel maxVel])
     box off
     
     subplot(1, 2, 2)
@@ -68,11 +69,13 @@ for subN = 1:size(names, 2)
     legend({'50' '70' '90'}, 'box', 'off')
     title('perceptual trials')
     ylabel('Horizontal eye velocity (deg/s)')
-%     ylim([minVel maxVel])
+    %     ylim([minVel maxVel])
     box off
     saveas(gca, ['anticipatoryP_boxplot_', names{subN}, '.pdf'])
     
     % grouped bars
+    %     figure
+    %     subplot(1, 2, 1)
     for probN = 1:size(probCons, 2)
         meanAP(1, probN) = nanmean(anticipatoryP{subN}.standard(:, probN));
         stdAP(1, probN) = nanstd(anticipatoryP{subN}.standard(:, probN));
@@ -82,7 +85,7 @@ for subN = 1:size(names, 2)
         'bar_names',{'50','70','90'});
     title('standard trials')
     ylabel('Horizontal eye velocity (deg/s)')
-%     ylim([-0.5 5])
+    %     ylim([-0.5 5])
     box off
     saveas(gca, ['anticipatoryP_standard_', names{subN}, '.pdf'])
     
@@ -96,9 +99,9 @@ for subN = 1:size(names, 2)
         'bar_names',{'50','70','90'});
     title('perceptual trials')
     ylabel('Horizontal eye velocity (deg/s)')
-%     ylim([-0.5 5])
+    %     ylim([-0.5 5])
     box off
-    saveas(gca, ['anticipatoryP_perceptual_', names{subN}, '.pdf'])
+    saveas(gca, ['anticipatoryP_barplot_', names{subN}, '.pdf'])
 end
 
 %% compare first and second half of the trials
@@ -108,7 +111,7 @@ end
 %     load(['eyeData_' names{subN} '.mat']);
 %     probCons = unique(eyeTrialData.prob);
 %     cd ..
-% 
+%
 %     for probN = 1:size(probCons, 2)
 %         % standard trials
 %         validI = find(eyeTrialData.errorStatus(subN, :)~=1 & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
@@ -117,7 +120,7 @@ end
 %         anticipatoryP{subN, probN}.firstStandard = NaN(lengthF, 1); % align the reversal; filled with NaN
 %         anticipatoryP{subN, probN}.lastStandard = NaN(lengthL, 1); % align the reversal; filled with NaN
 %         % rows are trials, columns are frames
-% 
+%
 %         % first half standard trials, fill in the velocity trace of each frame
 %         % use interpolate points for a better velocity trace
 %         for validTrialN = 1:lengthF
@@ -125,14 +128,14 @@ end
 %             endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(50);
 %             anticipatoryP{subN, probN}.firstStandard(validTrialN, 1) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
 %         end
-% 
+%
 %         % last half standard trials
 %         for validTrialN = 1:lengthL
 %             startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN+lengthF))-ms2frames(50);
 %             endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN+lengthF))+ms2frames(50);
 %             anticipatoryP{subN, probN}.lastStandard(validTrialN, 1) = nanmean(eyeTrialData.trial{subN, validI(validTrialN+lengthF)}.DX_noSac(startI:endI));
 %         end
-% 
+%
 %         % then perceptual trials
 %         validI = find(eyeTrialData.errorStatus(subN, :)~=1 & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
 %         lengthF = round(length(validI)/2); % first half of the trials
@@ -140,7 +143,7 @@ end
 %         anticipatoryP{subN, probN}.firstPerceptual = NaN(lengthF, 1); % align the reversal; filled with NaN
 %         anticipatoryP{subN, probN}.lastPerceptual = NaN(lengthL, 1); % align the reversal; filled with NaN
 %         % rows are trials, columns are frames
-% 
+%
 %         % first half standard trials, fill in the velocity trace of each frame
 %         % use interpolate points for a better velocity trace
 %         for validTrialN = 1:lengthF
@@ -148,7 +151,7 @@ end
 %             endI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN))+ms2frames(50);
 %             anticipatoryP{subN, probN}.firstPerceptual(validTrialN, 1) = nanmean(eyeTrialData.trial{subN, validI(validTrialN)}.DX_noSac(startI:endI));
 %         end
-% 
+%
 %         % last half standard trials
 %         for validTrialN = 1:lengthL
 %             startI = eyeTrialData.frameLog.rdkOn(subN, validI(validTrialN+lengthF))-ms2frames(50);
@@ -156,7 +159,7 @@ end
 %             anticipatoryP{subN, probN}.lastPerceptual(validTrialN, 1) = nanmean(eyeTrialData.trial{subN, validI(validTrialN+lengthF)}.DX_noSac(startI:endI));
 %         end
 %     end
-% 
+%
 % %     figure % plot mean anticipatory pursuit in all probabilities, just a rough check...
 % %     subplot(1, 2, 1)
 %     for probN = 1:size(probCons, 2)
@@ -174,7 +177,7 @@ end
 %     ylim([-0.5 4])
 %     box off
 %     saveas(gca, ['anticipatoryP_standard_', names{subN}, '.pdf'])
-% 
+%
 % %     subplot(1, 2, 2)
 %     for probN = 1:size(probCons, 2)
 %         meanAP(1, probN) = nanmean(anticipatoryP{subN, probN}.firstPerceptual);
