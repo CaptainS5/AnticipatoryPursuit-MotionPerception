@@ -7,7 +7,7 @@ trialN = 26; % number of trials for each coherence level in each direction
 colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 %% fitting data
-for subN = 1:size(names, 2)
+for subN = 3:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.coh==1, :) = [];

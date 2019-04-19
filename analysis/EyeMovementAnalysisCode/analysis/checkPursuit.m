@@ -265,6 +265,7 @@ for subN = 1:size(names, 2)
     slidingOLP{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
     slidingCLP{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
     slidingPercept{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
+    slidingCLPp{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
     for probI = 1:size(probCons, 2)
         idxT = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0);
         for slideI = 1:length(idxT)-trialBin
@@ -275,11 +276,12 @@ for subN = 1:size(names, 2)
         
         idxT = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0 ...
             & abs(eyeTrialDataLog.coh(subN, :))~=1);
-        for slideI = 1:length(idxT)-trialBin
+        for slideI = 1:length(idxT)-trialBin+1
             slidingPercept{subN}(probI, slideI) = nanmean(eyeTrialDataLog.choice(subN, idxT(slideI:(slideI+trialBin-1))));
+            slidingCLPp{subN}(probI, slideI) = nanmean(eyeTrialData.pursuit.closedLoopGain(subN, idxT(slideI:(slideI+trialBin-1)))); % close loop pursuit gain
         end
     end
-    % individual plot
+%     % individual plot
     % AP
     figure
     for probI = 1:size(probCons, 2)
@@ -315,6 +317,18 @@ for subN = 1:size(names, 2)
     ylabel('Closed-loop pursuit gain')
     title(names{subN})
     saveas(gca, ['slidingCLPgain_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+    
+    % CLP in perceptual trials
+    figure
+    for probI = 1:size(probCons, 2)
+        plot(slidingCLPp{subN}(probI, :), 'color', colorProb(probI, :))
+        hold on
+    end
+    legend({'50' '70' '90'}, 'box', 'off')
+    xlabel('Trial number (only perceptual trials)')
+    ylabel('Closed-loop pursuit gain')
+    title(names{subN})
+    saveas(gca, ['slidingCLPgain_perceptualTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
     
     % Perception
     figure

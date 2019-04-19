@@ -399,6 +399,18 @@ end
 % end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
+if blockN==0 % prectice block, give feedback
+    if rdkDir<0
+        feedbackText = 'left';
+    elseif rdkDir>0
+        feedbackText = 'right';
+    end
+    DrawFormattedText(prm.screen.windowPtr, feedbackText,...
+        'center', 'center', prm.textColour);
+    Screen('Flip', prm.screen.windowPtr);
+    WaitSecs(0.5)
+end
+
 % %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
 if rem(trialN, prm.reminderTrialN)==0
     trialsLeft = prm.trialPerBlock-trialN;
