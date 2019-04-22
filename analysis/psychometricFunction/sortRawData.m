@@ -11,7 +11,7 @@ data = table();
 %%
 % dataIdx = 1;    
 cd ..
-for sub = 4:size(names, 2)
+for sub = 3:size(names, 2)
     % Read all raw data
     cd ..
     % read Experiment data
