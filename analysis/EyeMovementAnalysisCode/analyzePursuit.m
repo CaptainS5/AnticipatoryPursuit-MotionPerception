@@ -17,17 +17,26 @@ function [pursuit] = analyzePursuit(trial, pursuit)
 negativeAPwindow = ms2frames(-50);
 positiveAPwindow = ms2frames(50);
 % calculate AP...
+pursuit.APvelocity.X = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
 
 % define the window you want to analyze open-loop pursuit in
+%%calculated open-loop duration
+
+%%end of calculated open-loop duration
+% or use the following:
+%%fixed open-loop duration
 openLoopLength = 140;
 openLoopDuration = ms2frames(openLoopLength);
-pursuitOff = trial.stim_offset; % may want to adjust if target has already disappeard 
+pursuitOff = trial.stim_offset-ms2frames(150); % may want to adjust if target has already disappeard 
 % analyze open-loop phase first
-startFrame = nanmin([trial.stim_onset+positiveAPwindow pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
-if startFrame<trial.stim_onset+positiveAPwindow % if onset is earlier that AP window, set it to AP window?
+startFrame = nanmax([trial.stim_onset+positiveAPwindow pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
+endFrame = startFrame+openLoopDuration; %nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
+if startFrame<trial.stim_onset+positiveAPwindow % if onset is earlier that AP window, set it to AP window
     startFrame = trial.stim_onset+positiveAPwindow;
+    endFrame = trial.stim_onset+openLoopDuration;
 end
-endFrame = startFrame+openLoopDuration; %?nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
+%%end of fixed open-loop duration
+
 pursuit.openLoopStartFrame = startFrame;
 pursuit.openLoopEndFrame = endFrame;
 % If subjects were fixating in the beginning (saccadeType = 2) or if purusit onset
@@ -132,13 +141,14 @@ closedLoop = startFrame:endFrame;
 pursuit.closedLoopMeanVel.X = nanmean(trial.DX_noSac(startFrame:endFrame));
 % calculate gain first
 speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
+speedX_noSac = sqrt((trial.DX_noSac).^2);
 absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
 idx = absoluteVel < 0.05;
 absoluteVel(idx) = NaN;
-pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
-pursuit.gain= nanmean(pursuitGain);
-if length(pursuitGain) < ms2frames(40)
-    pursuit.gain = NaN;
+pursuitGainX = (speedX_noSac(closedLoop))./absoluteVel(closedLoop);
+pursuit.gain.X= nanmean(pursuitGainX);
+if length(pursuitGainX) < ms2frames(40)
+    pursuit.gain.X = NaN;
 end
 % % calculate position error
 % horizontalError = trial.X_noSac(startFrame:endFrame)-trial.stimulus.XposGenerated(startFrame:endFrame);

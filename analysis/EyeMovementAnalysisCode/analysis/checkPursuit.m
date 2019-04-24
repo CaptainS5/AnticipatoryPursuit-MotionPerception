@@ -35,8 +35,8 @@ for subN = 1:size(names, 2)
             endI = eyeTrialDataLog.frameLog.rdkOn(subN, trialI)+ms2frames(positiveWindow);
             eyeTrialData.pursuit.AP(subN, trialI) = nanmean(eyeTrialDataSub.trial{1, trialI}.DX_noSac(startI:endI));
             %             eyeTrialData.trial{subN, trialI}.pursuit = analyzePursuit(eyeTrialDataSub.trial{1, trialI}, eyeTrialDataSub.trial{1, trialI}.pursuit);
-            eyeTrialData.pursuit.initialMeanVelocity(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.initialMeanVelocity;
-            eyeTrialData.pursuit.closedLoopGain(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.gain;
+            eyeTrialData.pursuit.initialMeanVelocity(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.initialMeanVelocity.X;
+            eyeTrialData.pursuit.closedLoopGain(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.gain.X;
             eyeTrialData.pursuit.closedLoopMeanVel(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.closedLoopMeanVel.X;
         end
     end

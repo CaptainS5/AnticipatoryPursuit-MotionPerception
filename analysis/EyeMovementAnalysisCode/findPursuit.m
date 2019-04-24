@@ -9,6 +9,9 @@
 % 13-07-2018    JF commented to make the script more accecable for future
 %               VPOM students
 % for questions email jolande.fooken@rwth-aachen.de
+% 23-04-2019    XW added steady-state onset using the same method
+% for questions email xiuyunwu5@gmail.com
+
 %
 % input: trial --> structure containing relevant current trial information
 % output: pursuit --> structure containing info about pursuit onset
@@ -38,9 +41,10 @@ end
 % this is basically saying there is no pursuit
 if endTime-startTime < 10
     pursuit.onset = NaN;
-else   
+    pursuit.onsetSteadyState = NaN;
+else
     time = startTime:endTime;
-    fixationInterval = 575; % chose an interval before stimulus onset that
+    fixationInterval = 550; % chose an interval before stimulus onset that
     % we will use as fixation window; needs to be at least 201 ms
     if trial.stim_onset > fixationInterval
         fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
@@ -48,12 +52,12 @@ else
     else
         fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
         fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
-    end    
-    % 2. calculate 2D vector relative to fixation position
+    end
+    % 2. calculate 2D vector relative to fixation velocity
     dataxy_tmp = sqrt( (trial.eyeDX_filt-fix_x).^2 + (trial.eyeDY_filt-fix_y).^2 );
-    XY = dataxy_tmp(time);       
+    XY = dataxy_tmp(time);
     % run changeDetect.m
-    [cx,cy,ly,ry] = changeDetect(time,XY);  
+    [cx,cy,ly,ry] = changeDetect(time,XY);
     pursuit.onset = round(cx);
     % this next part has been written by JF to make sure that the pursuit
     % onset is ligit (e.g. not in an undetected saccade or during a
@@ -121,13 +125,13 @@ else
             pursuit.onset = pursuit.onset + 50;
             pursuit.saccadeType = -2;
         end
-    % check if the pursuit onset is not just a fixation
+        % check if the pursuit onset is not just a fixation
     elseif ceil(sqrt(checkX.^2+checkY.^2)*10)/10 < 1.5
         pursuit.onset = endMark;
         pursuit.saccadeType = 2;
     else %everything fine
         pursuit.saccadeType = 0;
-    end    
+    end
     % just mark the pursuit onset types to later count what's going on
     if mark < trial.stim_onset
         pursuit.onsetType = -1;
@@ -135,6 +139,44 @@ else
         pursuit.onsetType = 0;
     else
         pursuit.onsetType = 1;
+    end
+    
+    %%calculate the steady-state phase onset, using similar methods
+    %%currently not reliable enough... need to check later
+    startTime = pursuit.onset + ms2frames(50);
+    endTime = startTime + ms2frames(200); % open-loop phase not longer than a certain window
+    if startTime>=trial.stim_offset - ms2frames(140) % if steady-state phase is < 50ms, ignore
+        pursuit.onsetSteadyState = NaN;
+    else
+        time = startTime:endTime;
+%         fixationInterval = 550; % chose an interval before stimulus onset that
+%         % we will use as fixation window; needs to be at least 201 ms
+%         if trial.stim_onset > fixationInterval
+%             fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
+%             fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
+%         else
+%             fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
+%             fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
+%         end
+        % calculate 2D vector relative to fixation velocity
+        dataxy_tmp = sqrt( (trial.DX_interpolSac-fix_x).^2 + (trial.DY_interpolSac-fix_y).^2 );
+        XY = dataxy_tmp(time);
+        % run changeDetect.m
+        [cx,cy,ly,ry] = changeDetect(time,XY);
+        pursuit.onsetSteadyState = round(cx);
+        % if the steady state onset is during a saccade, move it
+        % before the saccade
+        if ~isempty(trial.saccades.onsetsDuring) && ~isempty(trial.saccades.offsetsDuring)
+            onsetT = find(trial.saccades.onsetsDuring>pursuit.onset & trial.saccades.onsetsDuring<pursuit.onsetSteadyState);
+            offsetT = find(trial.saccades.offsetsDuring>pursuit.onsetSteadyState);
+            if ~isempty(onsetT) && ~isempty(offsetT)
+                if find(onsetT==offsetT(1))
+                    pursuit.onsetSteadyState = trial.saccades.onsetsDuring(offsetT(1));
+                end
+            end
+        end
+        
+        disp(num2str(pursuit.onsetSteadyState-pursuit.onset))
     end
 end
 

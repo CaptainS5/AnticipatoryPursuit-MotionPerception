@@ -4,7 +4,12 @@ clear all; close all; clc
 
 names = {'XW0' 'p2' 'p4'};
 trialN = 26; % number of trials for each coherence level in each direction
-colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+% just flip the leftward probability participants? maybe later...
+% colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
+probCons = [10; 30; 50; 70; 90];
+probNames{1} = {'Prob 10%' 'Prob 30%' 'Prob 50%'};
+probNames{2} = {'Prob 50%' 'Prob 70%' 'Prob 90%'};
+colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 %% fitting data
 for subN = 3:size(names, 2)
@@ -21,12 +26,17 @@ for subN = 3:size(names, 2)
     %     end
     
     probLevels = unique(data.prob);
+    if probLevels(1)<50
+        probB = 1;
+    else
+        probB = 2;
+    end
     
     figure
-    hold on
-    
+    hold on    
     %% fitting for each coherence level
     for probN = 1:length(probLevels)
+        probIdx = find(probCons==probLevels(probN));
         % sort data
         dataT = data(data.prob==probLevels(probN, :), :);
         cohLevels = unique(dataT.cohFit); % stimulus levels, negative is left
@@ -61,8 +71,8 @@ for subN = 3:size(names, 2)
         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
         ProportionCorrectModel = PF(paramsValues{subN, probN},StimLevelsFineGrain);
         
-        f{probN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probN, :), 'linewidth', 2);
-        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probN, :), 'markersize', 30);
+        f{probN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probIdx, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probIdx, :), 'markersize', 30);
     end
     set(gca, 'fontsize',16);
     set(gca, 'Xtick',cohLevels);
@@ -70,7 +80,7 @@ for subN = 3:size(names, 2)
     xlabel('Stimulus Intensity');
     ylabel('Proportion right');
     hold off
-    legend([f{:}], {'Prob 50%' 'Prob 70%' 'Prob 90%'}, 'box', 'off', 'location', 'northwest')
+    legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
     
     saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end

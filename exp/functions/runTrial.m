@@ -400,10 +400,10 @@ end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
 if blockN==0 % prectice block, give feedback
-    if rdkDir<0
-        feedbackText = 'left';
-    elseif rdkDir>0
-        feedbackText = 'right';
+    if (rdkDir<0 && strcmp(key, prm.leftKey)) || (rdkDir>0 && strcmp(key, prm.rightKey))
+        feedbackText = 'correct';
+    else
+        feedbackText = 'incorrect';
     end
     DrawFormattedText(prm.screen.windowPtr, feedbackText,...
         'center', 'center', prm.textColour);
