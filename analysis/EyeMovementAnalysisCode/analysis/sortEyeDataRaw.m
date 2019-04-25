@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2'};
+names = {'XW0' 'p2' 'p4'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
@@ -44,27 +44,27 @@ for subN = 1:length(names)
 %             screenResX = 2000;
 %             screenResY = 1500;
 %         end
-        eyeTrialDataLog.sub(subN, currentTrial) = subN;
-        eyeTrialDataLog.trialIdx(subN, currentTrial) = currentTrial;
-        eyeTrialDataLog.trialType(subN, currentTrial) = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
-        eyeTrialDataLog.prob(subN, currentTrial) = parameters.prob(currentTrial, 1); % n%
-        eyeTrialDataLog.rdkDir(subN, currentTrial) = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
-        eyeTrialDataLog.coh(subN, currentTrial) = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
-        eyeTrialDataLog.choice(subN, currentTrial) = parameters.choice(currentTrial, 1); % 0-left, 1-right
-        eyeTrialDataLog.errorStatus(subN, currentTrial) = errors.errorStatus(currentTrial, 1);
+        eyeTrialData.sub(subN, currentTrial) = subN;
+        eyeTrialData.trialIdx(subN, currentTrial) = currentTrial;
+        eyeTrialData.trialType(subN, currentTrial) = parameters.trialType(currentTrial, 1); % 0-perceptual trial, 1-standard trial
+        eyeTrialData.prob(subN, currentTrial) = parameters.prob(currentTrial, 1); % n%
+        eyeTrialData.rdkDir(subN, currentTrial) = parameters.rdkDir(currentTrial, 1); % -1=left, 1=right, 0=0 coherence, no direction
+        eyeTrialData.coh(subN, currentTrial) = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
+        eyeTrialData.choice(subN, currentTrial) = parameters.choice(currentTrial, 1); % 0-left, 1-right
+        eyeTrialData.errorStatus(subN, currentTrial) = errors.errorStatus(currentTrial, 1);
         if errors.errorStatus(currentTrial, 1)~=-1
             analyzeTrial;
             
-            eyeTrialDataLog.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
-            eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
-            eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
-            eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
+            eyeTrialData.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
+            eyeTrialData.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
+            eyeTrialData.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
+            eyeTrialData.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
             eyeTrialDataSub.trial{1, currentTrial} = trial;
         else
-            eyeTrialDataLog.frameLog.fixationOn(subN, currentTrial) = NaN;
-            eyeTrialDataLog.frameLog.fixationOff(subN, currentTrial) = NaN;
-            eyeTrialDataLog.frameLog.rdkOn(subN, currentTrial) = NaN;
-            eyeTrialDataLog.frameLog.rdkOff(subN, currentTrial) = NaN;
+            eyeTrialData.frameLog.fixationOn(subN, currentTrial) = NaN;
+            eyeTrialData.frameLog.fixationOff(subN, currentTrial) = NaN;
+            eyeTrialData.frameLog.rdkOn(subN, currentTrial) = NaN;
+            eyeTrialData.frameLog.rdkOff(subN, currentTrial) = NaN;
             eyeTrialDataSub.trial{1, currentTrial} = NaN;
         end
         % %         eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
@@ -82,4 +82,4 @@ for subN = 1:length(names)
     cd([analysisPath '\analysis'])    
     save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialDataSub');
 end
-save(['eyeTrialDataLog_all.mat'], 'eyeTrialDataLog');
+save(['eyeTrialData_all.mat'], 'eyeTrialData');

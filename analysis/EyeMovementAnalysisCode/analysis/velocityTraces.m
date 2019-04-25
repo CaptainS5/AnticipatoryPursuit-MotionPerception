@@ -1,12 +1,12 @@
 % plot velocity traces, generate csv file for plotting in R
 clear all; close all; clc
 
-names = {'XW0' 'p2'};
+names = {'XW0' 'p2' 'p4'};
 sampleRate = 1000;
 % for plotting
 minVel = [-12 -1];
 maxVel = [5 12];
-load(['eyeTrialDataLog_all.mat']);
+load(['eyeTrialData_all.mat']);
 % cd ..
 folder = pwd;
 probCons = [10 30 50 70 90];
@@ -18,17 +18,17 @@ colorPlotting = [255 0 0; 0 0 255; 255 182 135; 137 126 255; 113 204 100]/255; %
 for subN = 1:size(names, 2)
     cd(folder)
     load(['eyeTrialData_' names{subN} '.mat']);
-    frameLength(subN) = min(max(eyeTrialDataLog.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate);
+    frameLength(subN) = min(max(eyeTrialData.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate);
     lengthT = size(eyeTrialDataSub.trial, 2);
     frames{subN} = NaN(lengthT, frameLength(subN));
     
     for trialN = 1:lengthT        
-        endI = eyeTrialDataLog.frameLog.rdkOff(subN, trialN);
+        endI = eyeTrialData.frameLog.rdkOff(subN, trialN);
         if endI>frameLength(subN)
             startI = endI-frameLength(subN)+1;
             startIF = 1;
         else
-            startI = eyeTrialDataLog.frameLog.fixationOn(subN, trialN);
+            startI = eyeTrialData.frameLog.fixationOn(subN, trialN);
             startIF = frameLength(subN)-endI+1;
         end
         frames{subN}(trialN, startIF:end) = eyeTrialDataSub.trial{1, trialN}.DX_interpolSac(startI:endI);
@@ -52,12 +52,12 @@ for probN = 3:size(probCons, 2)
 %     stdVel{probN}.rightPerceptual = NaN(length(names), maxFrameLength);
     
     for subN = 1:size(names, 2)
-        if find(eyeTrialDataLog.prob(subN, :)==probCons(probN))
+        if find(eyeTrialData.prob(subN, :)==probCons(probN))
             tempStartI = maxFrameLength-frameLength(subN)+1;
-            leftSIdx = find(eyeTrialDataLog.rdkDir(subN, :)<0 & eyeTrialDataLog.prob(subN, :)==probCons(probN) & abs(eyeTrialDataLog.coh(subN, :))==1);
-            rightSIdx = find(eyeTrialDataLog.rdkDir(subN, :)>0 & eyeTrialDataLog.prob(subN, :)==probCons(probN) & abs(eyeTrialDataLog.coh(subN, :))==1);
-            leftPIdx = find(eyeTrialDataLog.rdkDir(subN, :)<0 & eyeTrialDataLog.prob(subN, :)==probCons(probN) & abs(eyeTrialDataLog.coh(subN, :))<1);
-            rightPIdx = find(eyeTrialDataLog.rdkDir(subN, :)>0 & eyeTrialDataLog.prob(subN, :)==probCons(probN) & abs(eyeTrialDataLog.coh(subN, :))<1);
+            leftSIdx = find(eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
+            rightSIdx = find(eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
+            leftPIdx = find(eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
+            rightPIdx = find(eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
             
             meanVel{probN}.leftStandard(subN, tempStartI:end) = nanmean(frames{subN}(leftSIdx, :));
             meanVel{probN}.rightStandard(subN, tempStartI:end) = nanmean(frames{subN}(rightSIdx, :));

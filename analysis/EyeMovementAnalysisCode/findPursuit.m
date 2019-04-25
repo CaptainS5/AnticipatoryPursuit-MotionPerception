@@ -58,7 +58,15 @@ else
     XY = dataxy_tmp(time);
     % run changeDetect.m
     [cx,cy,ly,ry] = changeDetect(time,XY);
-    pursuit.onset = round(cx);
+    pursuit.onsetTrue = round(cx); % the calculated onset after the gap
+    % make sure it is visually-driven, the earliest from 50ms after
+    % stimulus onset
+    if pursuit.onsetTrue<(trial.stim_onset+ms2frames(50))
+        pursuit.onset = trial.stim_onset+ms2frames(50);
+    else
+        pursuit.onset = pursuit.onsetTrue;
+    end
+    
     % this next part has been written by JF to make sure that the pursuit
     % onset is ligit (e.g. not in an undetected saccade or during a
     % fixation --> there was no pursuit at all
@@ -143,9 +151,9 @@ else
     
     %%calculate the steady-state phase onset, using similar methods
     %%currently not reliable enough... need to check later
-    startTime = pursuit.onset + ms2frames(50);
-    endTime = startTime + ms2frames(200); % open-loop phase not longer than a certain window
-    if startTime>=trial.stim_offset - ms2frames(140) % if steady-state phase is < 50ms, ignore
+    startTime = pursuit.onset;
+    endTime =  pursuit.onset + ms2frames(250); % open-loop phase not longer than a certain window
+    if startTime>=trial.stim_offset - ms2frames(150) % if pursuit onset too late, ignore
         pursuit.onsetSteadyState = NaN;
     else
         time = startTime:endTime;
@@ -165,18 +173,20 @@ else
         [cx,cy,ly,ry] = changeDetect(time,XY);
         pursuit.onsetSteadyState = round(cx);
         % if the steady state onset is during a saccade, move it
-        % before the saccade
+        % around the saccade
         if ~isempty(trial.saccades.onsetsDuring) && ~isempty(trial.saccades.offsetsDuring)
-            onsetT = find(trial.saccades.onsetsDuring>pursuit.onset & trial.saccades.onsetsDuring<pursuit.onsetSteadyState);
+            onsetT = find(trial.saccades.onsetsDuring>=pursuit.onset & trial.saccades.onsetsDuring<pursuit.onsetSteadyState);
             offsetT = find(trial.saccades.offsetsDuring>pursuit.onsetSteadyState);
             if ~isempty(onsetT) && ~isempty(offsetT)
-                if find(onsetT==offsetT(1))
+                if ~isempty(find(onsetT==offsetT(1))) && (trial.saccades.onsetsDuring(offsetT(1))-pursuit.onset)>140
                     pursuit.onsetSteadyState = trial.saccades.onsetsDuring(offsetT(1));
+                else
+                    pursuit.onsetSteadyState = trial.saccades.offsetsDuring(offsetT(1))+1;
                 end
             end
         end
         
-        disp(num2str(pursuit.onsetSteadyState-pursuit.onset))
+%         disp(num2str(pursuit.onsetSteadyState-pursuit.onset))
     end
 end
 

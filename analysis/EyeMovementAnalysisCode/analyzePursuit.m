@@ -20,22 +20,30 @@ positiveAPwindow = ms2frames(50);
 pursuit.APvelocity.X = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
 
 % define the window you want to analyze open-loop pursuit in
-%%calculated open-loop duration
+openLoopLength = 140;
+pursuitOff = trial.stim_offset-ms2frames(150); % may want to adjust if target has already disappeard 
 
+%%calculated open-loop duration
+if pursuit.onset && pursuit.onsetSteadyState
+    openLoopDuration = pursuit.onsetSteadyState - pursuit.onset;
+else
+    openLoopDuration = ms2frames(openLoopLength);
+end
 %%end of calculated open-loop duration
 % or use the following:
 %%fixed open-loop duration
-openLoopLength = 140;
 openLoopDuration = ms2frames(openLoopLength);
-pursuitOff = trial.stim_offset-ms2frames(150); % may want to adjust if target has already disappeard 
+%%end of fixed open-loop duration
+
 % analyze open-loop phase first
 startFrame = nanmax([trial.stim_onset+positiveAPwindow pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
 endFrame = startFrame+openLoopDuration; %nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
-if startFrame<trial.stim_onset+positiveAPwindow % if onset is earlier that AP window, set it to AP window
-    startFrame = trial.stim_onset+positiveAPwindow;
-    endFrame = trial.stim_onset+openLoopDuration;
-end
-%%end of fixed open-loop duration
+% if startFrame<trial.stim_onset+positiveAPwindow % if onset is
+% earlier that AP window, set it to AP window--already restrict this
+% in findPursuit.m
+%     startFrame = trial.stim_onset+positiveAPwindow;
+%     endFrame = trial.stim_onset+openLoopDuration;
+% end
 
 pursuit.openLoopStartFrame = startFrame;
 pursuit.openLoopEndFrame = endFrame;

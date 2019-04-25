@@ -5,7 +5,7 @@
 
 clear all; close all; clc
 
-names = {'XW0' 'p2'};
+names = {'XW0' 'p2' 'p4'};
 sampleRate = 1000;
 negativeWindow = -50;
 positiveWindow = 50;
@@ -14,7 +14,7 @@ positiveWindow = 50;
 % minVel = [-6];
 % maxVel = [12];
 folder = pwd;
-load(['eyeTrialDataLog_all.mat']);
+load(['eyeTrialData_all.mat']);
 % dirCons = [-1 1]; % -1=left, 1=right
 % dirNames = {'left' 'right'};
 colorProb = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
@@ -25,14 +25,14 @@ for subN = 1:size(names, 2)
     load(['eyeTrialData_' names{subN} '.mat']);
     cd ..
     
-    eyeTrialData.pursuit.AP(subN, :) = NaN(1, size(eyeTrialDataLog.trialIdx(subN, :), 2));
-    eyeTrialData.pursuit.initialMeanVelocity(subN, :) = NaN(1, size(eyeTrialDataLog.trialIdx(subN, :), 2));
-    eyeTrialData.pursuit.closedLoopGain(subN, :) = NaN(1, size(eyeTrialDataLog.trialIdx(subN, :), 2));
-    eyeTrialData.pursuit.closedLoopMeanVel(subN, :) = NaN(1, size(eyeTrialDataLog.trialIdx(subN, :), 2));
-    for trialI = 1:size(eyeTrialDataLog.trialIdx(subN, :), 2)
+    eyeTrialData.pursuit.AP(subN, :) = NaN(1, size(eyeTrialData.trialIdx(subN, :), 2));
+    eyeTrialData.pursuit.initialMeanVelocity(subN, :) = NaN(1, size(eyeTrialData.trialIdx(subN, :), 2));
+    eyeTrialData.pursuit.closedLoopGain(subN, :) = NaN(1, size(eyeTrialData.trialIdx(subN, :), 2));
+    eyeTrialData.pursuit.closedLoopMeanVel(subN, :) = NaN(1, size(eyeTrialData.trialIdx(subN, :), 2));
+    for trialI = 1:size(eyeTrialData.trialIdx(subN, :), 2)
         if eyeTrialDataLog.errorStatus(subN, trialI)==0
-            startI = eyeTrialDataLog.frameLog.rdkOn(subN, trialI)+ms2frames(negativeWindow);
-            endI = eyeTrialDataLog.frameLog.rdkOn(subN, trialI)+ms2frames(positiveWindow);
+            startI = eyeTrialData.frameLog.rdkOn(subN, trialI)+ms2frames(negativeWindow);
+            endI = eyeTrialData.frameLog.rdkOn(subN, trialI)+ms2frames(positiveWindow);
             eyeTrialData.pursuit.AP(subN, trialI) = nanmean(eyeTrialDataSub.trial{1, trialI}.DX_noSac(startI:endI));
             %             eyeTrialData.trial{subN, trialI}.pursuit = analyzePursuit(eyeTrialDataSub.trial{1, trialI}, eyeTrialDataSub.trial{1, trialI}.pursuit);
             eyeTrialData.pursuit.initialMeanVelocity(subN, trialI) = eyeTrialDataSub.trial{1, trialI}.pursuit.initialMeanVelocity.X;
@@ -47,7 +47,7 @@ end
 % compare different probabilities
 % separate perceptual and standard trials
 for subN = 1:size(names, 2)
-    probCons = unique(eyeTrialDataLog.prob(subN, eyeTrialDataLog.errorStatus(subN, :)==0));
+    probCons = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
     
     apB{subN}.standard = NaN(500, size(probCons, 2));
     olpB{subN}.standard = NaN(500, size(probCons, 2));
@@ -62,33 +62,33 @@ for subN = 1:size(names, 2)
     clpBR{subN}.perceptual = NaN(182, size(probCons, 2));
     for probN = 1:size(probCons, 2)
         % standard trials
-        validI = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
         apB{subN}.standard(1:length(validI), probN) = eyeTrialData.pursuit.AP(subN, validI);
         olpB{subN}.standard(1:length(validI), probN) = eyeTrialData.pursuit.initialMeanVelocity(subN, validI);
         clpB{subN}.standard(1:length(validI), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validI);
         
         % then perceptual trials
-        validI = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==0 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
         apB{subN}.perceptual(1:length(validI), probN) = eyeTrialData.pursuit.AP(subN, validI);
         olpB{subN}.perceptual(1:length(validI), probN) = eyeTrialData.pursuit.initialMeanVelocity(subN, validI);
         clpB{subN}.perceptual(1:length(validI), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validI);
-        perceptB{subN}.perceptual(1:length(validI), probN) = eyeTrialDataLog.choice(subN, validI);
+        perceptB{subN}.perceptual(1:length(validI), probN) = eyeTrialData.choice(subN, validI);
         
         %%seperate left and rightward trials
         % standard trials
-        validIL = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==1 ...
-            & eyeTrialDataLog.rdkDir(subN, :)==-1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==1 ...
+            & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probCons(probN));
         clpBL{subN}.standard(1:length(validIL), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validIL);
-        validIR = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==1 ...
-            & eyeTrialDataLog.rdkDir(subN, :)==1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==1 ...
+            & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
         clpBR{subN}.standard(1:length(validIR), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validIR);
         
         % then perceptual trials
-        validIL = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==0 ...
-            & eyeTrialDataLog.rdkDir(subN, :)==-1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probCons(probN));
         clpBL{subN}.perceptual(1:length(validIL), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validIL);
-        validIR = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.trialType(subN, :)==0 ...
-            & eyeTrialDataLog.rdkDir(subN, :)==1 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
         clpBR{subN}.perceptual(1:length(validIR), probN) = eyeTrialData.pursuit.closedLoopGain(subN, validIR);
     end
     
@@ -196,7 +196,7 @@ end
 % sort data of different participants together
 for probN = 1:size(probCons, 2)
     for subN = 1:size(names, 2)
-        validI = find(eyeTrialDataLog.errorStatus(subN, :)==0 & eyeTrialDataLog.prob(subN, :)==probCons(probN));
+        validI = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
         apTemp = eyeTrialData.pursuit.AP(subN, validI);
         meanAP(subN, probN) = nanmean(apTemp);
         %         stdAP(subN, probN) = nanstd(apTemp);
@@ -260,24 +260,24 @@ end
 trialBin = 30; % window of trial numbers
 % get sliding AP for each bock
 for subN = 1:size(names, 2)
-    probCons = unique(eyeTrialDataLog.prob(subN, :));
-    slidingAP{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
-    slidingOLP{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
-    slidingCLP{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
-    slidingPercept{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
-    slidingCLPp{subN} = NaN(size(probCons, 2), size(eyeTrialDataLog.prob, 2)/size(probCons, 2)-trialBin);
+    probCons = unique(eyeTrialData.prob(subN, :));
+    slidingAP{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
+    slidingOLP{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
+    slidingCLP{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
+    slidingPercept{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
+    slidingCLPp{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
     for probI = 1:size(probCons, 2)
-        idxT = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0);
+        idxT = find(eyeTrialData.prob(subN, :)==probCons(probI) & eyeTrialData.errorStatus(subN, :)==0);
         for slideI = 1:length(idxT)-trialBin
             slidingAP{subN}(probI, slideI) = nanmean(eyeTrialData.pursuit.AP(subN, idxT(slideI:(slideI+trialBin-1))));
             slidingOLP{subN}(probI, slideI) = nanmean(eyeTrialData.pursuit.initialMeanVelocity(subN, idxT(slideI:(slideI+trialBin-1)))); % open loop pursuit
             slidingCLP{subN}(probI, slideI) = nanmean(eyeTrialData.pursuit.closedLoopGain(subN, idxT(slideI:(slideI+trialBin-1)))); % close loop pursuit gain
         end
         
-        idxT = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0 ...
-            & abs(eyeTrialDataLog.coh(subN, :))~=1);
+        idxT = find(eyeTrialData.prob(subN, :)==probCons(probI) & eyeTrialData.errorStatus(subN, :)==0 ...
+            & abs(eyeTrialData.coh(subN, :))~=1);
         for slideI = 1:length(idxT)-trialBin+1
-            slidingPercept{subN}(probI, slideI) = nanmean(eyeTrialDataLog.choice(subN, idxT(slideI:(slideI+trialBin-1))));
+            slidingPercept{subN}(probI, slideI) = nanmean(eyeTrialData.choice(subN, idxT(slideI:(slideI+trialBin-1))));
             slidingCLPp{subN}(probI, slideI) = nanmean(eyeTrialData.pursuit.closedLoopGain(subN, idxT(slideI:(slideI+trialBin-1)))); % close loop pursuit gain
         end
     end
@@ -347,23 +347,23 @@ end
 trialBin = 5; % window of trial numbers; needs to be smaller than 50 for now
 clear precedeProbPercept precedeProb perceptProbR clpProbR olpProbR apProbR xProb yAP yOLP yCLP xProbPercept yPercept
 for subN = 1:size(names, 2)
-    probCons = unique(eyeTrialDataLog.prob(subN, :));
+    probCons = unique(eyeTrialData.prob(subN, :));
     %     precedeProb{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
     %     apProbR{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
     %     olpProbR{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
     %     clpProbR{subN} = NaN(size(probCons, 2), size(eyeTrialData.prob, 2)/size(probCons, 2)-trialBin);
     for probI = 1:size(probCons, 2)
         % eye movements
-        idxT = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0 ...
+        idxT = find(eyeTrialData.prob(subN, :)==probCons(probI) & eyeTrialData.errorStatus(subN, :)==0 ...
             & ~isnan(eyeTrialData.pursuit.AP(subN, :)) & ~isnan(eyeTrialData.pursuit.closedLoopMeanVel(subN, :)) & abs(eyeTrialDataLog.coh(subN, :))<1);
         % true preceding trials
         for slideI = 1:length(idxT)
-            rightN = length(find(eyeTrialDataLog.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1))==1)); % counting on perceptual choice, true preceding trials
+            rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1))==1)); % counting on perceptual choice, true preceding trials
             precedeProb{subN}(probI, slideI) = rightN/trialBin;
             apProbR{subN}(probI, slideI) = eyeTrialData.pursuit.AP(subN, idxT(slideI));
             olpProbR{subN}(probI, slideI) = eyeTrialData.pursuit.initialMeanVelocity(subN, idxT(slideI));
             clpProbR{subN}(probI, slideI) = eyeTrialData.pursuit.closedLoopGain(subN, idxT(slideI));
-            perceptProbR{subN}(probI, slideI) = eyeTrialDataLog.choice(subN, idxT(slideI));
+            perceptProbR{subN}(probI, slideI) = eyeTrialData.choice(subN, idxT(slideI));
         end
         %     % preceding trials in the list
         %     for slideI = (trialBin+1):length(idxT)
@@ -452,11 +452,11 @@ for subN = 1:size(names, 2)
     
     for probI = 1:size(probCons, 2)
         % low coherece trials perceived as moving to the right
-        idxR = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0 ...
-            & eyeTrialDataLog.choice(subN, :)==1 & abs(eyeTrialDataLog.coh(subN, :))<0.15);
+        idxR = find(eyeTrialData.prob(subN, :)==probCons(probI) & eyeTrialData.errorStatus(subN, :)==0 ...
+            & eyeTrialData.choice(subN, :)==1 & abs(eyeTrialData.coh(subN, :))<0.15);
         % low coherece trials perceived as moving to the left
-        idxL = find(eyeTrialDataLog.prob(subN, :)==probCons(probI) & eyeTrialDataLog.errorStatus(subN, :)==0 ...
-            & eyeTrialDataLog.choice(subN, :)==0 & abs(eyeTrialDataLog.coh(subN, :))<0.15);
+        idxL = find(eyeTrialData.prob(subN, :)==probCons(probI) & eyeTrialData.errorStatus(subN, :)==0 ...
+            & eyeTrialData.choice(subN, :)==0 & abs(eyeTrialData.coh(subN, :))<0.15);
         
         apChoice.mean{subN}(probI, 1) = nanmean(eyeTrialData.pursuit.AP(subN, idxL)); % choosing left
         apChoice.std{subN}(probI, 1) = nanstd(eyeTrialData.pursuit.AP(subN, idxL)); % choosing left

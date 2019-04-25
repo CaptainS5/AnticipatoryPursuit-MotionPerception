@@ -47,11 +47,13 @@ ylabel('Position (degree)', 'fontsize', 12);
 % plot x- and y- eye position over time
 plot(startFrame:endFrame,trial.eyeX_filt(startFrame:endFrame),'k');
 plot(startFrame:endFrame,trial.eyeY_filt(startFrame:endFrame),'b');
-plot(trial.saccades.X.onsets,trial.eyeX_filt(trial.saccades.X.onsets),'g*');
-plot(trial.saccades.X.offsets,trial.eyeX_filt(trial.saccades.X.offsets),'m*');
+plot(trial.saccades.X_left.onsets,trial.eyeX_filt(trial.saccades.X_left.onsets),'go');
+plot(trial.saccades.X_left.offsets,trial.eyeX_filt(trial.saccades.X_left.offsets),'mo');
+plot(trial.saccades.X_right.onsets,trial.eyeX_filt(trial.saccades.X_right.onsets),'g*');
+plot(trial.saccades.X_right.offsets,trial.eyeX_filt(trial.saccades.X_right.offsets),'m*');
 plot(trial.saccades.Y.onsets,trial.eyeY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeY_filt(trial.saccades.Y.offsets),'c*');
-legend({'x pos','y pos', 'sacOn', 'sacOff', ...
+legend({'x pos','y pos', 'sacLeftOn', 'sacLeftOff', 'sacRightOn', 'sacRightOff', ...
     'sacOn', 'sacOff'},'Location','NorthWest');%, 'AutoUpdate','off');
 % vertical lines indicate events/target onsets
 line([trial.log.fixationOff trial.log.fixationOff], [minPosAbs maxPosAbs],'Color','b','LineStyle','--');
@@ -74,8 +76,10 @@ ylabel('Speed (degree/second)', 'fontsize', 12);
 plot(startFrame:endFrame,trial.eyeDX_filt(startFrame:endFrame),'k');
 plot(startFrame:endFrame,trial.eyeDY_filt(startFrame:endFrame),'b');
 % plot saccade onsets in x- and y with different colors
-plot(trial.saccades.X.onsets,trial.eyeDX_filt(trial.saccades.X.onsets),'g*');
-plot(trial.saccades.X.offsets,trial.eyeDX_filt(trial.saccades.X.offsets),'m*');
+plot(trial.saccades.X_left.onsets,trial.eyeDX_filt(trial.saccades.X_left.onsets),'go');
+plot(trial.saccades.X_left.offsets,trial.eyeDX_filt(trial.saccades.X_left.offsets),'mo');
+plot(trial.saccades.X_right.onsets,trial.eyeDX_filt(trial.saccades.X_right.onsets),'g*');
+plot(trial.saccades.X_right.offsets,trial.eyeDX_filt(trial.saccades.X_right.offsets),'m*');
 plot(trial.saccades.Y.onsets,trial.eyeDY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeDY_filt(trial.saccades.Y.offsets),'c*');
 % vertical lines indicate events/target onsets
@@ -84,7 +88,6 @@ line([trial.log.targetOnset trial.log.targetOnset], [minVel maxVel],'Color','k',
 line([trial.stim_offset trial.stim_offset], [minVel maxVel],'Color','k','LineStyle','--');
 if ~isempty(trial.pursuit.onset)
     line([trial.pursuit.onset trial.pursuit.onset], [minVel maxVel],'Color','r','LineStyle','--');
-    line([trial.pursuit.openLoopStartFrame trial.pursuit.openLoopStartFrame], [minVel maxVel],'Color','m','LineStyle','--');
     line([trial.pursuit.openLoopEndFrame trial.pursuit.openLoopEndFrame], [minVel maxVel],'Color','m','LineStyle','--');
 end
 if ~isempty(trial.pursuit.onsetSteadyState)

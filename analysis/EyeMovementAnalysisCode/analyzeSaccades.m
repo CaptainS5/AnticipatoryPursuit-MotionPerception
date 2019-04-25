@@ -19,6 +19,12 @@ function [trial, saccades] = analyzeSaccades(trial, saccades)
 trial.saccades.X.onsets = [];
 trial.saccades.X.offsets = [];
 duringIdx = 1;
+
+trial.saccades.X_left.onsets = [];
+trial.saccades.X_left.offsets = [];
+trial.saccades.X_right.onsets = [];
+trial.saccades.X_right.offsets = [];
+
 for i = 1:length(saccades.X.onsets)
     trial.saccades.X.onsets(i,1) = saccades.X.onsets(i); % ?... why use the loop
     trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);
@@ -26,6 +32,13 @@ for i = 1:length(saccades.X.onsets)
         trial.saccades.X.onsetsDuring(duringIdx, 1) = trial.saccades.X.onsets(i,1);
         trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
         duringIdx = duringIdx + 1;
+    end
+    if trial.eyeX_filt(saccades.X.offsets(i))-trial.eyeX_filt(saccades.X.onsets(i)) > 0
+        trial.saccades.X_left.onsets = [trial.saccades.X_left.onsets; saccades.X.onsets(i)];
+        trial.saccades.X_left.offsets = [trial.saccades.X_left.offsets; saccades.X.offsets(i)];
+    else
+        trial.saccades.X_right.onsets = [trial.saccades.X_right.onsets; saccades.X.onsets(i)];
+        trial.saccades.X_right.offsets = [trial.saccades.X_right.offsets; saccades.X.offsets(i)];
     end
 end
 if duringIdx>1 
@@ -110,6 +123,21 @@ else
     trial.saccades.offsets = offsets;
 end
 
+xSacL = length(trial.saccades.X_left.onsets);
+xSacR = length(trial.saccades.X_right.onsets);
+if ~isempty(xSacL)
+    trial.saccades.X_left.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_left.offsets) - trial.eyeX_filt(trial.saccades.X_left.onsets));
+    % trial.saccades.X_left.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X_left.offsets) - trial.eyeX_filt(trial.saccades.X_left.onsets)).^2 ...
+    %         + (trial.eyeY_filt(trial.saccades.X_left.offsets) - trial.eyeY_filt(trial.saccades.X_left.onsets)).^2);
+else
+    trial.saccades.X_left.amplitudes = NaN;
+end
+if ~isempty(xSacR)
+    trial.saccades.X_right.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_right.offsets) - trial.eyeX_filt(trial.saccades.X_right.onsets));
+else
+    trial.saccades.X_right.amplitudes = NaN;
+end
+
 % caluclate mean and max amplitude, mean duration, total number, &
 % cumulative saccade amplitude (saccadic sum)
 if isempty(trial.saccades.onsets)
@@ -120,6 +148,14 @@ if isempty(trial.saccades.onsets)
     trial.saccades.meanDuration = [];
     trial.saccades.number = [];
     trial.saccades.sacSum = [];
+    trial.saccades.X_left.number = [];
+    trial.saccades.X_left.meanAmplitude = [];
+    trial.saccades.X_left.meanDuration = [];
+    trial.saccades.X_left.sumAmplitude = [];
+    trial.saccades.X_right.number = [];
+    trial.saccades.X_right.meanAmplitude = [];
+    trial.saccades.X_right.meanDuration = [];
+    trial.saccades.X_right.sumAmplitude = [];
 else
     trial.saccades.meanAmplitude = nanmean(trial.saccades.amplitudes);
     trial.saccades.maxAmplitude = max(trial.saccades.amplitudes);
@@ -129,6 +165,14 @@ else
                                                trial.saccades.Y.meanDuration.^2));
     trial.saccades.number = length(trial.saccades.onsets);
     trial.saccades.sacSum = sum(trial.saccades.amplitudes);
+    trial.saccades.X_left.number = length(trial.saccades.X_left.onsets);
+    trial.saccades.X_left.meanAmplitude = nanmean(trial.saccades.X_left.amplitudes);
+    trial.saccades.X_left.meanDuration = mean(trial.saccades.X_left.offsets - trial.saccades.X_left.onsets);
+    trial.saccades.X_left.sumAmplitude = sum(trial.saccades.X_left.amplitudes);
+    trial.saccades.X_right.number = length(trial.saccades.X_right.onsets);
+    trial.saccades.X_right.meanAmplitude = nanmean(trial.saccades.X_right.amplitudes);
+    trial.saccades.X_right.meanDuration = mean(trial.saccades.X_right.offsets - trial.saccades.X_right.onsets);
+    trial.saccades.X_right.sumAmplitude = sum(trial.saccades.X_right.amplitudes);
 end
 
 % calculate mean and peak velocity for each saccade; then find average

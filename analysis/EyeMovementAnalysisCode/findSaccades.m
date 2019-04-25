@@ -27,6 +27,7 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
+accelerationThreshold = 200;
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
@@ -63,6 +64,7 @@ speedOffsets = find(speedOffsets);
 middle = acceleration/1000;
 predecessor = [middle(2:end); 0];
 signSwitches = find((middle .* predecessor) <= 0)+1; % either sign switch, or rapid change of speed
+accelerationAbs = find(abs(acceleration)<accelerationThreshold)+1;
 
 onsets = NaN(1,length(speedOnsets));
 offsets = NaN(1,length(speedOnsets));
@@ -71,13 +73,16 @@ offsets = NaN(1,length(speedOnsets));
 for i = 1:length(speedOnsets)   
     % make sure, that there is always both, an onset and an offset
     % otherwise, skip this saccade
-    if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches)
+    if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) ...
+            || abs(acceleration(speedOnsets(i)))<accelerationThreshold ...
+            || abs(acceleration(speedOffsets(i)))<accelerationThreshold
         continue
     end
     
     onsets(i) = max(signSwitches(signSwitches <= speedOnsets(i)));
-    offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i))-1); %the -1 is a subjective adjustment
-
+    offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
+        accelerationAbs(accelerationAbs > speedOffsets(i))])-1;
+    %the -1 is a subjective adjustment
 end
 
 % trim to delete NaNs

@@ -5,17 +5,16 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'XW0' 'p2' 'p4'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6'};
 data = table();
 
 %%
-% dataIdx = 1;    
-cd ..
-for sub = 3:size(names, 2)
+for sub = 4:size(names, 2)
     % Read all raw data
-    cd ..
     % read Experiment data
-    cd(['data\', names{sub}])
+    cd ..
+    cd ..
+    cd(['data\' names{sub}])
     % get the filenames to load
     fileResp = dir('response*.mat');
     % combine all response files for later use in eye data analysis
@@ -46,7 +45,7 @@ for sub = 3:size(names, 2)
 %     dataRaw.fixDuration = [];
     cd(folder) 
     save(['dataRaw_', names{sub}], 'dataRaw')
-    
+
     %% collapse all data
 %     if ii==1
 %         dataRawAll = dataRaw; % experiment
