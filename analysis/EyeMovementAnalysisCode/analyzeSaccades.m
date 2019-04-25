@@ -13,67 +13,26 @@
 %                   with saccades added
 %         saccades --> edited saccade structure
 
-function [trial, saccades] = analyzeSaccades(trial, saccades)
-% add saccades to trial information
-% for x
-trial.saccades.X.onsets = [];
-trial.saccades.X.offsets = [];
-duringIdx = 1;
-
-trial.saccades.X_left.onsets = [];
-trial.saccades.X_left.offsets = [];
-trial.saccades.X_right.onsets = [];
-trial.saccades.X_right.offsets = [];
-
-for i = 1:length(saccades.X.onsets)
-    trial.saccades.X.onsets(i,1) = saccades.X.onsets(i); % ?... why use the loop
-    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);
-    if trial.saccades.X.onsets(i,1)>=trial.stim_onset && trial.saccades.X.offsets(i,1)<=trial.stim_offset
-        trial.saccades.X.onsetsDuring(duringIdx, 1) = trial.saccades.X.onsets(i,1);
-        trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
-        duringIdx = duringIdx + 1;
-    end
-    if trial.eyeX_filt(saccades.X.offsets(i))-trial.eyeX_filt(saccades.X.onsets(i)) > 0
-        trial.saccades.X_left.onsets = [trial.saccades.X_left.onsets; saccades.X.onsets(i)];
-        trial.saccades.X_left.offsets = [trial.saccades.X_left.offsets; saccades.X.offsets(i)];
-    else
-        trial.saccades.X_right.onsets = [trial.saccades.X_right.onsets; saccades.X.onsets(i)];
-        trial.saccades.X_right.offsets = [trial.saccades.X_right.offsets; saccades.X.offsets(i)];
-    end
-end
-if duringIdx>1 
-    trial.saccades.firstSaccadeOnset = trial.saccades.X.onsetsDuring(1, 1);
-else
-    trial.saccades.firstSaccadeOnset = [];
-    trial.saccades.X.onsetsDuring = [];
-    trial.saccades.X.offsetsDuring = [];
-end
-
-% and for y
-trial.saccades.Y.onsets = [];
-trial.saccades.Y.offsets = [];
-duringIdxY = 1;
-for i = 1:length(saccades.Y.onsets)    
-    trial.saccades.Y.onsets(i,1) = saccades.Y.onsets(i);
-    trial.saccades.Y.offsets(i,1) = saccades.Y.offsets(i);
-    if trial.saccades.Y.onsets(i,1)>=trial.stim_onset && trial.saccades.Y.offsets(i,1)<=trial.stim_offset
-        trial.saccades.Y.onsetsDuring(duringIdxY, 1) = trial.saccades.Y.onsets(i,1);
-        trial.saccades.Y.offsetsDuring(duringIdxY, 1) = trial.saccades.Y.offsets(i,1);
-        duringIdxY = duringIdxY + 1;
-    end
-end
-if duringIdxY>1
-    trial.saccades.firstSaccadeOnset = min(trial.saccades.firstSaccadeOnset, trial.saccades.Y.onsetsDuring(1, 1));
-else
-    trial.saccades.Y.onsetsDuring = [];
-    trial.saccades.Y.offsetsDuring = [];
-end
-
-% store all found on and offsets together
+function [trial, saccades] = analyzeSaccades(trial)
+% define the window you want to analyze saccades in
+startFrame = nanmax(trial.stim_onset+ms2frames(50), trial.pursuit.onset);
+endFrame = trial.stim_offset-ms2frames(150);
+% then find the proper onsets and offsets
+xIdx = find(trial.saccades.X.onsets>=startFrame & trial.saccades.X.onsets<=endFrame);
+yIdx = find(trial.saccades.Y.onsets>=startFrame & trial.saccades.Y.onsets<=endFrame);
+trial.saccades.X.onsets = trial.saccades.X.onsets(xIdx);
+trial.saccades.X.offsets = trial.saccades.X.offsets(xIdx);
+trial.saccades.Y.onsets = trial.saccades.Y.onsets(yIdx);
+trial.saccades.Y.offsets = trial.saccades.Y.offsets(yIdx);
 trial.saccades.onsets = [trial.saccades.X.onsets; trial.saccades.Y.onsets];
 trial.saccades.offsets = [trial.saccades.X.offsets; trial.saccades.Y.offsets];
-trial.saccades.onsetsDuring = [trial.saccades.X.onsetsDuring; trial.saccades.Y.onsetsDuring];
-trial.saccades.offsetsDuring = [trial.saccades.X.offsetsDuring; trial.saccades.Y.offsetsDuring];
+
+xIdxL = find(trial.saccades.X_left.onsets>=startFrame & trial.saccades.X_left.onsets<=endFrame);
+xIdxR = find(trial.saccades.X_right.onsets>=startFrame & trial.saccades.X_right.onsets<=endFrame);
+trial.saccades.X_left.onsets = trial.saccades.X_left.onsets(xIdxL);
+trial.saccades.X_left.offsets = trial.saccades.X_left.offsets(xIdxL);
+trial.saccades.X_right.onsets = trial.saccades.X_right.onsets(xIdxR);
+trial.saccades.X_right.offsets = trial.saccades.X_right.offsets(xIdxR);
 
 % calculate saccade amplitudes
 % if there are no y-saccades, use x and y position of x saccades and vice
@@ -82,45 +41,26 @@ trial.saccades.offsetsDuring = [trial.saccades.X.offsetsDuring; trial.saccades.Y
 % affected equally
 xSac = length(trial.saccades.X.onsets);
 ySac = length(trial.saccades.Y.onsets);
-if isempty(ySac)
+if numel(trial.saccades.onsets) == 0
+    trial.saccades.amplitudes = NaN;
+elseif isempty(ySac)
     trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
         + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
 elseif isempty(xSac)
     trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.Y.offsets) - trial.eyeX_filt(trial.saccades.Y.onsets)).^2 ...
         + (trial.eyeY_filt(trial.saccades.Y.offsets) - trial.eyeY_filt(trial.saccades.Y.onsets)).^2);
-elseif numel(trial.saccades.onsets) == 0
-    trial.saccades.amplitudes = NaN;
 else
-    testOnsets = sort(trial.saccades.onsets);
-    testOffsets = sort(trial.saccades.offsets);
-    count1 = 1;
-    tempOnset1 = [];
-    tempOffset1 = [];
-    count2 = 1;
-    tempOnset2 = [];
-    tempOffset2 = [];   
-    for i = 1:length(testOnsets)-1
-        if testOnsets(i+1)-testOnsets(i) < 20
-            tempOnset1(count1) = testOnsets(i);
-            tempOffset1(count1) = testOffsets(i);
-            count1 = length(tempOnset1) +1;
-        else
-            tempOnset2(count2) = testOnsets(i+1);
-            tempOffset2(count2) = testOffsets(i+1);
-            count2 = length(tempOnset2) +1;
-        end
-    end
-    onsets = unique([tempOnset1 tempOnset2 testOnsets(1)])';
-    offsets = unique([tempOffset1 tempOffset2 testOffsets(1)])';
-    if length(onsets) ~= length(offsets)
+    if length(trial.saccades.onsets) ~= length(trial.saccades.offsets)
         trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
-            + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
+        + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
     else
-        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(offsets) - trial.eyeX_filt(onsets)).^2 ...
-            + (trial.eyeY_filt(offsets) - trial.eyeY_filt(onsets)).^2);
+        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.offsets) - trial.eyeX_filt(trial.saccades.onsets)).^2 ...
+            + (trial.eyeY_filt(trial.saccades.offsets) - trial.eyeY_filt(trial.saccades.onsets)).^2);
     end
-    trial.saccades.onsets = onsets;
-    trial.saccades.offsets = offsets;
+end
+if ~isempty(xSac)
+    trial.saccades.X.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
+        + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
 end
 
 xSacL = length(trial.saccades.X_left.onsets);
@@ -159,12 +99,16 @@ if isempty(trial.saccades.onsets)
 else
     trial.saccades.meanAmplitude = nanmean(trial.saccades.amplitudes);
     trial.saccades.maxAmplitude = max(trial.saccades.amplitudes);
+    trial.saccades.X.meanAmplitude = nanmean(trial.saccades.X.amplitudes);
+    trial.saccades.X.maxAmplitude = max(trial.saccades.X.amplitudes);
     trial.saccades.X.meanDuration = mean(trial.saccades.X.offsets - trial.saccades.X.onsets);
     trial.saccades.Y.meanDuration = mean(trial.saccades.Y.offsets - trial.saccades.Y.onsets);
     trial.saccades.meanDuration = nanmean(sqrt(trial.saccades.X.meanDuration.^2 + ...
                                                trial.saccades.Y.meanDuration.^2));
     trial.saccades.number = length(trial.saccades.onsets);
+    trial.saccades.X.number = length(trial.saccades.X.onsets);
     trial.saccades.sacSum = sum(trial.saccades.amplitudes);
+    trial.saccades.X.sacSum = sum(trial.saccades.X.amplitudes);
     trial.saccades.X_left.number = length(trial.saccades.X_left.onsets);
     trial.saccades.X_left.meanAmplitude = nanmean(trial.saccades.X_left.amplitudes);
     trial.saccades.X_left.meanDuration = mean(trial.saccades.X_left.offsets - trial.saccades.X_left.onsets);

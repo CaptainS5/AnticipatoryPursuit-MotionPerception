@@ -13,6 +13,122 @@
 %                   de-saccaded eye movements added
 
 function [trial] = removeSaccades(trial)
+% add saccades to trial information
+% for x
+trial.saccades.X.onsets = [];
+trial.saccades.X.offsets = [];
+duringIdx = 1;
+
+trial.saccades.X_left.onsets = [];
+trial.saccades.X_left.offsets = [];
+trial.saccades.X_right.onsets = [];
+trial.saccades.X_right.offsets = [];
+
+for i = 1:length(saccades.X.onsets)
+    trial.saccades.X.onsets(i,1) = saccades.X.onsets(i); % ?... why use the loop
+    trial.saccades.X.offsets(i,1) = saccades.X.offsets(i);
+    if trial.saccades.X.onsets(i,1)>=trial.stim_onset && trial.saccades.X.offsets(i,1)<=trial.stim_offset
+        trial.saccades.X.onsetsDuring(duringIdx, 1) = trial.saccades.X.onsets(i,1);
+        trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
+        duringIdx = duringIdx + 1;
+    end
+    if trial.eyeX_filt(saccades.X.offsets(i))-trial.eyeX_filt(saccades.X.onsets(i)) < 0
+        trial.saccades.X_left.onsets = [trial.saccades.X_left.onsets; saccades.X.onsets(i)];
+        trial.saccades.X_left.offsets = [trial.saccades.X_left.offsets; saccades.X.offsets(i)];
+    else
+        trial.saccades.X_right.onsets = [trial.saccades.X_right.onsets; saccades.X.onsets(i)];
+        trial.saccades.X_right.offsets = [trial.saccades.X_right.offsets; saccades.X.offsets(i)];
+    end
+end
+if duringIdx>1 
+    trial.saccades.firstSaccadeOnset = trial.saccades.X.onsetsDuring(1, 1);
+else
+    trial.saccades.firstSaccadeOnset = [];
+    trial.saccades.X.onsetsDuring = [];
+    trial.saccades.X.offsetsDuring = [];
+end
+
+% and for y
+trial.saccades.Y.onsets = [];
+trial.saccades.Y.offsets = [];
+duringIdxY = 1;
+for i = 1:length(saccades.Y.onsets)    
+    trial.saccades.Y.onsets(i,1) = saccades.Y.onsets(i);
+    trial.saccades.Y.offsets(i,1) = saccades.Y.offsets(i);
+    if trial.saccades.Y.onsets(i,1)>=trial.stim_onset && trial.saccades.Y.offsets(i,1)<=trial.stim_offset
+        trial.saccades.Y.onsetsDuring(duringIdxY, 1) = trial.saccades.Y.onsets(i,1);
+        trial.saccades.Y.offsetsDuring(duringIdxY, 1) = trial.saccades.Y.offsets(i,1);
+        duringIdxY = duringIdxY + 1;
+    end
+end
+if duringIdxY>1
+    trial.saccades.firstSaccadeOnset = min(trial.saccades.firstSaccadeOnset, trial.saccades.Y.onsetsDuring(1, 1));
+else
+    trial.saccades.Y.onsetsDuring = [];
+    trial.saccades.Y.offsetsDuring = [];
+end
+
+% store all found on and offsets together
+trial.saccades.onsets = [trial.saccades.X.onsets; trial.saccades.Y.onsets];
+trial.saccades.offsets = [trial.saccades.X.offsets; trial.saccades.Y.offsets];
+trial.saccades.onsetsDuring = [trial.saccades.X.onsetsDuring; trial.saccades.Y.onsetsDuring];
+trial.saccades.offsetsDuring = [trial.saccades.X.offsetsDuring; trial.saccades.Y.offsetsDuring];
+% merge saccades on X and Y that are actually the same...
+xSac = length(trial.saccades.X.onsets);
+ySac = length(trial.saccades.Y.onsets);
+if ~isempty(ySac) && ~isempty(xSac) && numel(trial.saccades.onsets) ~= 0
+    testOnsets = sort(trial.saccades.onsets);
+    testOffsets = sort(trial.saccades.offsets);
+    count1 = 1;
+    tempOnset1 = [];
+    tempOffset1 = [];
+    count2 = 1;
+    tempOnset2 = [];
+    tempOffset2 = [];   
+    for i = 1:length(testOnsets)-1
+        if testOnsets(i+1)-testOnsets(i) < 20
+            tempOnset1(count1) = testOnsets(i);
+            tempOffset1(count1) = testOffsets(i);
+            count1 = length(tempOnset1) +1;
+        else
+            tempOnset2(count2) = testOnsets(i+1);
+            tempOffset2(count2) = testOffsets(i+1);
+            count2 = length(tempOnset2) +1;
+        end
+    end
+    onsets = unique([tempOnset1 tempOnset2 testOnsets(1)])';
+    offsets = unique([tempOffset1 tempOffset2 testOffsets(1)])';
+    trial.saccades.onsets = onsets;
+    trial.saccades.offsets = offsets;
+end
+xSac = length(trial.saccades.X.onsetsDuring);
+ySac = length(trial.saccades.Y.onsetsDuring);
+if ~isempty(ySac) && ~isempty(xSac) && numel(trial.saccades.onsetsDuring) ~= 0
+    testOnsets = sort(trial.saccades.onsetsDuring);
+    testOffsets = sort(trial.saccades.offsetsDuring);
+    count1 = 1;
+    tempOnset1 = [];
+    tempOffset1 = [];
+    count2 = 1;
+    tempOnset2 = [];
+    tempOffset2 = [];   
+    for i = 1:length(testOnsets)-1
+        if testOnsets(i+1)-testOnsets(i) < 20
+            tempOnset1(count1) = testOnsets(i);
+            tempOffset1(count1) = testOffsets(i);
+            count1 = length(tempOnset1) +1;
+        else
+            tempOnset2(count2) = testOnsets(i+1);
+            tempOffset2(count2) = testOffsets(i+1);
+            count2 = length(tempOnset2) +1;
+        end
+    end
+    onsets = unique([tempOnset1 tempOnset2 testOnsets(1)])';
+    offsets = unique([tempOffset1 tempOffset2 testOffsets(1)])';
+    trial.saccades.onsetsDuring = onsets;
+    trial.saccades.offsetsDuring = offsets;
+end
+
 % open eye movement data structure
 trial.X_noSac = trial.eyeX_filt;
 trial.Y_noSac = trial.eyeY_filt;

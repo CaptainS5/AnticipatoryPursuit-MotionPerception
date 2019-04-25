@@ -2,7 +2,7 @@
 % Xiuyun Wu, 01/10/2018
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5' 'p6'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p7'};
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;

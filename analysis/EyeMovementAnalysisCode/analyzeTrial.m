@@ -43,18 +43,18 @@ end
 stimulusVelocityY = 0;
 [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);
 [saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, threshold, stimulusVelocityY);
-
-%% analyze saccades
-[trial] = analyzeSaccades(trial, saccades);
-clear saccades;
 % remove saccades
-trial = removeSaccades(trial);
+trial = removeSaccades(trial, saccades);
+clear saccades;
 
- %% OPTIONAL: find and analyze pursuit
+%% find and analyze pursuit
 pursuit = findPursuit(trial); 
 % analyze pursuit
 pursuit = analyzePursuit(trial, pursuit);
 trial.pursuit = pursuit;
+
+%% analyze saccades
+[trial] = analyzeSaccades(trial);
 
 %% OPTIONAL: find micro saccades
 % % remove saccades
