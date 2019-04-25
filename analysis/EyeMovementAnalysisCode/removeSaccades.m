@@ -12,7 +12,7 @@
 % output: trial --> structure containing relevant current trial information
 %                   de-saccaded eye movements added
 
-function [trial] = removeSaccades(trial)
+function [trial] = removeSaccades(trial, saccades)
 % add saccades to trial information
 % for x
 trial.saccades.X.onsets = [];
@@ -32,7 +32,17 @@ for i = 1:length(saccades.X.onsets)
         trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
         duringIdx = duringIdx + 1;
     end
-    if trial.eyeX_filt(saccades.X.offsets(i))-trial.eyeX_filt(saccades.X.onsets(i)) < 0
+    peakV = max(abs(trial.eyeDX_filt(saccades.X.onsets(i):saccades.X.offsets(i))));
+    peakVIdx = find(abs(trial.eyeDX_filt)==peakV);
+    if length(peakVIdx)>1
+        for ii = 1:length(peakVIdx)
+            if peakVIdx(ii) > saccades.X.onsets(i) && peakVIdx(ii) < saccades.X.offsets(i)
+                peakVIdx = peakVIdx(ii);
+                break
+            end
+        end
+    end
+    if trial.eyeDX_filt(peakVIdx) < 0 % whether velocity is positive or negative
         trial.saccades.X_left.onsets = [trial.saccades.X_left.onsets; saccades.X.onsets(i)];
         trial.saccades.X_left.offsets = [trial.saccades.X_left.offsets; saccades.X.offsets(i)];
     else

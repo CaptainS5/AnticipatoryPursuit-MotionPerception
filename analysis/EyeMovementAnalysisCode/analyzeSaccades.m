@@ -15,72 +15,73 @@
 
 function [trial, saccades] = analyzeSaccades(trial)
 % define the window you want to analyze saccades in
+% all saccade properties are within this window, using onsets_pursuit and
+% offsets_pursuit
 startFrame = nanmax(trial.stim_onset+ms2frames(50), trial.pursuit.onset);
-endFrame = trial.stim_offset-ms2frames(150);
+endFrame = trial.stim_offset-ms2frames(100);
 % then find the proper onsets and offsets
 xIdx = find(trial.saccades.X.onsets>=startFrame & trial.saccades.X.onsets<=endFrame);
 yIdx = find(trial.saccades.Y.onsets>=startFrame & trial.saccades.Y.onsets<=endFrame);
-trial.saccades.X.onsets = trial.saccades.X.onsets(xIdx);
-trial.saccades.X.offsets = trial.saccades.X.offsets(xIdx);
-trial.saccades.Y.onsets = trial.saccades.Y.onsets(yIdx);
-trial.saccades.Y.offsets = trial.saccades.Y.offsets(yIdx);
-trial.saccades.onsets = [trial.saccades.X.onsets; trial.saccades.Y.onsets];
-trial.saccades.offsets = [trial.saccades.X.offsets; trial.saccades.Y.offsets];
+trial.saccades.X.onsets_pursuit = trial.saccades.X.onsets(xIdx);
+trial.saccades.X.offsets_pursuit = trial.saccades.X.offsets(xIdx);
+trial.saccades.Y.onsets_pursuit = trial.saccades.Y.onsets(yIdx);
+trial.saccades.Y.offsets_pursuit = trial.saccades.Y.offsets(yIdx);
+trial.saccades.onsets_pursuit = [trial.saccades.X.onsets_pursuit; trial.saccades.Y.onsets_pursuit];
+trial.saccades.offsets_pursuit = [trial.saccades.X.offsets_pursuit; trial.saccades.Y.offsets_pursuit];
 
 xIdxL = find(trial.saccades.X_left.onsets>=startFrame & trial.saccades.X_left.onsets<=endFrame);
 xIdxR = find(trial.saccades.X_right.onsets>=startFrame & trial.saccades.X_right.onsets<=endFrame);
-trial.saccades.X_left.onsets = trial.saccades.X_left.onsets(xIdxL);
-trial.saccades.X_left.offsets = trial.saccades.X_left.offsets(xIdxL);
-trial.saccades.X_right.onsets = trial.saccades.X_right.onsets(xIdxR);
-trial.saccades.X_right.offsets = trial.saccades.X_right.offsets(xIdxR);
+trial.saccades.X_left.onsets_pursuit = trial.saccades.X_left.onsets(xIdxL);
+trial.saccades.X_left.offsets_pursuit = trial.saccades.X_left.offsets(xIdxL);
+trial.saccades.X_right.onsets_pursuit = trial.saccades.X_right.onsets(xIdxR);
+trial.saccades.X_right.offsets_pursuit = trial.saccades.X_right.offsets(xIdxR);
 
 % calculate saccade amplitudes
 % if there are no y-saccades, use x and y position of x saccades and vice
 % versa; otherwise use the earlier onset and later offset; basically we
 % assume that the eye is making a saccade and x- and y-position should be
 % affected equally
-xSac = length(trial.saccades.X.onsets);
-ySac = length(trial.saccades.Y.onsets);
-if numel(trial.saccades.onsets) == 0
+xSac = length(trial.saccades.X.onsets_pursuit);
+ySac = length(trial.saccades.Y.onsets_pursuit);
+if numel(trial.saccades.onsets_pursuit) == 0
     trial.saccades.amplitudes = NaN;
 elseif isempty(ySac)
-    trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
-        + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
+    trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X.onsets_pursuit)).^2 ...
+        + (trial.eyeY_filt(trial.saccades.X.offsets_pursuit) - trial.eyeY_filt(trial.saccades.X.onsets_pursuit)).^2);
 elseif isempty(xSac)
-    trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.Y.offsets) - trial.eyeX_filt(trial.saccades.Y.onsets)).^2 ...
-        + (trial.eyeY_filt(trial.saccades.Y.offsets) - trial.eyeY_filt(trial.saccades.Y.onsets)).^2);
+    trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.Y.offsets_pursuit) - trial.eyeX_filt(trial.saccades.Y.onsets_pursuit)).^2 ...
+        + (trial.eyeY_filt(trial.saccades.Y.offsets_pursuit) - trial.eyeY_filt(trial.saccades.Y.onsets_pursuit)).^2);
 else
-    if length(trial.saccades.onsets) ~= length(trial.saccades.offsets)
-        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
-        + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
+    if length(trial.saccades.onsets_pursuit) ~= length(trial.saccades.offsets_pursuit)
+        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X.onsets_pursuit)).^2 ...
+        + (trial.eyeY_filt(trial.saccades.X.offsets_pursuit) - trial.eyeY_filt(trial.saccades.X.onsets_pursuit)).^2);
     else
-        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.offsets) - trial.eyeX_filt(trial.saccades.onsets)).^2 ...
-            + (trial.eyeY_filt(trial.saccades.offsets) - trial.eyeY_filt(trial.saccades.onsets)).^2);
+        trial.saccades.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.offsets_pursuit) - trial.eyeX_filt(trial.saccades.onsets_pursuit)).^2 ...
+            + (trial.eyeY_filt(trial.saccades.offsets_pursuit) - trial.eyeY_filt(trial.saccades.onsets_pursuit)).^2);
     end
 end
 if ~isempty(xSac)
-    trial.saccades.X.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X.offsets) - trial.eyeX_filt(trial.saccades.X.onsets)).^2 ...
-        + (trial.eyeY_filt(trial.saccades.X.offsets) - trial.eyeY_filt(trial.saccades.X.onsets)).^2);
+    trial.saccades.X.amplitudes = abs(trial.eyeX_filt(trial.saccades.X.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X.onsets_pursuit));
 end
 
-xSacL = length(trial.saccades.X_left.onsets);
-xSacR = length(trial.saccades.X_right.onsets);
+xSacL = length(trial.saccades.X_left.onsets_pursuit);
+xSacR = length(trial.saccades.X_right.onsets_pursuit);
 if ~isempty(xSacL)
-    trial.saccades.X_left.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_left.offsets) - trial.eyeX_filt(trial.saccades.X_left.onsets));
-    % trial.saccades.X_left.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X_left.offsets) - trial.eyeX_filt(trial.saccades.X_left.onsets)).^2 ...
-    %         + (trial.eyeY_filt(trial.saccades.X_left.offsets) - trial.eyeY_filt(trial.saccades.X_left.onsets)).^2);
+    trial.saccades.X_left.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_left.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X_left.onsets_pursuit));
+    % trial.saccades.X_left.amplitudes = sqrt((trial.eyeX_filt(trial.saccades.X_left.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X_left.onsets_pursuit)).^2 ...
+    %         + (trial.eyeY_filt(trial.saccades.X_left.offsets_pursuit) - trial.eyeY_filt(trial.saccades.X_left.onsets_pursuit)).^2);
 else
     trial.saccades.X_left.amplitudes = NaN;
 end
 if ~isempty(xSacR)
-    trial.saccades.X_right.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_right.offsets) - trial.eyeX_filt(trial.saccades.X_right.onsets));
+    trial.saccades.X_right.amplitudes = abs(trial.eyeX_filt(trial.saccades.X_right.offsets_pursuit) - trial.eyeX_filt(trial.saccades.X_right.onsets_pursuit));
 else
     trial.saccades.X_right.amplitudes = NaN;
 end
 
 % caluclate mean and max amplitude, mean duration, total number, &
 % cumulative saccade amplitude (saccadic sum)
-if isempty(trial.saccades.onsets)
+if isempty(trial.saccades.onsets_pursuit)
     trial.saccades.meanAmplitude = [];
     trial.saccades.maxAmplitude = [];   
     trial.saccades.X.meanDuration = [];
@@ -101,21 +102,21 @@ else
     trial.saccades.maxAmplitude = max(trial.saccades.amplitudes);
     trial.saccades.X.meanAmplitude = nanmean(trial.saccades.X.amplitudes);
     trial.saccades.X.maxAmplitude = max(trial.saccades.X.amplitudes);
-    trial.saccades.X.meanDuration = mean(trial.saccades.X.offsets - trial.saccades.X.onsets);
-    trial.saccades.Y.meanDuration = mean(trial.saccades.Y.offsets - trial.saccades.Y.onsets);
+    trial.saccades.X.meanDuration = mean(trial.saccades.X.offsets_pursuit - trial.saccades.X.onsets_pursuit);
+    trial.saccades.Y.meanDuration = mean(trial.saccades.Y.offsets_pursuit - trial.saccades.Y.onsets_pursuit);
     trial.saccades.meanDuration = nanmean(sqrt(trial.saccades.X.meanDuration.^2 + ...
                                                trial.saccades.Y.meanDuration.^2));
-    trial.saccades.number = length(trial.saccades.onsets);
-    trial.saccades.X.number = length(trial.saccades.X.onsets);
+    trial.saccades.number = length(trial.saccades.onsets_pursuit);
+    trial.saccades.X.number = length(trial.saccades.X.onsets_pursuit);
     trial.saccades.sacSum = sum(trial.saccades.amplitudes);
     trial.saccades.X.sacSum = sum(trial.saccades.X.amplitudes);
-    trial.saccades.X_left.number = length(trial.saccades.X_left.onsets);
+    trial.saccades.X_left.number = length(trial.saccades.X_left.onsets_pursuit);
     trial.saccades.X_left.meanAmplitude = nanmean(trial.saccades.X_left.amplitudes);
-    trial.saccades.X_left.meanDuration = mean(trial.saccades.X_left.offsets - trial.saccades.X_left.onsets);
+    trial.saccades.X_left.meanDuration = mean(trial.saccades.X_left.offsets_pursuit - trial.saccades.X_left.onsets_pursuit);
     trial.saccades.X_left.sumAmplitude = sum(trial.saccades.X_left.amplitudes);
-    trial.saccades.X_right.number = length(trial.saccades.X_right.onsets);
+    trial.saccades.X_right.number = length(trial.saccades.X_right.onsets_pursuit);
     trial.saccades.X_right.meanAmplitude = nanmean(trial.saccades.X_right.amplitudes);
-    trial.saccades.X_right.meanDuration = mean(trial.saccades.X_right.offsets - trial.saccades.X_right.onsets);
+    trial.saccades.X_right.meanDuration = mean(trial.saccades.X_right.offsets_pursuit - trial.saccades.X_right.onsets_pursuit);
     trial.saccades.X_right.sumAmplitude = sum(trial.saccades.X_right.amplitudes);
 end
 
@@ -124,25 +125,25 @@ trial.saccades.X.peakVelocity = [];
 trial.saccades.Y.peakVelocity = [];
 trial.saccades.X.meanVelocity = [];
 trial.saccades.Y.meanVelocity = [];
-saccadesXXpeakVelocity = NaN(length(trial.saccades.X.onsets),1);
-saccadesXYpeakVelocity = NaN(length(trial.saccades.X.onsets),1);
-saccadesXXmeanVelocity = NaN(length(trial.saccades.X.onsets),1);
-saccadesXYmeanVelocity = NaN(length(trial.saccades.X.onsets),1);
-for i = 1:length(trial.saccades.X.onsets)
-    saccadesXXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.X.onsets(i):trial.saccades.X.offsets(i))));
-    saccadesXYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.X.onsets(i):trial.saccades.X.offsets(i))));
-    saccadesXXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.X.onsets(i):trial.saccades.X.offsets(i))));
-    saccadesXYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.X.onsets(i):trial.saccades.X.offsets(i))));
+saccadesXXpeakVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
+saccadesXYpeakVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
+saccadesXXmeanVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
+saccadesXYmeanVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
+for i = 1:length(trial.saccades.X.onsets_pursuit)
+    saccadesXXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+    saccadesXYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+    saccadesXXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+    saccadesXYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
 end
-saccadesYYpeakVelocity = NaN(length(trial.saccades.Y.onsets),1);
-saccadesYXpeakVelocity = NaN(length(trial.saccades.Y.onsets),1);
-saccadesYYmeanVelocity = NaN(length(trial.saccades.Y.onsets),1);
-saccadesYXmeanVelocity = NaN(length(trial.saccades.Y.onsets),1);
-for i = 1:length(trial.saccades.Y.onsets)
-    saccadesYYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.Y.onsets(i):trial.saccades.Y.offsets(i))));
-    saccadesYXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.Y.onsets(i):trial.saccades.Y.offsets(i))));
-    saccadesYYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.Y.onsets(i):trial.saccades.Y.offsets(i))));
-    saccadesYXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.Y.onsets(i):trial.saccades.Y.offsets(i))));
+saccadesYYpeakVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
+saccadesYXpeakVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
+saccadesYYmeanVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
+saccadesYXmeanVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
+for i = 1:length(trial.saccades.Y.onsets_pursuit)
+    saccadesYYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+    saccadesYXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+    saccadesYYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+    saccadesYXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
 end
 trial.saccades.X.peakVelocity = max([saccadesXXpeakVelocity; saccadesYXpeakVelocity]);
 trial.saccades.Y.peakVelocity = max([saccadesXYpeakVelocity; saccadesYYpeakVelocity]);

@@ -17,14 +17,15 @@ function [pursuit] = analyzePursuit(trial, pursuit)
 negativeAPwindow = ms2frames(-50);
 positiveAPwindow = ms2frames(50);
 % calculate AP...
-pursuit.APvelocity.X = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
+pursuit.APvelocity = nanmean(sqrt( trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 + trial.DY_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 ));
+pursuit.APvelocityX = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
 
 % define the window you want to analyze open-loop pursuit in
 openLoopLength = 140;
 pursuitOff = trial.stim_offset-ms2frames(150); % may want to adjust if target has already disappeard 
 
 %%calculated open-loop duration
-if pursuit.onset && pursuit.onsetSteadyState
+if ~isnan(pursuit.onset) && ~isnan(pursuit.onsetSteadyState)
     openLoopDuration = pursuit.onsetSteadyState - pursuit.onset;
 else
     openLoopDuration = ms2frames(openLoopLength);
@@ -60,30 +61,38 @@ else
     remove = isnan(meanVelocityX);
     meanVelocityX(remove) = [];
     pursuit.initialMeanVelocity.X = mean(abs(meanVelocityX));
+    pursuit.initialMeanVelocityX = mean(meanVelocityX);
     if length(meanVelocityX) < ms2frames(40) % if open loop pursuit is less than 40 ms before catch up saccde pursuit was not truely initiated
         pursuit.initialMeanVelocity.X = NaN;
+        pursuit.initialMeanVelocityX = NaN;
     end    
     peakVelocityX = trial.DX_noSac(startFrame:endFrame);
     remove = isnan(peakVelocityX);
     peakVelocityX(remove) = [];
     pursuit.initialPeakVelocity.X = max(abs(peakVelocityX));
+    pursuit.initialPeakVelocityX = pursuit.initialPeakVelocity.X;
     if length(peakVelocityX) < ms2frames(40)
         pursuit.initialPeakVelocity.X = NaN;
+        pursuit.initialPeakVelocityX = NaN;
     end    
     meanAccelerationX = trial.eyeDDX_filt(startFrame:endFrame);
     remove = isnan(meanAccelerationX);
     meanAccelerationX(remove) = [];
     pursuit.initialMeanAcceleration.X = mean(abs(meanAccelerationX));
+    pursuit.initialMeanAccelerationX = mean(meanAccelerationX);
     if length(meanAccelerationX) < ms2frames(40)
         pursuit.initialMeanAcceleration.X = NaN;
+        pursuit.initialMeanAccelerationX = NaN;
     end
     
     peakAccelerationX = trial.eyeDDX_filt(startFrame:endFrame);
     remove = isnan(peakAccelerationX);
     peakAccelerationX(remove) = [];
     pursuit.initialPeakAcceleration.X = max(abs(peakAccelerationX));
+     pursuit.initialPeakAccelerationX = max(abs(peakAccelerationX));
     if length(peakAccelerationX) < ms2frames(40)
         pursuit.initialPeakAcceleration.X = NaN;
+        pursuit.initialPeakAccelerationX = NaN;
     end
     % next analyze initial pursuit in y 
     meanVelocityY = trial.DY_noSac(startFrame:endFrame);
@@ -146,17 +155,22 @@ end
 startFrame = pursuit.openLoopEndFrame+1;
 endFrame = pursuitOff;
 closedLoop = startFrame:endFrame;
-pursuit.closedLoopMeanVel.X = nanmean(trial.DX_noSac(startFrame:endFrame));
+pursuit.closedLoopMeanVelX = nanmean(trial.DX_noSac(startFrame:endFrame));
 % calculate gain first
 speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
 speedX_noSac = sqrt((trial.DX_noSac).^2);
 absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
 idx = absoluteVel < 0.05;
 absoluteVel(idx) = NaN;
+pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
+pursuit.gain= nanmean(pursuitGain);
+if length(pursuitGain) < ms2frames(40)
+    pursuit.gain = NaN;
+end
 pursuitGainX = (speedX_noSac(closedLoop))./absoluteVel(closedLoop);
-pursuit.gain.X= nanmean(pursuitGainX);
+pursuit.gainX= nanmean(pursuitGainX);
 if length(pursuitGainX) < ms2frames(40)
-    pursuit.gain.X = NaN;
+    pursuit.gainX = NaN;
 end
 % % calculate position error
 % horizontalError = trial.X_noSac(startFrame:endFrame)-trial.stimulus.XposGenerated(startFrame:endFrame);

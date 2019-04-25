@@ -7,8 +7,10 @@ clear all; close all; clc
 names = {'XW0' 'p2' 'p4'};
 cd ..
 analysisPath = pwd;
-dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data';
-% dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data';
+dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
+% dataPath =
+% 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+% dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
 sampleRate = 1000;
@@ -59,25 +61,50 @@ for subN = 1:length(names)
             eyeTrialData.frameLog.fixationOff(subN, currentTrial) = trial.log.fixationOff;
             eyeTrialData.frameLog.rdkOn(subN, currentTrial) = trial.log.targetOnset;
             eyeTrialData.frameLog.rdkOff(subN, currentTrial) = trial.log.trialEnd;
-            eyeTrialDataSub.trial{1, currentTrial} = trial;
+            
+            eyeTrialData.pursuit.APvelocityX(subN, currentTrial) = trial.pursuit.APvelocityX;
+            eyeTrialData.pursuit.onset(subN, currentTrial) = trial.pursuit.onset; % visually driven pursuit onset
+            eyeTrialData.pursuit.onsetSteadyState(subN, currentTrial) = trial.pursuit.onsetSteadyState;
+            eyeTrialData.pursuit.onsetTrue(subN, currentTrial) = trial.pursuit.onsetTrue; % original onset, could be earlier than visual stimulus onset
+            eyeTrialData.pursuit.openLoopStartFrame(subN, currentTrial) = trial.pursuit.openLoopStartFrame;
+            eyeTrialData.pursuit.openLoopEndFrame(subN, currentTrial) = trial.pursuit.openLoopEndFrame;
+            eyeTrialData.pursuit.initialMeanVelocityX(subN, currentTrial) = trial.pursuit.initialMeanVelocityX;
+            eyeTrialData.pursuit.initialPeakVelocityX(subN, currentTrial) = trial.pursuit.initialPeakVelocityX;
+            eyeTrialData.pursuit.initialMeanAccelerationX(subN, currentTrial) = trial.pursuit.MeanAccelerationX;
+            eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = trial.pursuit.PeakAccelerationX;
+            eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = trial.pursuit.closedLoopMeanVelX;
+            eyeTrialData.pursuit.gainX(subN, currentTrial) = trial.pursuit.gainX;
+             
+            eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = trial.saccades.X.sacSum;
+            eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X.;
+            eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X.;
+            
+            eyeTrialDataSub.trial{1, currentTrial}.eyeX_filt = trial.eyeX_filt; % for velocity traces
+            eyeTrialDataSub.trial{1, currentTrial}.eyeY_filt = trial.eyeY_filt; 
+            eyeTrialDataSub.trial{1, currentTrial}.eyeDX_filt = trial.eyeDX_filt; 
+            eyeTrialDataSub.trial{1, currentTrial}.eyeDY_filt = trial.eyeDY_filt; 
+            eyeTrialDataSub.trial{1, currentTrial}.X_noSac = trial.X_noSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.Y_noSac = trial.Y_noSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.DX_noSac = trial.DX_noSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.DY_noSac = trial.DY_noSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.X_interpolSac = trial.X_interpolSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.Y_interpolSac = trial.Y_interpolSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.DX_interpolSac = trial.DX_interpolSac; 
+            eyeTrialDataSub.trial{1, currentTrial}.DY_interpolSac = trial.DY_interpolSac; 
         else
             eyeTrialData.frameLog.fixationOn(subN, currentTrial) = NaN;
             eyeTrialData.frameLog.fixationOff(subN, currentTrial) = NaN;
             eyeTrialData.frameLog.rdkOn(subN, currentTrial) = NaN;
             eyeTrialData.frameLog.rdkOff(subN, currentTrial) = NaN;
-            eyeTrialDataSub.trial{1, currentTrial} = NaN;
+            
+            eyeTrialDataSub.trial{1, currentTrial} = NaN; % for velocity traces
         end
-        % %         eyeTrialData.stim.offset(subN, currentTrial) = trial.stim_offset;
-        % %         eyeTrialData.stim.beforeFrames(subN, currentTrial) = trial.stim_reversalOnset-trial.stim_onset; % for later alignment of velocity traces
-        % %         eyeTrialData.stim.afterFrames(subN, currentTrial) = trial.stim_offset-trial.stim_reversalOffset+1; % for later alignment of velocity traces
-        % %         eyeTrialData.frameLog.startFrame(subN, currentTrial) = trial.log.trialStart;
-        % %         eyeTrialData.frameLog.endFrame(subN, currentTrial) = trial.log.trialEnd;
-        %         eyeTrialData.frameLog.length(subN, currentTrial) = trial.log.trialEnd;
-        % %         eyeTrialData.frameLog.lostXframes{subN, currentTrial} = trial.lostXframes;
-        % %         eyeTrialData.frameLog.lostYframes{subN, currentTrial} = trial.lostYframes;
-        % %         eyeTrialData.frameLog.lostTframes{subN, currentTrial} = trial.lostTframes;
-        % %         eyeTrialData.frameLog.quickphaseFrames{subN, currentTrial} = trial.quickphaseFrames;
-        %         eyeTrialData.saccades{subN, currentTrial} = trial.saccades;
     end
     cd([analysisPath '\analysis'])    
     save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialDataSub');
