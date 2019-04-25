@@ -82,38 +82,52 @@ end
 % caluclate mean and max amplitude, mean duration, total number, &
 % cumulative saccade amplitude (saccadic sum)
 if isempty(trial.saccades.onsets_pursuit)
-    trial.saccades.meanAmplitude = [];
-    trial.saccades.maxAmplitude = [];   
-    trial.saccades.X.meanDuration = [];
-    trial.saccades.Y.meanDuration = [];
-    trial.saccades.meanDuration = [];
-    trial.saccades.number = [];
-    trial.saccades.sacSum = [];
-    trial.saccades.X_left.number = [];
-    trial.saccades.X_left.meanAmplitude = [];
-    trial.saccades.X_left.meanDuration = [];
-    trial.saccades.X_left.sumAmplitude = [];
-    trial.saccades.X_right.number = [];
-    trial.saccades.X_right.meanAmplitude = [];
-    trial.saccades.X_right.meanDuration = [];
-    trial.saccades.X_right.sumAmplitude = [];
+    trial.saccades.meanAmplitude = NaN;
+    trial.saccades.maxAmplitude = NaN;   
+    trial.saccades.X.meanDuration = NaN;
+    trial.saccades.Y.meanDuration = NaN;
+    trial.saccades.meanDuration = NaN;
+    trial.saccades.number = NaN;
+    trial.saccades.sacSum = NaN;
 else
     trial.saccades.meanAmplitude = nanmean(trial.saccades.amplitudes);
     trial.saccades.maxAmplitude = max(trial.saccades.amplitudes);
-    trial.saccades.X.meanAmplitude = nanmean(trial.saccades.X.amplitudes);
-    trial.saccades.X.maxAmplitude = max(trial.saccades.X.amplitudes);
     trial.saccades.X.meanDuration = mean(trial.saccades.X.offsets_pursuit - trial.saccades.X.onsets_pursuit);
     trial.saccades.Y.meanDuration = mean(trial.saccades.Y.offsets_pursuit - trial.saccades.Y.onsets_pursuit);
     trial.saccades.meanDuration = nanmean(sqrt(trial.saccades.X.meanDuration.^2 + ...
                                                trial.saccades.Y.meanDuration.^2));
     trial.saccades.number = length(trial.saccades.onsets_pursuit);
-    trial.saccades.X.number = length(trial.saccades.X.onsets_pursuit);
     trial.saccades.sacSum = sum(trial.saccades.amplitudes);
+end
+if isempty(trial.saccades.X.onsets_pursuit)
+    trial.saccades.X.number = NaN;
+    trial.saccades.X.sacSum = NaN;
+    trial.saccades.X.meanAmplitude = NaN;
+    trial.saccades.X.maxAmplitude = NaN;
+else
+    trial.saccades.X.meanAmplitude = nanmean(trial.saccades.X.amplitudes);
+    trial.saccades.X.maxAmplitude = max(trial.saccades.X.amplitudes);
+    trial.saccades.X.meanDuration = mean(trial.saccades.X.offsets_pursuit - trial.saccades.X.onsets_pursuit);
+    trial.saccades.X.number = length(trial.saccades.X.onsets_pursuit);
     trial.saccades.X.sacSum = sum(trial.saccades.X.amplitudes);
+end
+if isempty(trial.saccades.X_left.onsets_pursuit)
+    trial.saccades.X_left.number = NaN;
+    trial.saccades.X_left.meanAmplitude = NaN;
+    trial.saccades.X_left.meanDuration = NaN;
+    trial.saccades.X_left.sumAmplitude = NaN;
+else
     trial.saccades.X_left.number = length(trial.saccades.X_left.onsets_pursuit);
     trial.saccades.X_left.meanAmplitude = nanmean(trial.saccades.X_left.amplitudes);
     trial.saccades.X_left.meanDuration = mean(trial.saccades.X_left.offsets_pursuit - trial.saccades.X_left.onsets_pursuit);
     trial.saccades.X_left.sumAmplitude = sum(trial.saccades.X_left.amplitudes);
+end
+if isempty(trial.saccades.X_right.onsets_pursuit)
+    trial.saccades.X_right.number = NaN;
+    trial.saccades.X_right.meanAmplitude = NaN;
+    trial.saccades.X_right.meanDuration = NaN;
+    trial.saccades.X_right.sumAmplitude = NaN;
+else
     trial.saccades.X_right.number = length(trial.saccades.X_right.onsets_pursuit);
     trial.saccades.X_right.meanAmplitude = nanmean(trial.saccades.X_right.amplitudes);
     trial.saccades.X_right.meanDuration = mean(trial.saccades.X_right.offsets_pursuit - trial.saccades.X_right.onsets_pursuit);
@@ -121,35 +135,40 @@ else
 end
 
 % calculate mean and peak velocity for each saccade; then find average
-trial.saccades.X.peakVelocity = [];
-trial.saccades.Y.peakVelocity = [];
-trial.saccades.X.meanVelocity = [];
-trial.saccades.Y.meanVelocity = [];
+trial.saccades.X.peakVelocity = NaN;
+trial.saccades.Y.peakVelocity = NaN;
+trial.saccades.X.meanVelocity = NaN;
+trial.saccades.Y.meanVelocity = NaN;
 saccadesXXpeakVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
 saccadesXYpeakVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
 saccadesXXmeanVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
 saccadesXYmeanVelocity = NaN(length(trial.saccades.X.onsets_pursuit),1);
-for i = 1:length(trial.saccades.X.onsets_pursuit)
-    saccadesXXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
-    saccadesXYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
-    saccadesXXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
-    saccadesXYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+if ~isempty(trial.saccades.X.onsets_pursuit)
+    for i = 1:length(trial.saccades.X.onsets_pursuit)
+        saccadesXXpeakVelocity(i) = nanmax(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+        saccadesXYpeakVelocity(i) = nanmax(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+        saccadesXXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+        saccadesXYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.X.onsets_pursuit(i):trial.saccades.X.offsets_pursuit(i))));
+    end
 end
 saccadesYYpeakVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
 saccadesYXpeakVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
 saccadesYYmeanVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
 saccadesYXmeanVelocity = NaN(length(trial.saccades.Y.onsets_pursuit),1);
-for i = 1:length(trial.saccades.Y.onsets_pursuit)
-    saccadesYYpeakVelocity(i) = max(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
-    saccadesYXpeakVelocity(i) = max(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
-    saccadesYYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
-    saccadesYXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+if ~isempty(trial.saccades.Y.onsets_pursuit)
+    for i = 1:length(trial.saccades.Y.onsets_pursuit)
+        saccadesYYpeakVelocity(i) = nanmax(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+        saccadesYXpeakVelocity(i) = nanmax(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+        saccadesYYmeanVelocity(i) = nanmean(abs(trial.eyeDY_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+        saccadesYXmeanVelocity(i) = nanmean(abs(trial.eyeDX_filt(trial.saccades.Y.onsets_pursuit(i):trial.saccades.Y.offsets_pursuit(i))));
+    end
 end
-trial.saccades.X.peakVelocity = max([saccadesXXpeakVelocity; saccadesYXpeakVelocity]);
-trial.saccades.Y.peakVelocity = max([saccadesXYpeakVelocity; saccadesYYpeakVelocity]);
-trial.saccades.X.meanVelocity = nanmean([saccadesXXmeanVelocity; saccadesYXmeanVelocity]);
-trial.saccades.Y.meanVelocity = nanmean([saccadesXYmeanVelocity; saccadesYYmeanVelocity]);
-
+if ~isempty(trial.saccades.X.onsets_pursuit) || ~isempty(trial.saccades.Y.onsets_pursuit)
+    trial.saccades.X.peakVelocity = nanmax([saccadesXXpeakVelocity; saccadesYXpeakVelocity]);
+    trial.saccades.Y.peakVelocity = nanmax([saccadesXYpeakVelocity; saccadesYYpeakVelocity]);
+    trial.saccades.X.meanVelocity = nanmean([saccadesXXmeanVelocity; saccadesYXmeanVelocity]);
+    trial.saccades.Y.meanVelocity = nanmean([saccadesXYmeanVelocity; saccadesYYmeanVelocity]);
+end
 trial.saccades.peakVelocity = nanmean(sqrt(trial.saccades.X.peakVelocity.^2 + trial.saccades.Y.peakVelocity.^2));
 trial.saccades.meanVelocity = nanmean(sqrt(trial.saccades.X.meanVelocity.^2 + trial.saccades.Y.meanVelocity.^2));
 

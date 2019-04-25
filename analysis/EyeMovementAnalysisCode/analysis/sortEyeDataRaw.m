@@ -70,8 +70,8 @@ for subN = 1:length(names)
             eyeTrialData.pursuit.openLoopEndFrame(subN, currentTrial) = trial.pursuit.openLoopEndFrame;
             eyeTrialData.pursuit.initialMeanVelocityX(subN, currentTrial) = trial.pursuit.initialMeanVelocityX;
             eyeTrialData.pursuit.initialPeakVelocityX(subN, currentTrial) = trial.pursuit.initialPeakVelocityX;
-            eyeTrialData.pursuit.initialMeanAccelerationX(subN, currentTrial) = trial.pursuit.MeanAccelerationX;
-            eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = trial.pursuit.PeakAccelerationX;
+            eyeTrialData.pursuit.initialMeanAccelerationX(subN, currentTrial) = trial.pursuit.initialMeanAccelerationX;
+            eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = trial.pursuit.initialPeakAccelerationX;
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = trial.pursuit.closedLoopMeanVelX;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = trial.pursuit.gainX;
              

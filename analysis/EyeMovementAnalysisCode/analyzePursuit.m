@@ -55,6 +55,11 @@ if pursuit.saccadeType == 2 || pursuit.saccadeType == -2
     pursuit.initialPeakVelocity = NaN;
     pursuit.initialMeanAcceleration = NaN;
     pursuit.initialPeakAcceleration = NaN;   
+    
+    pursuit.initialMeanVelocityX = NaN;
+    pursuit.initialPeakVelocityX = NaN;
+    pursuit.initialMeanAccelerationX = NaN;
+    pursuit.initialPeakAccelerationX = NaN;   
 else
     % first analyze initial pursuit in X
     meanVelocityX = trial.DX_noSac(startFrame:endFrame);

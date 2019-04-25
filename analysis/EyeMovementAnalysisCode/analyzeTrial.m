@@ -54,7 +54,7 @@ pursuit = analyzePursuit(trial, pursuit);
 trial.pursuit = pursuit;
 
 %% analyze saccades
-% [trial] = analyzeSaccades(trial);
+[trial] = analyzeSaccades(trial);
 
 %% OPTIONAL: find micro saccades
 % % remove saccades
