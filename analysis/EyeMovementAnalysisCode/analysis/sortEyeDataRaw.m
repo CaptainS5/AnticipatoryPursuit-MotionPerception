@@ -75,15 +75,15 @@ for subN = 1:length(names)
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = trial.pursuit.closedLoopMeanVelX;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = trial.pursuit.gainX;
              
-            eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X.;
-            eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X.;
-            eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = trial.saccades.X.;
-            eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = trial.saccades.X.;
+            eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X.number;
+            eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X.meanAmplitude;
+            eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = trial.saccades.X.maxAmplitude;
+            eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = trial.saccades.X.meanDuration;
             eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = trial.saccades.X.sacSum;
-            eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = trial.saccades.X.;
-            eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = trial.saccades.X.;
-            eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X.;
-            eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X.;
+            eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = trial.saccades.X.peakVelocity;
+            eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = trial.saccades.X.meanVelocity;
+            eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X.onsets_pursuit;
+            eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X.offsets_pursuit;
             
             eyeTrialDataSub.trial{1, currentTrial}.eyeX_filt = trial.eyeX_filt; % for velocity traces
             eyeTrialDataSub.trial{1, currentTrial}.eyeY_filt = trial.eyeY_filt; 
@@ -102,6 +102,29 @@ for subN = 1:length(names)
             eyeTrialData.frameLog.fixationOff(subN, currentTrial) = NaN;
             eyeTrialData.frameLog.rdkOn(subN, currentTrial) = NaN;
             eyeTrialData.frameLog.rdkOff(subN, currentTrial) = NaN;
+            
+            eyeTrialData.pursuit.APvelocityX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.onset(subN, currentTrial) = NaN; % visually driven pursuit onset
+            eyeTrialData.pursuit.onsetSteadyState(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.onsetTrue(subN, currentTrial) = NaN; % original onset, could be earlier than visual stimulus onset
+            eyeTrialData.pursuit.openLoopStartFrame(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.openLoopEndFrame(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.initialMeanVelocityX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.initialPeakVelocityX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.initialMeanAccelerationX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.gainX(subN, currentTrial) = NaN;
+             
+            eyeTrialData.saccades.X.number(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = NaN;
+            eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = NaN;
+            eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = NaN;
             
             eyeTrialDataSub.trial{1, currentTrial} = NaN; % for velocity traces
         end

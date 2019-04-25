@@ -152,7 +152,7 @@ else
     %%calculate the steady-state phase onset, using similar methods
     %%currently not reliable enough... need to check later
     startTime = pursuit.onset;
-    endTime =  pursuit.onset + ms2frames(250); % open-loop phase not longer than a certain window
+    endTime =  trial.stim_offset - ms2frames(100); % open-loop phase not longer than a certain window
     if startTime>=trial.stim_offset - ms2frames(150) % if pursuit onset too late, ignore
         pursuit.onsetSteadyState = NaN;
     else
@@ -170,7 +170,7 @@ else
         dataxy_tmp = sqrt( (trial.DX_interpolSac-fix_x).^2 + (trial.DY_interpolSac-fix_y).^2 );
         XY = dataxy_tmp(time);
         % run changeDetect.m
-        [cx,cy,ly,ry] = changeDetect(time,XY);
+        [cx,cy,ly,ry] = changeDetectRestricted(time,XY);
         pursuit.onsetSteadyState = round(cx);
         % if the steady state onset is during a saccade, move it
         % around the saccade
