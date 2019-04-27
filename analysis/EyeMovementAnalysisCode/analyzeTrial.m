@@ -30,6 +30,10 @@ trial = readoutTrial(eyeData, currentSubject, analysisPath, parameters, currentT
 trial.stim_onset = trial.log.targetOnset;
 trial.stim_offset = trial.log.trialEnd;
 trial.length = trial.stim_offset;
+trial.timeWindow.APnegative = ms2frames(-50);
+trial.timeWindow.APpositive = ms2frames(50);
+trial.timeWindow.openLoopDuration = ms2frames(140); % fixed duration; may not be used, see analyzePursuit.m
+trial.timeWindow.excludeEndDuration = ms2frames(100); % exclude the last x ms of stimulus display
 
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');

@@ -19,7 +19,7 @@
 function [pursuit] = findPursuit(trial)
 
 anticipatoryPeriod = ms2frames(300); % when should we start looking for pursuit onset
-pursuitSearchEnd = 400; % this means we stop searching for pursuit onset n ms after stimulus onset
+pursuitSearchEnd = 300; % this means we stop searching for pursuit onset n ms after stimulus onset
 % x-value: TIME
 if trial.stim_onset > anticipatoryPeriod
     startTime = trial.stim_onset-anticipatoryPeriod;
@@ -152,8 +152,8 @@ else
     %%calculate the steady-state phase onset, using similar methods
     %%currently not reliable enough... need to check later
     startTime = pursuit.onset;
-    endTime =  trial.stim_offset - ms2frames(100); % open-loop phase not longer than a certain window
-    if startTime>=trial.stim_offset - ms2frames(150) % if pursuit onset too late, ignore
+    endTime =  nanmin(pursuit.onset + ms2frames(250), trial.stim_offset - trial.timeWindow.excludeEndDuration); % open-loop phase not longer than a certain window
+    if startTime>=trial.stim_offset - trial.timeWindow.excludeEndDuration - ms2frames(50) % if pursuit onset too late, ignore
         pursuit.onsetSteadyState = NaN;
     else
         time = startTime:endTime;

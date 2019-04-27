@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2' 'p4'};
+names = {'XW0' 'p2' 'p4' 'p5'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
@@ -39,7 +39,7 @@ for subN = 1:length(names)
     load eventLog
     cd(analysisPath)
     errors = load(['Errorfiles\Sub_' currentSubject '_errorFile.mat']);
-    clear eyeTrialData
+    clear eyeTrialDataSub
     
     for currentTrial = 1:size(parameters, 1)
 %         if currentTrial>1364

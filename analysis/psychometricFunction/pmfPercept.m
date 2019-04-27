@@ -12,7 +12,7 @@ probNames{2} = {'Prob 50%' 'Prob 70%' 'Prob 90%'};
 colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 %% fitting data
-for subN = 4:size(names, 2)
+for subN = 5:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.coh==1, :) = [];

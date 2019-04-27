@@ -9,7 +9,7 @@ names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p7'};
 data = table();
 
 %%
-for sub = 4:size(names, 2)
+for sub = 5:size(names, 2)
     % Read all raw data
     % read Experiment data
     cd ..

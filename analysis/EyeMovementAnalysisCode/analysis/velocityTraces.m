@@ -1,7 +1,7 @@
 % plot velocity traces, generate csv file for plotting in R
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4'};
+names = {'XW0' 'p2' 'p4' 'p5'};
 sampleRate = 1000;
 % for plotting
 minVel = [-12 -1];

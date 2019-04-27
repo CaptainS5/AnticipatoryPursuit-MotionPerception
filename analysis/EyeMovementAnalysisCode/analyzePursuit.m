@@ -14,15 +14,15 @@
 
 function [pursuit] = analyzePursuit(trial, pursuit)
 % define the window of anticipatory pursuit
-negativeAPwindow = ms2frames(-50);
-positiveAPwindow = ms2frames(50);
+negativeAPwindow = trial.timeWindow.APnegative;
+positiveAPwindow = trial.timeWindow.APpositive;
 % calculate AP...
 pursuit.APvelocity = nanmean(sqrt( trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 + trial.DY_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 ));
 pursuit.APvelocityX = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
 
 % define the window you want to analyze open-loop pursuit in
-openLoopLength = 140;
-pursuitOff = trial.stim_offset-ms2frames(150); % may want to adjust if target has already disappeard 
+openLoopLength = trial.timeWindow.openLoopDuration;
+pursuitOff = trial.stim_offset-trial.timeWindow.excludeEndDuration; % may want to adjust if target has already disappeard 
 
 %%calculated open-loop duration
 if ~isnan(pursuit.onset) && ~isnan(pursuit.onsetSteadyState)
@@ -186,7 +186,7 @@ end
 %     (trial.stimulus.YvelGenerated(startFrame:endFrame) - trial.DY_noSac(startFrame:endFrame)).^2)); %auch 2D
 % determine the latency, i.e. when did the eye move with respect to 
 % target movement
-if pursuit.onset == trial.stim_onset
+if pursuit.onset == trial.stim_onset 
     pursuit.latency = NaN;
 else
     pursuit.latency = pursuit.onset - trial.stim_onset;

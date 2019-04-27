@@ -32,8 +32,10 @@ for i = 1:length(saccades.X.onsets)
         trial.saccades.X.offsetsDuring(duringIdx, 1) = trial.saccades.X.offsets(i,1);
         duringIdx = duringIdx + 1;
     end
-    peakV = max(abs(trial.eyeDX_filt(saccades.X.onsets(i):saccades.X.offsets(i))));
-    peakVIdx = find(abs(trial.eyeDX_filt)==peakV);
+    peakV = max( abs( trial.eyeDX_filt(saccades.X.onsets(i):saccades.X.offsets(i)) - mean([trial.eyeDX_filt(saccades.X.onsets(i));trial.eyeDX_filt( saccades.X.offsets(i))]) ) );
+    % minus mean velocity of onset and offset to move the baseline, so that the position of max velocity is
+    % the true peak
+    peakVIdx = find(abs( trial.eyeDX_filt - mean([trial.eyeDX_filt(saccades.X.onsets(i));trial.eyeDX_filt( saccades.X.offsets(i))]) )==peakV);
     if length(peakVIdx)>1
         for ii = 1:length(peakVIdx)
             if peakVIdx(ii) > saccades.X.onsets(i) && peakVIdx(ii) < saccades.X.offsets(i)
