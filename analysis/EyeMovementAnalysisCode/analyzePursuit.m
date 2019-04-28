@@ -38,7 +38,7 @@ openLoopDuration = ms2frames(openLoopLength);
 
 % analyze open-loop phase first
 startFrame = nanmax([trial.stim_onset+positiveAPwindow pursuit.onset]); % if there is no pursuit onset we still want to analyze eye movement quaility
-endFrame = startFrame+openLoopDuration; %nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
+endFrame = nanmin([startFrame+openLoopDuration pursuitOff]); %nanmin([(pursuit.onset+openLoopDuration) trial.saccades.firstSaccadeOnset (trial.stim_onset+positiveAPwindow+openLoopDuration)]);
 % if startFrame<trial.stim_onset+positiveAPwindow % if onset is
 % earlier that AP window, set it to AP window--already restrict this
 % in findPursuit.m
@@ -50,7 +50,7 @@ pursuit.openLoopStartFrame = startFrame;
 pursuit.openLoopEndFrame = endFrame;
 % If subjects were fixating in the beginning (saccadeType = 2) or if purusit onset
 % was inside a saccade (saccadeType = -2) there is no open loop values
-if pursuit.saccadeType == 2 || pursuit.saccadeType == -2
+if pursuit.saccadeType == 2 || pursuit.saccadeType == -2 || pursuit.openLoopEndFrame<=pursuit.openLoopStartFrame
     pursuit.initialMeanVelocity = NaN;
     pursuit.initialPeakVelocity = NaN;
     pursuit.initialMeanAcceleration = NaN;
@@ -59,7 +59,7 @@ if pursuit.saccadeType == 2 || pursuit.saccadeType == -2
     pursuit.initialMeanVelocityX = NaN;
     pursuit.initialPeakVelocityX = NaN;
     pursuit.initialMeanAccelerationX = NaN;
-    pursuit.initialPeakAccelerationX = NaN;   
+    pursuit.initialPeakAccelerationX = NaN;  
 else
     % first analyze initial pursuit in X
     meanVelocityX = trial.DX_noSac(startFrame:endFrame);
@@ -159,23 +159,29 @@ end
 % end
 startFrame = pursuit.openLoopEndFrame+1;
 endFrame = pursuitOff;
-closedLoop = startFrame:endFrame;
-pursuit.closedLoopMeanVelX = nanmean(trial.DX_noSac(startFrame:endFrame));
-% calculate gain first
-speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
-speedX_noSac = sqrt((trial.DX_noSac).^2);
-absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
-idx = absoluteVel < 0.05;
-absoluteVel(idx) = NaN;
-pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
-pursuit.gain= nanmean(pursuitGain);
-if length(pursuitGain) < ms2frames(40)
+if endFrame<=startFrame
+    pursuit.closedLoopMeanVelX = NaN;
     pursuit.gain = NaN;
-end
-pursuitGainX = (speedX_noSac(closedLoop))./absoluteVel(closedLoop);
-pursuit.gainX= nanmean(pursuitGainX);
-if length(pursuitGainX) < ms2frames(40)
     pursuit.gainX = NaN;
+else
+    closedLoop = startFrame:endFrame;
+    pursuit.closedLoopMeanVelX = nanmean(trial.DX_noSac(startFrame:endFrame));
+    % calculate gain first
+    speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
+    speedX_noSac = sqrt((trial.DX_noSac).^2);
+    absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
+    idx = absoluteVel < 0.05;
+    absoluteVel(idx) = NaN;
+    pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
+    pursuit.gain= nanmean(pursuitGain);
+    if length(pursuitGain) < ms2frames(50)
+        pursuit.gain = NaN;
+    end
+    pursuitGainX = (speedX_noSac(closedLoop))./absoluteVel(closedLoop);
+    pursuit.gainX= nanmean(pursuitGainX);
+    if length(pursuitGainX) < ms2frames(50)
+        pursuit.gainX = NaN;
+    end
 end
 % % calculate position error
 % horizontalError = trial.X_noSac(startFrame:endFrame)-trial.stimulus.XposGenerated(startFrame:endFrame);
@@ -186,7 +192,7 @@ end
 %     (trial.stimulus.YvelGenerated(startFrame:endFrame) - trial.DY_noSac(startFrame:endFrame)).^2)); %auch 2D
 % determine the latency, i.e. when did the eye move with respect to 
 % target movement
-if pursuit.onset == trial.stim_onset 
+if pursuit.onset == trial.stim_onset
     pursuit.latency = NaN;
 else
     pursuit.latency = pursuit.onset - trial.stim_onset;

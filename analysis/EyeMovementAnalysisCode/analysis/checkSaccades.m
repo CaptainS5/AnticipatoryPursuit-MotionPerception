@@ -3,14 +3,17 @@
 % what are the directions of these saccades?
 clear all; close all; clc
 
-names = {'tW'};
+names = {'XW0' 'p2' 'p4' 'p5'};
 sampleRate = 1000;
 % for plotting
 folder = pwd;
 
+probCons = [10 30 50 70 90];
+probNames{1} = {'10', '30', '50'};
+probNames{2} = {'50', '70', '90'};
 dirCons = [-1 1]; % -1=left, 1=right
 dirNames = {'left' 'right'};
-colorPlotting = [255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 %% compare different probabilities
 % separate perceptual and standard trials
@@ -86,3 +89,6 @@ for subN = 1:size(names, 2)
         
     saveas(gca, ['saccadeDuringAP_', names{subN}, '.pdf'])
 end
+
+%% plotting
+% cd('saccadePlots')

@@ -1,4 +1,4 @@
-% Xiuyun Wu, 01/14/2019
+% Xiuyun Wu, 04/28/2019
 % getting the raw processed eye data... will be much more convenient for
 % later analysis; from fixation onset to rdk offset
 % run this after getting the errorfiles
@@ -7,9 +7,8 @@ clear all; close all; clc
 names = {'XW0' 'p2' 'p4' 'p5'};
 cd ..
 analysisPath = pwd;
-dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-% dataPath =
-% 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+% dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
+dataPath = 'C:\Users\CaptainS5\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
@@ -27,7 +26,7 @@ distance = 55; % 57.29 for tW
 saccadeThreshold = 15;
 microSaccadeThreshold = 5;
 
-%% Perceptual trials
+%% All trials
 
 for subN = 1:length(names)
     currentSubject = names{subN};
@@ -130,6 +129,6 @@ for subN = 1:length(names)
         end
     end
     cd([analysisPath '\analysis'])    
-    save(['eyeTrialData_' names{subN} '.mat'], 'eyeTrialDataSub');
+    save(['eyeTrialDataSub_' names{subN} '.mat'], 'eyeTrialDataSub');
 end
 save(['eyeTrialData_all.mat'], 'eyeTrialData');
