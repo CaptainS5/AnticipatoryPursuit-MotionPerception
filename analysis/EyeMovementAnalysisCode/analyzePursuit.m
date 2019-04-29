@@ -84,7 +84,7 @@ else
     remove = isnan(meanAccelerationX);
     meanAccelerationX(remove) = [];
     pursuit.initialMeanAcceleration.X = mean(abs(meanAccelerationX));
-    pursuit.initialMeanAccelerationX = mean(meanAccelerationX);
+    pursuit.initialMeanAccelerationX = mean(abs(meanAccelerationX));
     if length(meanAccelerationX) < ms2frames(40)
         pursuit.initialMeanAcceleration.X = NaN;
         pursuit.initialMeanAccelerationX = NaN;

@@ -31,6 +31,8 @@ maxFrameLength = max(frameLength);
 cd(velTraceFolder)
 % for each probability, draw the mean velocity trace
 for probN = 1:size(probCons, 2)
+    % first initialize; if a participant doesn't have the corresponding
+    % prob condition, then the values remain NaN and will be ignored later
     meanVel{probN}.leftStandard = NaN(length(names), maxFrameLength);
     meanVel{probN}.rightStandard = NaN(length(names), maxFrameLength);
     meanVel{probN}.leftPerceptual = NaN(length(names), maxFrameLength);
@@ -152,9 +154,8 @@ xlim([-500 700])
 ylim(yPerceptRange)
 box off
 saveas(gca, ['velocityAllProbs_all.pdf'])
-%%
 
-% % generate csv files, each file for one probability condition
+%% generate csv files, each file for one probability condition
 % % each row is the mean velocity trace of one participant
 % % use the min frame length--the lengeth where all participants have
 % % valid data points

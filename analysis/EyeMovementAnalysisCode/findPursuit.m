@@ -19,7 +19,7 @@
 function [pursuit] = findPursuit(trial)
 
 anticipatoryPeriod = ms2frames(300); % when should we start looking for pursuit onset
-pursuitSearchEnd = 300; % this means we stop searching for pursuit onset n ms after stimulus onset
+pursuitSearchEnd = 200; % this means we stop searching for pursuit onset n ms after stimulus onset
 % x-value: TIME
 if trial.stim_onset > anticipatoryPeriod
     startTime = trial.stim_onset-anticipatoryPeriod;
@@ -63,6 +63,8 @@ else
     % stimulus onset
     if pursuit.onsetTrue<(trial.stim_onset+ms2frames(50))
         pursuit.onset = trial.stim_onset+ms2frames(50);
+    elseif pursuit.onsetTrue>(trial.stim_onset+ms2frames(200))
+        pursuit.onset = trial.stim_onset+ms2frames(200);
     else
         pursuit.onset = pursuit.onsetTrue;
     end

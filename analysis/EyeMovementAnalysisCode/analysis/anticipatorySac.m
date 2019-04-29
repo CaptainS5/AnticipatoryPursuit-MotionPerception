@@ -1,26 +1,15 @@
 % use eyeDataAll to do more analysis with saccades
 % how many saccades are in the gap duration/anticipatory pursuit window?
 % what are the directions of these saccades?
-clear all; close all; clc
-
-names = {'XW0' 'p2' 'p4' 'p5'};
-sampleRate = 1000;
-% for plotting
-folder = pwd;
-
-probCons = [10 30 50 70 90];
-probNames{1} = {'10', '30', '50'};
-probNames{2} = {'50', '70', '90'};
-dirCons = [-1 1]; % -1=left, 1=right
-dirNames = {'left' 'right'};
-colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+initializeParas;
 
 %% compare different probabilities
 % separate perceptual and standard trials
+%%not updated yet...
 for subN = 1:size(names, 2)
-    cd(folder)
-    load(['eyeData_' names{subN} '.mat']);
-    probCons = unique(eyeTrialData.prob);
+    cd(analysisFolder)
+    load(['eyeTrialDataSub_' names{subN} '.mat']);
+    probCons = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
     cd ..
     
     saccadesNum{subN}.left = zeros(682, size(probCons, 2));
@@ -55,7 +44,7 @@ for subN = 1:size(names, 2)
     saccadesNum{subN}.left(saccadesNum{subN}.left==0) = NaN;
     saccadesNum{subN}.right(saccadesNum{subN}.right==0) = NaN;
     
-    cd(folder)
+    cd(analysisFolder)
     figure
     subplot(3, 1, 1)
     plot(1:682, saccadesNum{subN}.left(:, 1), '+', 'MarkerSize', 5)
@@ -89,6 +78,3 @@ for subN = 1:size(names, 2)
         
     saveas(gca, ['saccadeDuringAP_', names{subN}, '.pdf'])
 end
-
-%% plotting
-% cd('saccadePlots')
