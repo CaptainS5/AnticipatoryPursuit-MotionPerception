@@ -171,7 +171,7 @@ else
     absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
     idx = absoluteVel < 0.05;
     absoluteVel(idx) = NaN;
-    pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
+    pursuitGain = speedXY_noSac(closedLoop)./absoluteVel(closedLoop);
     pursuit.gain= nanmean(pursuitGain);
     if length(pursuitGain) < ms2frames(50)
         pursuit.gain = NaN;
@@ -193,9 +193,9 @@ else
     else
         absoluteVelX = repmat(trial.stimulus.absoluteVelocity*trial.log.rdkDir, size(speedX_noSac));
     end
-    idx = absoluteVelX < 0.05;
+    idx = abs(absoluteVelX) < 0.05;
     absoluteVelX(idx) = NaN;
-    pursuitGainX = (speedX_noSac(closedLoop))./absoluteVelX(closedLoop);
+    pursuitGainX = speedX_noSac(closedLoop)./absoluteVelX(closedLoop);
     pursuit.gainX= nanmean(pursuitGainX);
     if length(pursuitGainX) < ms2frames(50)
         pursuit.gainX = NaN;

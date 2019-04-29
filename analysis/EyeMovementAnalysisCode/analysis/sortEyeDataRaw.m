@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2' 'p4' 'p5'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6'};
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc

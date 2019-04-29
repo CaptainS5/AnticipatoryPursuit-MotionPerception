@@ -6,13 +6,13 @@ checkParas = {'pursuit.APvelocityX' ...
     'pursuit.gainX' ...
     'saccades.X.number' 'saccades.X.meanAmplitude' 'saccades.X.sumAmplitude'}; % field name in eyeTrialData
 pdfNames = {'APvelX' ...
-    'olpMeanVelX' 'olpPeakVelX' ...
+    'olpMeanVelX' 'olpPeakVelX' 'olpMeanAcceleration' ...
     'clpGainX' ...
     'sacNumX' 'sacMeanAmpX' 'sacSumAmpX'}; % name for saving the pdf
-sacStart = 5; % from the n_th parameter is saccade
+sacStart = 6; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 1;
+individualPlots = 0;
 averagedPlots = 1;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)'...
@@ -39,7 +39,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 5:5%size(checkParas, 2) % automatically loop through the parameters... just too much of them
+    for paraN = 1:size(checkParas, 2) % automatically loop through the parameters... just too much of them
         yValues{paraN, subN}.standard = NaN(500, size(probSub, 2));
         yValues{paraN, subN}.perceptual = NaN(182, size(probSub, 2));
         yValuesL{paraN, subN}.standard = NaN(500, size(probSub, 2));
@@ -110,7 +110,7 @@ end
 
 %% grouped bars of the mean of all participants
 % sort data of different participants together
-for paraN = 5:5%size(checkParas, 2)
+for paraN = 1:size(checkParas, 2)
     tempMeanS{paraN} = NaN(size(names, 2), size(probCons, 2)); % standard trials
     tempMeanSL{paraN} = NaN(size(names, 2), size(probCons, 2));
     tempMeanSR{paraN} = NaN(size(names, 2), size(probCons, 2));
@@ -186,16 +186,24 @@ for paraN = 5:5%size(checkParas, 2)
             cd(saccadeFolder)
         end
         % plot
-        %     if strcmp(checkParas{paraN}, 'pursuit.APvelocityX') % AP, left&right trials plot together
-        errorbar_groups(meanYp_all{paraN},  steYp_all{paraN}, ...
+        errorbar_groups(meanYs_all{paraN},  steYs_all{paraN}, ...
             'bar_width',0.75,'errorbar_width',0.5, ...
             'bar_names',{'50','70','90'});
-        title('all trials')
+        title('standard trials')
         ylabel(yLabels{paraN})
         %     ylim([-0.5 5])
         box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_allTrialsMerged.pdf'])
-        %     else
+        saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
+        
+        errorbar_groups(meanYp_all{paraN},  steYp_all{paraN}, ...
+            'bar_width',0.75,'errorbar_width',0.5, ...
+            'bar_names',{'50','70','90'});
+        title('perceptual trials')
+        ylabel(yLabels{paraN})
+        %     ylim([-0.5 5])
+        box off
+        saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsMerged.pdf'])
+        
         % left and right seperated, standard trials
         errorbar_groups(meanYs{paraN}, steYs{paraN},  ...
             'bar_width',0.75,'errorbar_width',0.5, ...
@@ -205,7 +213,7 @@ for paraN = 5:5%size(checkParas, 2)
         ylabel(yLabels{paraN})
         %         ylim([0 1.3])
         box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
+        saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
         
         % left and right seperated, perceptual trials
         errorbar_groups(meanYp{paraN}, steYp{paraN},  ...
@@ -216,7 +224,7 @@ for paraN = 5:5%size(checkParas, 2)
         ylabel(yLabels{paraN})
         %     ylim([-0.5 5])
         box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsMerged.pdf'])
+        saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR.pdf'])
     end
     %     % probability not merged... not correct = =
     %     for probN= 1:size(probCons, 2)

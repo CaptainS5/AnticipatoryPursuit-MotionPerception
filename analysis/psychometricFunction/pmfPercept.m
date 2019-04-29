@@ -3,7 +3,7 @@
 clear all; close all; clc
 
 names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p7'};
-averagedPlot = 1;
+averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
@@ -30,7 +30,7 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
-for subN = 1:4%:size(names, 2)
+for subN = 6:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.coh==1, :) = [];
@@ -79,7 +79,7 @@ for subN = 1:4%:size(names, 2)
         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probN, :), 'markersize', 30);
         
         % saving parameters
-        if probSub(1)==10
+        if probSub(1)<50
             probNmerged = 4-probN;
             paramsValues{subN, probSubN}(1) = -paramsValues{subN, probSubN}(1); % also flip PSE
         else
@@ -156,6 +156,6 @@ if averagedPlot==1
     xlabel('Probability of right');
     ylabel('PSE (right is positive)');
     saveas(gcf, ['PSE_all.pdf'])
+    
+    save('dataPercept_all', 'dataPercept');
 end
-
-save('dataPercept_all', 'dataPercept');
