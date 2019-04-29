@@ -168,7 +168,6 @@ else
     pursuit.closedLoopMeanVelX = nanmean(trial.DX_noSac(startFrame:endFrame));
     % calculate gain first
     speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
-    speedX_noSac = sqrt((trial.DX_noSac).^2);
     absoluteVel = repmat(abs(trial.stimulus.absoluteVelocity), size(speedXY_noSac));
     idx = absoluteVel < 0.05;
     absoluteVel(idx) = NaN;
@@ -177,7 +176,26 @@ else
     if length(pursuitGain) < ms2frames(50)
         pursuit.gain = NaN;
     end
-    pursuitGainX = (speedX_noSac(closedLoop))./absoluteVel(closedLoop);
+    
+    % only horizontal
+    speedX_noSac = trial.DX_noSac; %sqrt((trial.DX_noSac).^2);
+    % absoluteVelX = repmat(abs(trial.stimulus.absoluteVelocity), size(speedX_noSac));
+    % since it's possible to pursuit to the opposite direction in low coherence trials...
+    % not using absolute value, but preserve the signs for both eye
+    % velocity and target velocity
+    if trial.log.rdkDir==0
+        if pursuit.closedLoopMeanVelX>=0
+            pursuitDir = 1;
+        else
+            pursuitDir = -1;
+        end
+        absoluteVelX = repmat(trial.stimulus.absoluteVelocity*pursuitDir, size(speedX_noSac));
+    else
+        absoluteVelX = repmat(trial.stimulus.absoluteVelocity*trial.log.rdkDir, size(speedX_noSac));
+    end
+    idx = absoluteVelX < 0.05;
+    absoluteVelX(idx) = NaN;
+    pursuitGainX = (speedX_noSac(closedLoop))./absoluteVelX(closedLoop);
     pursuit.gainX= nanmean(pursuitGainX);
     if length(pursuitGainX) < ms2frames(50)
         pursuit.gainX = NaN;

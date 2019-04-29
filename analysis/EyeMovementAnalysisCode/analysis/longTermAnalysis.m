@@ -11,8 +11,12 @@ pdfNames = {'perception' 'APvelX' ...
     'sacNumX' 'sacMeanAmpX' 'sacSumAmpX'}; % name for saving the pdf
 sacStart = 6; % from the n_th parameter is saccade
 
+allLength = 682; % length of all trials in one block
+pLength = 182; % length of perceptual trials in one block
+trialBin = 50; % window of trial numbers
+
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'Probability of perceiving right' 'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' ...
@@ -29,9 +33,6 @@ maxY = [1; 3; ...
     5; 2; 5];
 
 %% building up of long-term effect, sliding window across trials
-allLength = 682; % length of all trials in one block
-pLength = 182; % length of perceptual trials in one block
-trialBin = 30; % window of trial numbers
 % get sliding AP for each bock
 for subN = 1:size(names, 2)
     probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
@@ -41,7 +42,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:size(checkParas, 2) % automatically loop through the parameters
+    for paraN = 1:5%size(checkParas, 2) % automatically loop through the parameters
         yValuesAll{paraN, subN} = NaN(size(probSub, 2), allLength-trialBin+1);
         yValuesP{paraN, subN} = NaN(size(probSub, 2), pLength-trialBin+1);
         
@@ -103,7 +104,7 @@ end
 
 %% grouped values for sliding window...
 if averagedPlots==1
-    for paraN = 1:size(checkParas, 2)        
+    for paraN = 1:5%size(checkParas, 2)        
         for probN= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probN} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probN} = NaN(size(names, 2), pLength-trialBin+1);
