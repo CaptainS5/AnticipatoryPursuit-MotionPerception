@@ -1,6 +1,7 @@
 initializeParas;
 
 %% sort trials by perceptual responses, plot pursuit
+%%not updated yet...
 for subN = 1:size(names, 2)
     probSub = unique(eyeTrialDataLog.prob(subN, :));
     

@@ -29,4 +29,4 @@ dirCons = [-1 1]; % -1=left, 1=right
 dirNames = {'left' 'right'};
 
 % for plotting
-colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+colorProb = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
