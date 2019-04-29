@@ -39,7 +39,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 4:4%size(checkParas, 2) % automatically loop through the parameters... just too much of them
+    for paraN = 5:5%size(checkParas, 2) % automatically loop through the parameters... just too much of them
         yValues{paraN, subN}.standard = NaN(500, size(probSub, 2));
         yValues{paraN, subN}.perceptual = NaN(182, size(probSub, 2));
         yValuesL{paraN, subN}.standard = NaN(500, size(probSub, 2));
@@ -110,7 +110,7 @@ end
 
 %% grouped bars of the mean of all participants
 % sort data of different participants together
-for paraN = 4:4%size(checkParas, 2)
+for paraN = 5:5%size(checkParas, 2)
     tempMeanS{paraN} = NaN(size(names, 2), size(probCons, 2)); % standard trials
     tempMeanSL{paraN} = NaN(size(names, 2), size(probCons, 2));
     tempMeanSR{paraN} = NaN(size(names, 2), size(probCons, 2));

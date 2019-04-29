@@ -42,7 +42,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:5%size(checkParas, 2) % automatically loop through the parameters
+    for paraN = 5:5%size(checkParas, 2) % automatically loop through the parameters
         yValuesAll{paraN, subN} = NaN(size(probSub, 2), allLength-trialBin+1);
         yValuesP{paraN, subN} = NaN(size(probSub, 2), pLength-trialBin+1);
         
@@ -104,7 +104,7 @@ end
 
 %% grouped values for sliding window...
 if averagedPlots==1
-    for paraN = 1:5%size(checkParas, 2)        
+    for paraN = 5:5%size(checkParas, 2)        
         for probN= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probN} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probN} = NaN(size(names, 2), pLength-trialBin+1);
