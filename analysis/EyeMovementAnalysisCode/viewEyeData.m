@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 683; % chose trial you want to look at here; default =
+currentTrial = 800; % chose trial you want to look at here; default =
 % 1; choose later with trial type information
 c = 1; % counter
 % monitor and setup specific parameters
@@ -36,7 +36,7 @@ distance = 55;
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 15;
+saccadeThreshold = 10;
 microSaccadeThreshold = 5;
 % this is a csv files that will contain information about discarded trials
 % errors = load('errors.csv'); ???

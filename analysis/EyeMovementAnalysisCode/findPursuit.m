@@ -18,8 +18,8 @@
 
 function [pursuit] = findPursuit(trial)
 
-anticipatoryPeriod = ms2frames(300); % when should we start looking for pursuit onset
-pursuitSearchEnd = 200; % this means we stop searching for pursuit onset n ms after stimulus onset
+anticipatoryPeriod = ms2frames(100); % when should we start looking for pursuit onset
+pursuitSearchEnd = 250; % this means we stop searching for pursuit onset n ms after stimulus onset
 % x-value: TIME
 if trial.stim_onset > anticipatoryPeriod
     startTime = trial.stim_onset-anticipatoryPeriod;
@@ -46,15 +46,16 @@ else
     time = startTime:endTime;
     fixationInterval = 550; % chose an interval before stimulus onset that
     % we will use as fixation window; needs to be at least 201 ms
+    % previously used eyeDX_filt; now use DX_interpolSac
     if trial.stim_onset > fixationInterval
-        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
-        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
+        fix_x = mean(trial.DX_interpolSac(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
+        fix_y = mean(trial.DY_interpolSac(trial.stim_onset-ms2frames(fixationInterval):trial.stim_onset-ms2frames(fixationInterval-200)));
     else
-        fix_x = mean(trial.eyeDX_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
-        fix_y = mean(trial.eyeDY_filt(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
+        fix_x = mean(trial.DX_interpolSac(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
+        fix_y = mean(trial.DY_interpolSac(trial.stim_onset-ms2frames(fixationInterval-100):trial.stim_onset-ms2frames(fixationInterval-300)));
     end
     % 2. calculate 2D vector relative to fixation velocity
-    dataxy_tmp = sqrt( (trial.eyeDX_filt-fix_x).^2 + (trial.eyeDY_filt-fix_y).^2 );
+    dataxy_tmp = sqrt( (trial.DX_interpolSac-fix_x).^2 + (trial.DY_interpolSac-fix_y).^2 );
     XY = dataxy_tmp(time);
     % run changeDetect.m
     [cx,cy,ly,ry] = changeDetect(time,XY);
@@ -63,8 +64,8 @@ else
     % stimulus onset
     if pursuit.onsetTrue<(trial.stim_onset+ms2frames(50))
         pursuit.onset = trial.stim_onset+ms2frames(50);
-    elseif pursuit.onsetTrue>(trial.stim_onset+ms2frames(200))
-        pursuit.onset = trial.stim_onset+ms2frames(200);
+    elseif pursuit.onsetTrue>(trial.stim_onset+ms2frames(250))
+        pursuit.onset = trial.stim_onset+ms2frames(250);
     else
         pursuit.onset = pursuit.onsetTrue;
     end
@@ -108,9 +109,10 @@ else
         earlyOff = max([trial.saccades.X.offsetsDuring(idx) trial.saccades.Y.offsetsDuring(idy)]);
     end
     if ~isempty(trial.saccades.onsetsDuring)
-        endMark = min([(mark+240) trial.saccades.onsetsDuring(1)]); %indicates end of open loop phase
+        endMark = min([(mark+140) trial.saccades.onsetsDuring(1) trial.stim_onset+ms2frames(pursuitSearchEnd)]); 
+        %indicates end of open loop phase; originally mark+240...
     else
-        endMark = mark+240;
+        endMark = min([mark+140 trial.stim_onset+ms2frames(pursuitSearchEnd)]);
     end
     checkX = mean(trial.eyeDX_filt(mark:endMark));
     checkY = mean(trial.eyeDY_filt(mark:endMark));
@@ -129,16 +131,16 @@ else
             pursuit.saccadeType = -2;
         end
     elseif sqrt(((abs(trial.eyeDX_filt(mark))).^2+(abs(trial.eyeDY_filt(mark))).^2)) > 18
-        pursuit.onset = pursuit.onset + 50;
+        pursuit.onset =  pursuit.onset + 50;
         pursuit.saccadeType = -1;
         if pursuit.onset < trial.stim_onset-280 || isnan(pursuit.onset)
             pursuit.onset = pursuit.onset + 50;
             pursuit.saccadeType = -2;
         end
         % check if the pursuit onset is not just a fixation
-    elseif ceil(sqrt(checkX.^2+checkY.^2)*10)/10 < 1.5
-        pursuit.onset = endMark;
-        pursuit.saccadeType = 2;
+%     elseif ceil(sqrt(checkX.^2+checkY.^2)*10)/10 < 1.5
+%         pursuit.onset = endMark;
+%         pursuit.saccadeType = 2;
     else %everything fine
         pursuit.saccadeType = 0;
     end

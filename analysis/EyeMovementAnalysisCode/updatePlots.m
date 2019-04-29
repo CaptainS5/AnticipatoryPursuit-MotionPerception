@@ -61,10 +61,11 @@ line([trial.log.targetOnset trial.log.targetOnset], [minPosAbs maxPosAbs],'Color
 line([trial.stim_offset trial.stim_offset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');
 if ~isempty(trial.pursuit.onset)
     line([trial.pursuit.onset trial.pursuit.onset], [minPosAbs maxPosAbs],'Color','r','LineStyle','--');
+    line([trial.pursuit.onsetTrue trial.pursuit.onsetTrue], [minPosAbs maxPosAbs],'Color','r','LineStyle','-.');
 end
-if ~isempty(trial.pursuit.onsetSteadyState)
-    line([trial.pursuit.onsetSteadyState trial.pursuit.onsetSteadyState], [minVel maxVel],'Color','r','LineStyle','--');
-end
+% if ~isempty(trial.pursuit.onsetSteadyState)
+%     line([trial.pursuit.onsetSteadyState trial.pursuit.onsetSteadyState], [minVel maxVel],'Color','r','LineStyle','--');
+% end
 
 % velocity plot over time
 subplot(2,1,2,'replace');
@@ -88,11 +89,12 @@ line([trial.log.targetOnset trial.log.targetOnset], [minVel maxVel],'Color','k',
 line([trial.stim_offset trial.stim_offset], [minVel maxVel],'Color','k','LineStyle','--');
 if ~isempty(trial.pursuit.onset)
     line([trial.pursuit.onset trial.pursuit.onset], [minVel maxVel],'Color','r','LineStyle','--');
+    line([trial.pursuit.onsetTrue trial.pursuit.onsetTrue], [minVel maxVel],'Color','r','LineStyle','-.');
     line([trial.pursuit.openLoopEndFrame trial.pursuit.openLoopEndFrame], [minVel maxVel],'Color','m','LineStyle','--');
 end
-if ~isempty(trial.pursuit.onsetSteadyState)
-    line([trial.pursuit.onsetSteadyState trial.pursuit.onsetSteadyState], [minVel maxVel],'Color','r','LineStyle','--');
-end
+% if ~isempty(trial.pursuit.onsetSteadyState)
+%     line([trial.pursuit.onsetSteadyState trial.pursuit.onsetSteadyState], [minVel maxVel],'Color','r','LineStyle','--');
+% end
 
 % % absolute position plot
 % % we will have 3 plots in the bottom row, so we need to make a subplot with
