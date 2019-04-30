@@ -12,8 +12,9 @@ pdfNames = {'APvelX' ...
 sacStart = 6; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 1;
+individualPlots = 0;
 averagedPlots = 1;
+scatterPlots = 0;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)'...
     'clp gain (horizontal)' ...
@@ -110,10 +111,10 @@ for subN = 1:size(names, 2)
                 plotMean = [];
                 plotSte = [];
                 for probSubN = 1:size(probSub, 2)
-                        plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN)); % left
-                        plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN)); % right
-                        plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % left
-                        plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % right
+                    plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN)); % left
+                    plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN)); % right
+                    plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % left
+                    plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % right
                 end
                 errorbar_groups(plotMean, plotSte,  ...
                     'bar_width',0.75,'errorbar_width',0.5, ...
@@ -129,10 +130,10 @@ for subN = 1:size(names, 2)
                 plotMean = [];
                 plotSte = [];
                 for probSubN = 1:size(probSub, 2)
-                        plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN)); % left
-                        plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN)); % right
-                        plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % left
-                        plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % right
+                    plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN)); % left
+                    plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN)); % right
+                    plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % left
+                    plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % right
                 end
                 errorbar_groups(plotMean, plotSte,  ...
                     'bar_width',0.75,'errorbar_width',0.5, ...
@@ -150,13 +151,13 @@ end
 
 %% grouped bars of the mean of all participants
 % sort data of different participants together
-for paraN = 1:size(checkParas, 2)
-    tempMeanS{paraN} = NaN(size(names, 2), size(probCons, 2)); % standard trials
-    tempMeanSL{paraN} = NaN(size(names, 2), size(probCons, 2));
-    tempMeanSR{paraN} = NaN(size(names, 2), size(probCons, 2));
-    tempMeanP{paraN} = NaN(size(names, 2), size(probCons, 2)); % perceptual trials
-    tempMeanPL{paraN} = NaN(size(names, 2), size(probCons, 2));
-    tempMeanPR{paraN} = NaN(size(names, 2), size(probCons, 2));
+for paraN = 1:1%size(checkParas, 2)
+    subMeanS{paraN} = NaN(size(names, 2), 3); % standard trials
+    subMeanSL{paraN} = NaN(size(names, 2), 3);
+    subMeanSR{paraN} = NaN(size(names, 2), 3);
+    subMeanP{paraN} = NaN(size(names, 2), 3); % perceptual trials
+    subMeanPL{paraN} = NaN(size(names, 2), 3);
+    subMeanPR{paraN} = NaN(size(names, 2), 3);
     
     for probN= 1:3 % here probN is merged, 50, 70, and 90
         for subN = 1:size(names, 2)
@@ -165,50 +166,50 @@ for paraN = 1:size(checkParas, 2)
             if probSub(1)==10 % flip the left and right trials
                 % also flip direction for AP (not absolute values)
                 if strcmp(checkParas{paraN}, 'pursuit.APvelocityX')
-                    tempMeanS{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.standard(:, 4-probN));
-                    tempMeanP{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanS{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.standard(:, 4-probN));
+                    subMeanP{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.perceptual(:, 4-probN));
                     
-                    tempMeanSL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.standard(:, 4-probN));
-                    tempMeanPL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.perceptual(:, 4-probN));
-                    tempMeanSR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.standard(:, 4-probN));
-                    tempMeanPR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.standard(:, 4-probN));
+                    subMeanPL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.standard(:, 4-probN));
+                    subMeanPR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.perceptual(:, 4-probN));
                 else
-                    tempMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, 4-probN));
-                    tempMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, 4-probN));
+                    subMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, 4-probN));
                     
-                    tempMeanSL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, 4-probN));
-                    tempMeanPL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, 4-probN));
-                    tempMeanSR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, 4-probN));
-                    tempMeanPR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, 4-probN));
+                    subMeanPL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, 4-probN));
+                    subMeanPR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, 4-probN));
                 end
             else
-                tempMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, probN));
-                tempMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, probN));
+                subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, probN));
+                subMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, probN));
                 
-                tempMeanSL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, probN));
-                tempMeanPL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probN));
-                tempMeanSR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, probN));
-                tempMeanPR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probN));
+                subMeanSL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, probN));
+                subMeanPL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probN));
+                subMeanSR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, probN));
+                subMeanPR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probN));
             end
             
         end
         % standard trials
-        meanYs_all{paraN}(1, probN) = nanmean(tempMeanS{paraN}(:, probN)); % all trials
-        steYs_all{paraN}(1, probN) = nanstd(tempMeanS{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
+        meanYs_all{paraN}(1, probN) = nanmean(subMeanS{paraN}(:, probN)); % all trials
+        steYs_all{paraN}(1, probN) = nanstd(subMeanS{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
         
-        meanYs{paraN}(1, probN) = nanmean(tempMeanSL{paraN}(:, probN)); % left trials
-        meanYs{paraN}(2, probN) = nanmean(tempMeanSR{paraN}(:, probN)); % right trials
-        steYs{paraN}(1, probN) = nanstd(tempMeanSL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
-        steYs{paraN}(2, probN) = nanstd(tempMeanSR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
+        meanYs{paraN}(1, probN) = nanmean(subMeanSL{paraN}(:, probN)); % left trials
+        meanYs{paraN}(2, probN) = nanmean(subMeanSR{paraN}(:, probN)); % right trials
+        steYs{paraN}(1, probN) = nanstd(subMeanSL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
+        steYs{paraN}(2, probN) = nanstd(subMeanSR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
         
         % perceptual trials
-        meanYp_all{paraN}(1, probN) = nanmean(tempMeanP{paraN}(:, probN)); % all trials
-        steYp_all{paraN}(1, probN) = nanstd(tempMeanP{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
+        meanYp_all{paraN}(1, probN) = nanmean(subMeanP{paraN}(:, probN)); % all trials
+        steYp_all{paraN}(1, probN) = nanstd(subMeanP{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
         
-        meanYp{paraN}(1, probN) = nanmean(tempMeanPL{paraN}(:, probN)); % left trials
-        meanYp{paraN}(2, probN) = nanmean(tempMeanPR{paraN}(:, probN)); % right trials
-        steYp{paraN}(1, probN) = nanstd(tempMeanPL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
-        steYp{paraN}(2, probN) = nanstd(tempMeanPR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
+        meanYp{paraN}(1, probN) = nanmean(subMeanPL{paraN}(:, probN)); % left trials
+        meanYp{paraN}(2, probN) = nanmean(subMeanPR{paraN}(:, probN)); % right trials
+        steYp{paraN}(1, probN) = nanstd(subMeanPL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
+        steYp{paraN}(2, probN) = nanstd(subMeanPR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
     end
     
     if averagedPlots==1
@@ -218,14 +219,14 @@ for paraN = 1:size(checkParas, 2)
             cd(saccadeFolder)
         end
         % plot
-        errorbar_groups(meanYs_all{paraN},  steYs_all{paraN}, ...
-            'bar_width',0.75,'errorbar_width',0.5, ...
-            'bar_names',{'50','70','90'});
-        title('standard trials')
-        ylabel(yLabels{paraN})
-        %     ylim([-0.5 5])
-        box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
+%         errorbar_groups(meanYs_all{paraN},  steYs_all{paraN}, ...
+%             'bar_width',0.75,'errorbar_width',0.5, ...
+%             'bar_names',{'50','70','90'});
+%         title('standard trials')
+%         ylabel(yLabels{paraN})
+%         %     ylim([-0.5 5])
+%         box off
+%         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
         
         errorbar_groups(meanYp_all{paraN},  steYp_all{paraN}, ...
             'bar_width',0.75,'errorbar_width',0.5, ...
@@ -236,17 +237,17 @@ for paraN = 1:size(checkParas, 2)
         box off
         saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsMerged.pdf'])
         
-        % left and right seperated, standard trials
-        errorbar_groups(meanYs{paraN}, steYs{paraN},  ...
-            'bar_width',0.75,'errorbar_width',0.5, ...
-            'bar_names',{'50','70','90'});
-        legend({'leftward trials' 'rightward trials'})
-        title('standard trials')
-        ylabel(yLabels{paraN})
-        %         ylim([0 1.3])
-        box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
-        
+%         % left and right seperated, standard trials
+%         errorbar_groups(meanYs{paraN}, steYs{paraN},  ...
+%             'bar_width',0.75,'errorbar_width',0.5, ...
+%             'bar_names',{'50','70','90'});
+%         legend({'leftward trials' 'rightward trials'})
+%         title('standard trials')
+%         ylabel(yLabels{paraN})
+%         %         ylim([0 1.3])
+%         box off
+%         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
+%         
         % left and right seperated, perceptual trials
         errorbar_groups(meanYp{paraN}, steYp{paraN},  ...
             'bar_width',0.75,'errorbar_width',0.5, ...
@@ -264,33 +265,33 @@ for paraN = 1:size(checkParas, 2)
     %             probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
     %             probSubN = find(probSub==probCons(probN)); % find prob index within the participant
     %             if ~isempty(probSubN) % if this participant has the probability condition
-    %                 tempMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, probSubN));
-    %                 tempMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, probSubN));
+    %                 subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, probSubN));
+    %                 subMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, probSubN));
     %
-    %                 tempMeanSL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN));
-    %                 tempMeanPL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN));
-    %                 tempMeanSR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN));
-    %                 tempMeanPR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN));
+    %                 subMeanSL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN));
+    %                 subMeanPL{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN));
+    %                 subMeanSR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN));
+    %                 subMeanPR{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN));
     %             end
     %
     %         end
     %         % standard trials
-    %         meanYs_all{paraN}(1, probN) = nanmean(tempMeanS{paraN}(:, probN)); % all trials
-    %         steYs_all{paraN}(1, probN) = nanstd(tempMeanS{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
+    %         meanYs_all{paraN}(1, probN) = nanmean(subMeanS{paraN}(:, probN)); % all trials
+    %         steYs_all{paraN}(1, probN) = nanstd(subMeanS{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
     %
-    %         meanYs{paraN}(1, probN) = nanmean(tempMeanSL{paraN}(:, probN)); % left trials
-    %         meanYs{paraN}(2, probN) = nanmean(tempMeanSR{paraN}(:, probN)); % right trials
-    %         steYs{paraN}(1, probN) = nanstd(tempMeanSL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
-    %         steYs{paraN}(2, probN) = nanstd(tempMeanSR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
+    %         meanYs{paraN}(1, probN) = nanmean(subMeanSL{paraN}(:, probN)); % left trials
+    %         meanYs{paraN}(2, probN) = nanmean(subMeanSR{paraN}(:, probN)); % right trials
+    %         steYs{paraN}(1, probN) = nanstd(subMeanSL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
+    %         steYs{paraN}(2, probN) = nanstd(subMeanSR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
     %
     %         % perceptual trials
-    %         meanYp_all{paraN}(1, probN) = nanmean(tempMeanP{paraN}(:, probN)); % all trials
-    %         steYp_all{paraN}(1, probN) = nanstd(tempMeanP{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
+    %         meanYp_all{paraN}(1, probN) = nanmean(subMeanP{paraN}(:, probN)); % all trials
+    %         steYp_all{paraN}(1, probN) = nanstd(subMeanP{paraN}(:, probN))/sqrt(size(names, 2)); % all trials
     %
-    %         meanYp{paraN}(1, probN) = nanmean(tempMeanPL{paraN}(:, probN)); % left trials
-    %         meanYp{paraN}(2, probN) = nanmean(tempMeanPR{paraN}(:, probN)); % right trials
-    %         steYp{paraN}(1, probN) = nanstd(tempMeanPL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
-    %         steYp{paraN}(2, probN) = nanstd(tempMeanPR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
+    %         meanYp{paraN}(1, probN) = nanmean(subMeanPL{paraN}(:, probN)); % left trials
+    %         meanYp{paraN}(2, probN) = nanmean(subMeanPR{paraN}(:, probN)); % right trials
+    %         steYp{paraN}(1, probN) = nanstd(subMeanPL{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
+    %         steYp{paraN}(2, probN) = nanstd(subMeanPR{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
     %     end
     %
     %     % plot
@@ -326,4 +327,41 @@ for paraN = 1:size(checkParas, 2)
     %         box off
     %         saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrials.pdf'])
     % %     end
+end
+
+%% scatter plot of all participants in all probabilities
+% each dot is one participant in one probability block
+cd(analysisFolder)
+cd ..
+cd ..
+cd('psychometricFunction')
+load dataPercept_all
+cd(analysisFolder)
+
+for paraN = 1:1%sacStart-1%size(checkParas, 2)
+    if scatterPlots==1
+        if paraN<sacStart
+            cd(pursuitFolder)
+        else
+            cd(saccadeFolder)
+        end
+        
+        figure
+        for subN = 1:size(names, 2)
+            hold on
+            scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
+        end
+%         for probNmerged = 1:3
+%             hold on
+%             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
+%                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
+%         end
+%         legend({'50','70','90'})
+        title('perceptual trials')
+        xlabel('PSE')
+        ylabel(yLabels{paraN})
+        %     ylim([-0.5 5])
+        box off
+%         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
+    end
 end

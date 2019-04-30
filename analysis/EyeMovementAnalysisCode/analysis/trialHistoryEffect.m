@@ -286,11 +286,43 @@ if averagedPlots==1
             cd(saccadeFolder)
         end
         
-        % perceptual trials, merged
-        if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
+%         % perceptual trials, merged
+%         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
+%             figure
+%             for probNmerged = 1:3
+%                 plot(xProbMergedP{paraN, probNmerged}, yValuesSortedMergedP{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
+%                 hold on
+%                 %         xlim([0 1])
+%                 %         ylim([-8 10])
+%             end
+%             legend(probNames{2}, 'box', 'off')
+%             xlabel('Preceded probability of right')
+%             ylabel(yLabels{paraN})
+%             title([' perceptual'])
+%             saveas(gca, ['precedeProbRightMerged_perceptualTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
+%         end
+%         % not merged
+%         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
+%             figure
+%             for probNmerged = 1:3
+%                 plot(xProbMergedPL{paraN, probNmerged}, yValuesSortedMergedPL{paraN, probNmerged}, '--', 'color', colorProb(probNmerged+2, :))
+%                 hold on
+%                 plot(xProbMergedPR{paraN, probNmerged}, yValuesSortedMergedPR{paraN, probNmerged}, '-', 'color', colorProb(probNmerged+2, :))
+%                 %         xlim([0 1])
+%                 %         ylim([-8 10])
+%             end
+%             legend({'50-left' '50-right' '70-left' '70-right' '90-left' '90-right'}, 'box', 'off')
+%             xlabel('Preceded probability of right')
+%             ylabel(yLabels{paraN})
+%             title([' perceptual'])
+%             saveas(gca, ['precedeProbRightMerged_perceptualTrialsLR_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
+%         end
+        
+        if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
+            % standard trials, merged
             figure
             for probNmerged = 1:3
-                plot(xProbMergedP{paraN, probNmerged}, yValuesSortedMergedP{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
+                plot(xProbMergedS{paraN, probNmerged}, yValuesSortedMergedS{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
                 hold on
                 %         xlim([0 1])
                 %         ylim([-8 10])
@@ -298,54 +330,22 @@ if averagedPlots==1
             legend(probNames{2}, 'box', 'off')
             xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            title([' perceptual'])
-            saveas(gca, ['precedeProbRightMerged_perceptualTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
-        end
-        % not merged
-        if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
+            title([' standard'])
+            saveas(gca, ['precedeProbRightMerged_standardTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
+%             
+            % all trials
             figure
             for probNmerged = 1:3
-                plot(xProbMergedPL{paraN, probNmerged}, yValuesSortedMergedPL{paraN, probNmerged}, '--', 'color', colorProb(probNmerged+2, :))
+                plot(xProbMergedAll{paraN, probNmerged}, yValuesSortedMergedAll{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
                 hold on
-                plot(xProbMergedPR{paraN, probNmerged}, yValuesSortedMergedPR{paraN, probNmerged}, '-', 'color', colorProb(probNmerged+2, :))
                 %         xlim([0 1])
                 %         ylim([-8 10])
             end
-            legend({'50-left' '50-right' '70-left' '70-right' '90-left' '90-right'}, 'box', 'off')
+            legend(probNames{2}, 'box', 'off')
             xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            title([' perceptual'])
-            saveas(gca, ['precedeProbRightMerged_perceptualTrialsLR_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
+            title([' all trials'])
+            saveas(gca, ['precedeProbRightMerged_allTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
         end
-        
-%         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
-%             % standard trials, merged
-%             figure
-%             for probNmerged = 1:3
-%                 plot(xProbMergedS{paraN, probNmerged}, yValuesSortedMergedS{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
-%                 hold on
-%                 %         xlim([0 1])
-%                 %         ylim([-8 10])
-%             end
-%             legend(probNames{2}, 'box', 'off')
-%             xlabel('Preceded probability of right')
-%             ylabel(yLabels{paraN})
-%             title([' standard'])
-%             saveas(gca, ['precedeProbRightMerged_standardTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
-%             
-%             % all trials
-%             figure
-%             for probNmerged = 1:3
-%                 plot(xProbMergedAll{paraN, probNmerged}, yValuesSortedMergedAll{paraN, probNmerged}, 'color', colorProb(probNmerged+2, :))
-%                 hold on
-%                 %         xlim([0 1])
-%                 %         ylim([-8 10])
-%             end
-%             legend(probNames{2}, 'box', 'off')
-%             xlabel('Preceded probability of right')
-%             ylabel(yLabels{paraN})
-%             title([' all trials'])
-%             saveas(gca, ['precedeProbRightMerged_allTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
-%         end
     end
 end

@@ -199,7 +199,7 @@ end
 
 %% grouped values for sliding window...
 if averagedPlots==1
-    for paraN = 1:1%sacStart-1%size(checkParas, 2)
+    for paraN = 2:2%sacStart-1%size(checkParas, 2)
         for probNmerged= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probNmerged} = NaN(size(names, 2), pLength-trialBin+1);
