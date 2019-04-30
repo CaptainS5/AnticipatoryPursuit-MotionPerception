@@ -18,7 +18,7 @@ trialBin = 2; % window of trial numbers
 
 % some settings
 individualPlots = 1;
-averagedPlots = 1;
+averagedPlots = 0;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' ...
     'clp gain (horizontal)' ...
@@ -43,47 +43,58 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:sacStart-1%size(checkParas, 2) % automatically loop through the parameters
-        yValuesAll{paraN, subN} = NaN(size(probSub, 2), allLength-trialBin+1);
-        yValuesS{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
-        yValuesSL{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
-        yValuesSR{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
-        yValuesP{paraN, subN} = NaN(size(probSub, 2), pLength-trialBin+1);
-        yValuesPL{paraN, subN} = NaN(size(probSub, 2), pLength-trialBin+1);
-        yValuesPR{paraN, subN} = NaN(size(probSub, 2), pLength-trialBin+1);
-        
+    for paraN = 1:sacStart-1%size(checkParas, 2) % automatically loop through the parameters        
         for probSubN = 1:size(probSub, 2)
+            yValuesAll{paraN, subN}{probSubN} = NaN(1, allLength-trialBin+1);
+            yValuesS{paraN, subN}{probSubN} = NaN(1, sLength-trialBin+1);
+            yValuesP{paraN, subN}{probSubN} = NaN(1, pLength-trialBin+1);
+            precedeProbAll{paraN, subN}{probSubN} = NaN(1, allLength-trialBin+1);
+            precedeProbS{paraN, subN}{probSubN} = NaN(1, sLength-trialBin+1);
+            precedeProbP{paraN, subN}{probSubN} = NaN(1, pLength-trialBin+1);
+            yValuesSortedAll{paraN, subN}{probSubN} = NaN(1, allLength-trialBin+1);
+            yValuesSortedS{paraN, subN}{probSubN} = NaN(1, sLength-trialBin+1);
+            yValuesSortedP{paraN, subN}{probSubN} = NaN(1, pLength-trialBin+1);
+            
             % all trials
             idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0);
             for slideI = (trialBin+1):length(idxT)
-                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)))>0));
-                precedeProbAll{paraN, subN}(probSubN, slideI-trialBin) = rightN/trialBin;
-                eval(['yValuesAll{paraN, subN}(probSubN, slideI-trialBin) = nanmean(eyeTrialData.' checkParas{paraN} '(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)));']);
+                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1))>0));
+                precedeProbAll{paraN, subN}{probSubN}(slideI-trialBin) = rightN/trialBin;
+                eval(['yValuesAll{paraN, subN}{probSubN}(slideI-trialBin) = eyeTrialData.' checkParas{paraN} '(subN, idxT(slideI));']);
             end
-            [xProbAll{paraN, subN}{probSubN} ia ic] = unique(precedeProbAll{paraN, subN}(probSubN, :));
-            yValuesSortedAll{paraN, subN}{probSubN} = accumarray(ic, yValuesAll{paraN, subN}(probSubN, :)', [], @mean); % mean AP of the corresponding probability
+            nanI = find(isnan(yValuesAll{paraN, subN}{probSubN}));            
+            yValuesAll{paraN, subN}{probSubN}(nanI) = [];
+            precedeProbAll{paraN, subN}{probSubN}(nanI) = [];
+            [xProbAll{paraN, subN}{probSubN} ia ic] = unique(precedeProbAll{paraN, subN}{probSubN});
+            yValuesSortedAll{paraN, subN}{probSubN} = accumarray(ic, yValuesAll{paraN, subN}{probSubN}', [], @mean); % mean AP of the corresponding probability
             
             % standard trials
             idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
                 & abs(eyeTrialData.coh(subN, :))==1);
             for slideI = (trialBin+1):length(idxT)
-                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)))>0));
-                precedeProbS{paraN, subN}(probSubN, slideI-trialBin) = rightN/trialBin;
-                eval(['yValuesS{paraN, subN}(probSubN, slideI-trialBin) = nanmean(eyeTrialData.' checkParas{paraN} '(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)));']);
+                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1))>0));
+                precedeProbS{paraN, subN}{probSubN}(slideI-trialBin) = rightN/trialBin;
+                eval(['yValuesS{paraN, subN}{probSubN}(slideI-trialBin) = eyeTrialData.' checkParas{paraN} '(subN, idxT(slideI));']);
             end
-            [xProbS{paraN, subN}{probSubN} ia ic] = unique(precedeProbS{paraN, subN}(probSubN, :));
-            yValuesSortedS{paraN, subN}{probSubN} = accumarray(ic, yValuesS{paraN, subN}(probSubN, :)', [], @mean); % mean AP of the corresponding probability
+            nanI = find(isnan(yValuesS{paraN, subN}{probSubN}));
+            precedeProbS{paraN, subN}{probSubN}(nanI) = [];
+            yValuesS{paraN, subN}{probSubN}(nanI) = [];
+            [xProbS{paraN, subN}{probSubN} ia ic] = unique(precedeProbS{paraN, subN}{probSubN});
+            yValuesSortedS{paraN, subN}{probSubN} = accumarray(ic, yValuesS{paraN, subN}{probSubN}', [], @mean); % mean AP of the corresponding probability
             
             % perceptual trials
             idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
                 & abs(eyeTrialData.coh(subN, :))~=1);
             for slideI = (trialBin+1):length(idxT)
-                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)))>0));
-                precedeProbP{paraN, subN}(probSubN, slideI-trialBin) = rightN/trialBin;
-                eval(['yValuesP{paraN, subN}(probSubN, slideI-trialBin) = nanmean(eyeTrialData.' checkParas{paraN} '(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1)));']);
+                rightN = length(find(eyeTrialData.rdkDir(subN, (idxT(slideI)-trialBin):(idxT(slideI)-1))>0));
+                precedeProbP{paraN, subN}{probSubN}(slideI-trialBin) = rightN/trialBin;
+                eval(['yValuesP{paraN, subN}{probSubN}(slideI-trialBin) = eyeTrialData.' checkParas{paraN} '(subN, idxT(slideI));']);
             end
-            [xProbP{paraN, subN}{probSubN} ia ic] = unique(precedeProbP{paraN, subN}(probSubN, :));
-            yValuesSortedP{paraN, subN}{probSubN} = accumarray(ic, yValuesP{paraN, subN}(probSubN, :)', [], @mean); % mean AP of the corresponding probability
+            nanI = find(isnan(yValuesP{paraN, subN}{probSubN}));
+            precedeProbP{paraN, subN}{probSubN}(nanI) = [];
+            yValuesP{paraN, subN}{probSubN}(nanI) = [];
+            [xProbP{paraN, subN}{probSubN} ia ic] = unique(precedeProbP{paraN, subN}{probSubN});
+            yValuesSortedP{paraN, subN}{probSubN} = accumarray(ic, yValuesP{paraN, subN}{probSubN}', [], @mean); % mean AP of the corresponding probability
         end
         
         if individualPlots==1
@@ -108,7 +119,7 @@ for subN = 1:size(names, 2)
             legend(probNames{probNameI}, 'box', 'off')
             xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            title([names{subN}])
+            title([names{subN}, ' perceptual'])
             saveas(gca, ['precedeProbRight_perceptualTrials_' pdfNames{paraN},  '_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
             
             if ~strcmp(checkParas{paraN}, 'choice')
@@ -116,29 +127,32 @@ for subN = 1:size(names, 2)
                 figure
                 for probSubN = 1:size(probSub, 2)
                     probN = find(probCons==probSub(probSubN));
-                    plot(yValuesS{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
+                    plot(xProbS{paraN, subN}{probSubN}, yValuesSortedS{paraN, subN}{probSubN}, 'color', colorProb(probN, :))
                     hold on
+                    %         xlim([0 1])
+                    %         ylim([-8 10])
                 end
                 legend(probNames{probNameI}, 'box', 'off')
-                xlabel('Trial bin number')
+                xlabel('Preceded probability of right')
                 ylabel(yLabels{paraN})
-                title(names{subN})
-                saveas(gca, [pdfNames{paraN}, '_standardTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+                title([names{subN}, ' standard'])
+                saveas(gca, ['precedeProbRight_standardTrials_' pdfNames{paraN},  '_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
                 
                 % all trials
-                if ~strcmp(checkParas{paraN}, 'choice')
-                    figure
-                    for probSubN = 1:size(probSub, 2)
-                        probN = find(probCons==probSub(probSubN));
-                        plot(yValuesAll{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
-                        hold on
-                    end
-                    legend(probNames{probNameI}, 'box', 'off')
-                    xlabel('Trial bin number')
-                    ylabel(yLabels{paraN})
-                    title(names{subN})
-                    saveas(gca, [pdfNames{paraN}, '_allTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+                figure
+                for probSubN = 1:size(probSub, 2)
+                    probN = find(probCons==probSub(probSubN));
+                    plot(xProbAll{paraN, subN}{probSubN}, yValuesSortedAll{paraN, subN}{probSubN}, 'color', colorProb(probN, :))
+                    hold on
+                    %         xlim([0 1])
+                    %         ylim([-8 10])
                 end
+                legend(probNames{probNameI}, 'box', 'off')
+                xlabel('Preceded probability of right')
+                ylabel(yLabels{paraN})
+                title([names{subN}, ' all'])
+                saveas(gca, ['precedeProbRight_allTrials_' pdfNames{paraN},  '_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+                
             end
         end
     end
