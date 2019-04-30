@@ -84,9 +84,9 @@ for subN = 1:size(names, 2)
     subplot(2, 1, 1)
     for probSubN = 1:size(probSub, 2)
         probN = find(probCons==probSub(probSubN));
-        plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
+        plot(timePoints, meanVel{probN}.leftStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1)
         hold on
-        p{probSubN} = plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
+        p{probSubN} = plot(timePoints, meanVel{probN}.rightStandard(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
     end
     % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -102,9 +102,9 @@ for subN = 1:size(names, 2)
     subplot(2, 1, 2)
     for probSubN = 1:size(probSub, 2)
         probN = find(probCons==probSub(probSubN));
-        plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
+        plot(timePoints, meanVel{probN}.leftPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1)
         hold on
-        p{probSubN} = plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
+        p{probSubN} = plot(timePoints, meanVel{probN}.rightPerceptual(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
     end
     % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
     % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -122,9 +122,9 @@ end
 figure % plot mean traces of all participants in all probabilities 
 subplot(2, 1, 1)
 for probN = 1:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftStandard, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
+    plot(timePoints, velMean{probN}.leftStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
     hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
+    p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
 end
 % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
 % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
@@ -139,9 +139,9 @@ box off
 
 subplot(2, 1, 2)
 for probN = 1:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1)
+    plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
     hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorPlotting(probN, :)); %, 'LineWidth', 1);
+    p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
 end
 % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
 % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')

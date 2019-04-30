@@ -3,21 +3,21 @@ initializeParas;
 % different parameters to look at
 checkParas = {'pursuit.APvelocityX' ...
     'pursuit.initialMeanVelocityX' 'pursuit.initialPeakVelocityX' 'pursuit.initialMeanAccelerationX' ...
-    'pursuit.gainX' ...
+    'pursuit.gainX' 'pursuit.gainSacSumAmpX' ...
     'saccades.X.number' 'saccades.X.meanAmplitude' 'saccades.X.sumAmplitude'}; % field name in eyeTrialData
 pdfNames = {'APvelX' ...
     'olpMeanVelX' 'olpPeakVelX' 'olpMeanAcceleration' ...
-    'clpGainX' ...
+    'clpGainX' 'clpGainSacSumAmpX'...
     'sacNumX' 'sacMeanAmpX' 'sacSumAmpX'}; % name for saving the pdf
 sacStart = 6; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 scatterPlots = 0;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)'...
-    'clp gain (horizontal)' ...
+    'clp gain (horizontal)' 'clp gain + sum sac amp/radius (horizontal)'...
     'saccade number (horizontal)' 'saccade mean amplitude (horizontal)' 'saccade sum amplitude (horizontal)'};
 % for plotting, each parameter has a specific y value range
 minY = [-3; ...
@@ -40,7 +40,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:size(checkParas, 2) % automatically loop through the parameters... just too much of them
+    for paraN = 6:6%:size(checkParas, 2) % automatically loop through the parameters... just too much of them
         yValues{paraN, subN}.standard = NaN(500, size(probSub, 2));
         yValues{paraN, subN}.perceptual = NaN(182, size(probSub, 2));
         yValuesL{paraN, subN}.standard = NaN(500, size(probSub, 2));
@@ -151,13 +151,28 @@ end
 
 %% grouped bars of the mean of all participants
 % sort data of different participants together
-for paraN = 1:1%size(checkParas, 2)
+for paraN = 6:6%size(checkParas, 2)
     subMeanS{paraN} = NaN(size(names, 2), 3); % standard trials
     subMeanSL{paraN} = NaN(size(names, 2), 3);
     subMeanSR{paraN} = NaN(size(names, 2), 3);
     subMeanP{paraN} = NaN(size(names, 2), 3); % perceptual trials
     subMeanPL{paraN} = NaN(size(names, 2), 3);
     subMeanPR{paraN} = NaN(size(names, 2), 3);
+    
+    if strcmp(checkParas{paraN}, 'pursuit.initialMeanVelocityX') % shifted olp mean vel to see the trend
+        for subN = 1:size(names, 2)
+%             probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
+%             if probSub(1)==10 % flip the left and right trials
+%             else
+            yValues{paraN, subN}.standard = yValues{paraN, subN}.standard-min(yValues{paraN, subN}.standard);
+            yValues{paraN, subN}.perceptual = yValues{paraN, subN}.perceptual-min(yValues{paraN, subN}.perceptual);
+            yValuesL{paraN, subN}.standard = yValuesL{paraN, subN}.standard-min(yValuesL{paraN, subN}.standard);
+            yValuesL{paraN, subN}.perceptual = yValuesL{paraN, subN}.perceptual-min(yValuesL{paraN, subN}.perceptual);
+            yValuesR{paraN, subN}.standard = yValuesR{paraN, subN}.standard-min(yValuesR{paraN, subN}.standard);
+            yValuesR{paraN, subN}.perceptual = yValuesR{paraN, subN}.perceptual-min(yValuesR{paraN, subN}.perceptual);
+%             end
+        end
+    end
     
     for probN= 1:3 % here probN is merged, 50, 70, and 90
         for subN = 1:size(names, 2)
