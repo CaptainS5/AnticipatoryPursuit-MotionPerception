@@ -2,7 +2,7 @@
 
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6'};
 sampleRate = 1000;
 
 analysisFolder = pwd;

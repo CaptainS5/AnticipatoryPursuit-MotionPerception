@@ -66,7 +66,7 @@ else
     remove = isnan(meanVelocityX);
     meanVelocityX(remove) = [];
     pursuit.initialMeanVelocity.X = mean(abs(meanVelocityX));
-    pursuit.initialMeanVelocityX = mean(meanVelocityX);
+    pursuit.initialMeanVelocityX = abs(mean(meanVelocityX));
     if length(meanVelocityX) < ms2frames(40) % if open loop pursuit is less than 40 ms before catch up saccde pursuit was not truely initiated
         pursuit.initialMeanVelocity.X = NaN;
         pursuit.initialMeanVelocityX = NaN;

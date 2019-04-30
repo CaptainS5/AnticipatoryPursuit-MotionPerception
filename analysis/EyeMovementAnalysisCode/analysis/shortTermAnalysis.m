@@ -17,8 +17,8 @@ pLength = 182; % length of perceptual trials in one block
 trialBin = 2; % window of trial numbers
 
 % some settings
-individualPlots = 1;
-averagedPlots = 0;
+individualPlots = 0;
+averagedPlots = 1;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' ...
     'clp gain (horizontal)' ...
@@ -99,11 +99,11 @@ for subN = 1:size(names, 2)
         
         if individualPlots==1
             if paraN==1
-                cd(perceptFolder)
+                cd([perceptFolder '\individuals'])
             elseif paraN<sacStart
-                cd(pursuitFolder)
+                cd([pursuitFolder '\individuals'])
             else
-                cd(saccadeFolder)
+                cd([saccadeFolder '\individuals'])
             end
             
             % individual plot
@@ -158,72 +158,55 @@ for subN = 1:size(names, 2)
     end
 end
 
-%% grouped values for sliding window...
+%% grouped values
 if averagedPlots==1
-    for paraN = 1:sacStart-1%size(checkParas, 2)
+    for paraN = 3:3%sacStart-1%size(checkParas, 2)
         for probNmerged= 1:3 % here probN is merged, 50, 70, and 90
-            tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
-            tempMeanP{paraN, probNmerged} = NaN(size(names, 2), pLength-trialBin+1);
-            for subN = 1:size(names, 2)
-                if strcmp(checkParas{paraN}, 'pursuit.initialMeanVelocityX') % flip direction to merge the left and right trials
-                    yValuesAll{paraN, subN} = abs(yValuesAll{paraN, subN});
-                    yValuesS{paraN, subN} = abs(yValuesS{paraN, subN});
-                    yValuesSL{paraN, subN} = abs(yValuesSL{paraN, subN});
-                    yValuesSR{paraN, subN} = abs(yValuesSR{paraN, subN});
-                    yValuesP{paraN, subN} = abs(yValuesP{paraN, subN});
-                    yValuesPL{paraN, subN} = abs(yValuesPL{paraN, subN});
-                    yValuesPR{paraN, subN} = abs(yValuesPR{paraN, subN});
-                end
-                
+            tempProbAll{paraN, probNmerged} = []; 
+            tempYall{paraN, probNmerged} = [];
+            tempProbS{paraN, probNmerged} = []; 
+            tempYs{paraN, probNmerged} = [];
+            tempProbP{paraN, probNmerged} = []; 
+            tempYp{paraN, probNmerged} = [];
+            
+            for subN = 1:size(names, 2)                
                 probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
                 if probSub(1)==10
-                    if strcmp(checkParas{paraN}, 'pursuit.APvelocityX') ||  strcmp(checkParas{paraN}, 'choice')
+                    tempProbAll{paraN, probNmerged} = [tempProbAll{paraN, probNmerged}; 1-precedeProbAll{paraN, subN}{4-probNmerged}'];
+                    tempProbS{paraN, probNmerged} = [tempProbS{paraN, probNmerged}; 1-precedeProbS{paraN, subN}{4-probNmerged}'];
+                    tempProbP{paraN, probNmerged} = [tempProbP{paraN, probNmerged}; 1-precedeProbP{paraN, subN}{4-probNmerged}'];
+                    if strcmp(checkParas{paraN}, 'pursuit.APvelocityX')
                         % flip direction for AP (these are not absolute values) and perceptual choices
-                        tempMeanAll{paraN, probNmerged}(subN, :) = -yValuesAll{paraN, subN}(4-probNmerged, :);
-                        tempMeanS{paraN, probNmerged}(subN, :) = -yValuesS{paraN, subN}(4-probNmerged, :);
-                        tempMeanSL{paraN, probNmerged}(subN, :) = -yValuesSR{paraN, subN}(4-probNmerged, :);
-                        tempMeanSR{paraN, probNmerged}(subN, :) = -yValuesSL{paraN, subN}(4-probNmerged, :);
-                        tempMeanP{paraN, probNmerged}(subN, :) = -yValuesP{paraN, subN}(4-probNmerged, :);
-                        tempMeanPL{paraN, probNmerged}(subN, :) = -yValuesPR{paraN, subN}(4-probNmerged, :);
-                        tempMeanPR{paraN, probNmerged}(subN, :) = -yValuesPL{paraN, subN}(4-probNmerged, :);
+                        tempYall{paraN, probNmerged} = [tempYall{paraN, probNmerged}; -yValuesAll{paraN, subN}{4-probNmerged}'];
+                        tempYs{paraN, probNmerged} = [tempYs{paraN, probNmerged}; -yValuesS{paraN, subN}{4-probNmerged}'];
+                        tempYp{paraN, probNmerged} = [tempYp{paraN, probNmerged}; -yValuesP{paraN, subN}{4-probNmerged}'];
+                    elseif strcmp(checkParas{paraN}, 'choice')
+                        tempYall{paraN, probNmerged} = [tempYall{paraN, probNmerged}; 1-yValuesAll{paraN, subN}{4-probNmerged}'];
+                        tempYs{paraN, probNmerged} = [tempYs{paraN, probNmerged}; 1-yValuesS{paraN, subN}{4-probNmerged}'];
+                        tempYp{paraN, probNmerged} = [tempYp{paraN, probNmerged}; 1-yValuesP{paraN, subN}{4-probNmerged}'];
                     else
-                        tempMeanAll{paraN, probNmerged}(subN, :) = yValuesAll{paraN, subN}(4-probNmerged, :);
-                        tempMeanS{paraN, probNmerged}(subN, :) = yValuesS{paraN, subN}(4-probNmerged, :);
-                        tempMeanSL{paraN, probNmerged}(subN, :) = yValuesSR{paraN, subN}(4-probNmerged, :);
-                        tempMeanSR{paraN, probNmerged}(subN, :) = yValuesSL{paraN, subN}(4-probNmerged, :);
-                        tempMeanP{paraN, probNmerged}(subN, :) = yValuesP{paraN, subN}(4-probNmerged, :);
-                        tempMeanPL{paraN, probNmerged}(subN, :) = yValuesPR{paraN, subN}(4-probNmerged, :);
-                        tempMeanPR{paraN, probNmerged}(subN, :) = yValuesPL{paraN, subN}(4-probNmerged, :);
+                        tempYall{paraN, probNmerged} = [tempYall{paraN, probNmerged}; yValuesAll{paraN, subN}{4-probNmerged}'];
+                        tempYs{paraN, probNmerged} = [tempYs{paraN, probNmerged}; yValuesS{paraN, subN}{4-probNmerged}'];
+                        tempYp{paraN, probNmerged} = [tempYp{paraN, probNmerged}; yValuesP{paraN, subN}{4-probNmerged}'];
                     end
                 else
-                    tempMeanAll{paraN, probNmerged}(subN, :) = yValuesAll{paraN, subN}(probNmerged, :);
-                    tempMeanS{paraN, probNmerged}(subN, :) = yValuesS{paraN, subN}(probNmerged, :);
-                    tempMeanSL{paraN, probNmerged}(subN, :) = yValuesSL{paraN, subN}(probNmerged, :);
-                    tempMeanSR{paraN, probNmerged}(subN, :) = yValuesSR{paraN, subN}(probNmerged, :);
-                    tempMeanP{paraN, probNmerged}(subN, :) = yValuesP{paraN, subN}(probNmerged, :);
-                    tempMeanPL{paraN, probNmerged}(subN, :) = yValuesPL{paraN, subN}(probNmerged, :);
-                    tempMeanPR{paraN, probNmerged}(subN, :) = yValuesPR{paraN, subN}(probNmerged, :);
+                    tempProbAll{paraN, probNmerged} = [tempProbAll{paraN, probNmerged}; precedeProbAll{paraN, subN}{probNmerged}'];
+                    tempYall{paraN, probNmerged} = [tempYall{paraN, probNmerged}; yValuesAll{paraN, subN}{probNmerged}'];
+                    tempProbS{paraN, probNmerged} = [tempProbS{paraN, probNmerged}; precedeProbS{paraN, subN}{probNmerged}'];
+                    tempYs{paraN, probNmerged} = [tempYs{paraN, probNmerged}; yValuesS{paraN, subN}{probNmerged}'];
+                    tempProbP{paraN, probNmerged} = [tempProbP{paraN, probNmerged}; precedeProbP{paraN, subN}{probNmerged}'];
+                    tempYp{paraN, probNmerged} = [tempYp{paraN, probNmerged}; yValuesP{paraN, subN}{probNmerged}'];
                 end
             end
             % all trials
-            meanY_all{paraN}(probNmerged, :) = nanmean(tempMeanAll{paraN, probNmerged}); % all trials
-            steY_all{paraN}(probNmerged, :) = nanstd(tempMeanAll{paraN, probNmerged})/sqrt(size(names, 2)); % all trials
-            
+            [xProbMergedAll{paraN, probNmerged} ia ic] = unique(tempProbAll{paraN, probNmerged});
+            yValuesSortedMergedAll{paraN, probNmerged} = accumarray(ic, tempYall{paraN, probNmerged}, [], @mean); 
             % standard trials
-            meanY_s{paraN}(probNmerged, :) = nanmean(tempMeanS{paraN, probNmerged}); % all trials
-            steY_s{paraN}(probNmerged, :) = nanstd(tempMeanS{paraN, probNmerged})/sqrt(size(names, 2)); % all trials
-            meanY_sL{paraN}(probNmerged, :) = nanmean(tempMeanSL{paraN, probNmerged}); % left trials
-            steY_sL{paraN}(probNmerged, :) = nanstd(tempMeanSL{paraN, probNmerged})/sqrt(size(names, 2)); % left trials
-            meanY_sR{paraN}(probNmerged, :) = nanmean(tempMeanSR{paraN, probNmerged}); % right trials
-            steY_sR{paraN}(probNmerged, :) = nanstd(tempMeanSR{paraN, probNmerged})/sqrt(size(names, 2)); % right trials
-            
+            [xProbMergedS{paraN, probNmerged} ia ic] = unique(tempProbS{paraN, probNmerged});
+            yValuesSortedMergedS{paraN, probNmerged} = accumarray(ic, tempYs{paraN, probNmerged}, [], @mean); 
             % perceptual trials
-            meanY_p{paraN}(probNmerged, :) = nanmean(tempMeanP{paraN, probNmerged}); % all trials
-            steY_p{paraN}(probNmerged, :) = nanstd(tempMeanP{paraN, probNmerged})/sqrt(size(names, 2)); % all trials
-            meanY_pL{paraN}(probNmerged, :) = nanmean(tempMeanPL{paraN, probNmerged}); % left trials
-            steY_pL{paraN}(probNmerged, :) = nanstd(tempMeanPL{paraN, probNmerged})/sqrt(size(names, 2)); % left trials
-            meanY_pR{paraN}(probNmerged, :) = nanmean(tempMeanPR{paraN, probNmerged}); % right trials
-            steY_pR{paraN}(probNmerged, :) = nanstd(tempMeanPR{paraN, probNmerged})/sqrt(size(names, 2)); % right trials
+            [xProbMergedP{paraN, probNmerged} ia ic] = unique(tempProbP{paraN, probNmerged});
+            yValuesSortedMergedP{paraN, probNmerged} = accumarray(ic, tempYp{paraN, probNmerged}, [], @mean); 
         end
         
         % plot
@@ -238,43 +221,47 @@ if averagedPlots==1
         % perceptual trials, merged
         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
             figure
-            for probNmerged = 1:3 % merged prob
-                plot(meanY_p{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+            for probNmerged = 1:3
+                plot(xProbMergedP{paraN, probNmerged}, yValuesSortedMergedP{paraN, probNmerged}, 'color', colorProb(probNmerged, :))
                 hold on
+                %         xlim([0 1])
+                %         ylim([-8 10])
             end
-            legend({'50' '70' '90'}, 'box', 'off')
-            title('perceptual trials')
-            xlabel('Trial bin number')
+            legend(probNames{2}, 'box', 'off')
+            xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            saveas(gca, [pdfNames{paraN}, '_perceptualTrials_all_bin', num2str(trialBin), '.pdf'])
+            title([' perceptual'])
+            saveas(gca, ['precedeProbRightMerged_perceptualTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
         end
         
         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
             % standard trials, merged
             figure
-            for probNmerged = 1:3 % merged prob
-                plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+            for probNmerged = 1:3
+                plot(xProbMergedS{paraN, probNmerged}, yValuesSortedMergedS{paraN, probNmerged}, 'color', colorProb(probNmerged, :))
                 hold on
+                %         xlim([0 1])
+                %         ylim([-8 10])
             end
-            legend({'50' '70' '90'}, 'box', 'off')
-            title('standard trials')
-            xlabel('Trial bin number')
+            legend(probNames{2}, 'box', 'off')
+            xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
-            %         end
+            title([' standard'])
+            saveas(gca, ['precedeProbRightMerged_standardTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
             
             % all trials
-            %         if ~strcmp(checkParas{paraN}, 'choice')
             figure
-            for probNmerged = 1:3 % merged prob
-                plot(meanY_all{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+            for probNmerged = 1:3
+                plot(xProbMergedAll{paraN, probNmerged}, yValuesSortedMergedAll{paraN, probNmerged}, 'color', colorProb(probNmerged, :))
                 hold on
+                %         xlim([0 1])
+                %         ylim([-8 10])
             end
-            legend({'50' '70' '90'}, 'box', 'off')
-            title('all trials')
-            xlabel('Trial bin number')
+            legend(probNames{2}, 'box', 'off')
+            xlabel('Preceded probability of right')
             ylabel(yLabels{paraN})
-            saveas(gca, [pdfNames{paraN}, '_allTrials_all_bin', num2str(trialBin), '.pdf'])
+            title([' all trials'])
+            saveas(gca, ['precedeProbRightMerged_allTrials_' pdfNames{paraN},  '_all_bin', num2str(trialBin), '.pdf'])
         end
     end
 end

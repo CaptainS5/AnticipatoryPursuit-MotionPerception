@@ -12,7 +12,7 @@ pdfNames = {'APvelX' ...
 sacStart = 6; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)'...
@@ -78,31 +78,71 @@ for subN = 1:size(names, 2)
         
         if individualPlots==1
             if paraN<sacStart
-                cd(pursuitFolder)
+                cd([pursuitFolder '\individuals'])
             else
-                cd(saccadeFolder)
+                cd([saccadeFolder '\individuals'])
             end
-            % individual plots
+            % individualplots
             % plot mean values of each participant
             if ~strcmp(checkParas{paraN}, 'choice') && ~strcmp(checkParas{paraN}, 'saccades.X.number') % do not plot boxplot of perception or saccade number... meaningless
-                figure
-                subplot(1, 2, 1)
-                hold on
-                boxplot(yValues{paraN, subN}.standard, 'Labels', probNames{probNameI})
+                %                 % boxplots, left&right trials merged
+                %                 figure
+                %                 subplot(1, 2, 1)
+                %                 hold on
+                %                 boxplot(yValues{paraN, subN}.standard, 'Labels', probNames{probNameI})
+                %                 title('standard trials')
+                %                 ylabel(yLabels{paraN})
+                %                 %             ylim([minY(paraN) maxY(paraN)])
+                %                 box off
+                %
+                %                 subplot(1, 2, 2)
+                %                 hold on
+                %                 boxplot(yValues{paraN, subN}.perceptual, 'Labels', probNames{probNameI})
+                %                 title('perceptual trials')
+                %                 ylabel(yLabels{paraN})
+                %                 %             ylim([minY(paraN) maxY(paraN)])
+                %                 box off
+                %
+                %                 saveas(gca, [pdfNames{paraN}, '_boxplot_', names{subN}, '.pdf'])
+                
+                % barplots, left&right trials not merged
+                % standard trials
+                plotMean = [];
+                plotSte = [];
+                for probSubN = 1:size(probSub, 2)
+                        plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN)); % left
+                        plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN)); % right
+                        plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % left
+                        plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % right
+                end
+                errorbar_groups(plotMean, plotSte,  ...
+                    'bar_width',0.75,'errorbar_width',0.5, ...
+                    'bar_names',probNames{probNameI});
+                legend({'leftward trials' 'rightward trials'})
                 title('standard trials')
                 ylabel(yLabels{paraN})
-                %             ylim([minY(paraN) maxY(paraN)])
+                %         ylim([0 1.3])
                 box off
+                saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR_' , names{subN}, '.pdf'])
                 
-                subplot(1, 2, 2)
-                hold on
-                boxplot(yValues{paraN, subN}.perceptual, 'Labels', probNames{probNameI})
+                % left and right seperated, perceptual trials
+                plotMean = [];
+                plotSte = [];
+                for probSubN = 1:size(probSub, 2)
+                        plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN)); % left
+                        plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN)); % right
+                        plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % left
+                        plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % right
+                end
+                errorbar_groups(plotMean, plotSte,  ...
+                    'bar_width',0.75,'errorbar_width',0.5, ...
+                    'bar_names',probNames{probNameI});
+                legend({'leftward trials' 'rightward trials'})
                 title('perceptual trials')
                 ylabel(yLabels{paraN})
-                %             ylim([minY(paraN) maxY(paraN)])
+                %     ylim([-0.5 5])
                 box off
-                
-                saveas(gca, [pdfNames{paraN}, '_boxplot_', names{subN}, '.pdf'])
+                saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
             end
         end
     end
@@ -120,18 +160,10 @@ for paraN = 1:size(checkParas, 2)
     
     for probN= 1:3 % here probN is merged, 50, 70, and 90
         for subN = 1:size(names, 2)
-            if strcmp(checkParas{paraN}, 'pursuit.initialMeanVelocityX') % flip direction to merge the left and right trials
-                yValues{paraN, subN}.standard = abs(yValues{paraN, subN}.standard);
-                yValues{paraN, subN}.perceptual = abs(yValues{paraN, subN}.perceptual);
-                yValuesL{paraN, subN}.standard = abs(yValuesL{paraN, subN}.standard);
-                yValuesL{paraN, subN}.perceptual = abs(yValuesL{paraN, subN}.perceptual);
-                yValuesR{paraN, subN}.standard = abs(yValuesR{paraN, subN}.standard);
-                yValuesR{paraN, subN}.perceptual = abs(yValuesR{paraN, subN}.perceptual);
-            end
             
             probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
             if probSub(1)==10 % flip the left and right trials
-                % also flip direction for AP (these are not absolute values)
+                % also flip direction for AP (not absolute values)
                 if strcmp(checkParas{paraN}, 'pursuit.APvelocityX')
                     tempMeanS{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.standard(:, 4-probN));
                     tempMeanP{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.perceptual(:, 4-probN));

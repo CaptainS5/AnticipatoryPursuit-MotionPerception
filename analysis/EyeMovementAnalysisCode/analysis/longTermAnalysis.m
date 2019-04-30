@@ -17,7 +17,7 @@ pLength = 182; % length of perceptual trials in one block
 trialBin = 50; % window of trial numbers
 
 % some settings
-individualPlots = 1;
+individualPlots = 0;
 averagedPlots = 1;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' ...
@@ -141,11 +141,11 @@ for subN = 1:size(names, 2)
         
         if individualPlots==1
             if paraN==1
-                cd(perceptFolder)
+                cd([perceptFolder '\individuals'])
             elseif paraN<sacStart
-                cd(pursuitFolder)
+                cd([pursuitFolder '\individuals'])
             else
-                cd(saccadeFolder)
+                cd([saccadeFolder '\individuals'])
             end
             
             % individual plot
@@ -199,25 +199,16 @@ end
 
 %% grouped values for sliding window...
 if averagedPlots==1
-    for paraN = 1:sacStart-1%size(checkParas, 2)
+    for paraN = 1:1%sacStart-1%size(checkParas, 2)
         for probNmerged= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probNmerged} = NaN(size(names, 2), pLength-trialBin+1);
             for subN = 1:size(names, 2)
-                if strcmp(checkParas{paraN}, 'pursuit.initialMeanVelocityX') % flip direction to merge the left and right trials
-                    yValuesAll{paraN, subN} = abs(yValuesAll{paraN, subN});
-                    yValuesS{paraN, subN} = abs(yValuesS{paraN, subN});
-                    yValuesSL{paraN, subN} = abs(yValuesSL{paraN, subN});
-                    yValuesSR{paraN, subN} = abs(yValuesSR{paraN, subN});
-                    yValuesP{paraN, subN} = abs(yValuesP{paraN, subN});
-                    yValuesPL{paraN, subN} = abs(yValuesPL{paraN, subN});
-                    yValuesPR{paraN, subN} = abs(yValuesPR{paraN, subN});
-                end
                 
                 probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
                 if probSub(1)==10
-                    if strcmp(checkParas{paraN}, 'pursuit.APvelocityX') ||  strcmp(checkParas{paraN}, 'choice')
-                        % flip direction for AP (these are not absolute values) and perceptual choices
+                    if strcmp(checkParas{paraN}, 'pursuit.APvelocityX') || strcmp(checkParas{paraN}, 'choice')
+                        % flip direction for AP (these are not absolute values)
                         tempMeanAll{paraN, probNmerged}(subN, :) = -yValuesAll{paraN, subN}(4-probNmerged, :);
                         tempMeanS{paraN, probNmerged}(subN, :) = -yValuesS{paraN, subN}(4-probNmerged, :);
                         tempMeanSL{paraN, probNmerged}(subN, :) = -yValuesSR{paraN, subN}(4-probNmerged, :);
