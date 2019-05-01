@@ -1,7 +1,6 @@
 function startScript()
 clc; clear all; close all;
 %start GUI
-
 %check whether there is a LogFiles folder on the same level as the
 %experiment folder
 try

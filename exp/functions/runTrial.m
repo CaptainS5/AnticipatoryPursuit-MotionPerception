@@ -179,7 +179,7 @@ while frameN<=fixFrames
             StopCommand = 1;
             break;
         elseif strcmp(key, prm.calibrationKey)
-            EyelinkDoTrackerSetup(prm.eyeLink.el);
+%             EyelinkDoTrackerSetup(prm.eyeLink.el);
             EyelinkDoDriftCorrection(prm.eyeLink.el);
             Eyelink('message', 'Recalibrated');
             %             WaitSecs(0.05);
@@ -249,7 +249,7 @@ while frameN<=fixFrames
         else
             error=Eyelink('CheckRecording');
             if(error~=0)
-                disp('EyeLink CheckRecording Error')
+                disp(['EyeLink CheckRecording Error: ', num2str(error)])
             end
             StopCommand = 1;
         end % if sample available
@@ -401,7 +401,7 @@ resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
 if blockN==0 % prectice block, give feedback
     if (rdkDir<0 && strcmp(key, prm.leftKey)) || (rdkDir>0 && strcmp(key, prm.rightKey))
-        feedbackText = 'correct';
+        feedbackText = 'corrrect';
     else
         feedbackText = 'incorrect';
     end
