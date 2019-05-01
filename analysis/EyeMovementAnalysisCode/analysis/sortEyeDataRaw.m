@@ -4,7 +4,8 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2' 'p4' 'p5' 'p6'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p7'};
+subStartI = 6;
 cd ..
 analysisPath = pwd;
 dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
@@ -27,8 +28,11 @@ saccadeThreshold = 15;
 microSaccadeThreshold = 5;
 
 %% All trials
+if subStartI>1 % load eyeTrialDataAll
+    load('eyeTrialData_all.mat')
+end
 
-for subN = 1:length(names)
+for subN = subStartI:length(names)
     currentSubject = names{subN};
     cd(dataPath)
     cd(currentSubject)
@@ -73,6 +77,8 @@ for subN = 1:length(names)
             eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = trial.pursuit.initialPeakAccelerationX;
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = trial.pursuit.closedLoopMeanVelX;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = trial.pursuit.gainX;
+            eyeTrialData.pursuit.initialVelChangeX(subN, currentTrial) = -nanmean(trial.DX_noSac( (trial.pursuit.openLoopStartFrame-ms2frames(5)) : (trial.pursuit.openLoopStartFrame+ms2frames(5)) )) ...
+                +nanmean(trial.DX_noSac( (trial.pursuit.openLoopEndFrame-ms2frames(5)) : (trial.pursuit.openLoopEndFrame+ms2frames(5)) ));
             
 %             eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X_right.number;
 %             eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X.meanAmplitude;
@@ -143,6 +149,7 @@ for subN = 1:length(names)
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.initialVelChangeX(subN, currentTrial) = NaN;
              
             eyeTrialData.saccades.X.number(subN, currentTrial) = NaN;
             eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = NaN;

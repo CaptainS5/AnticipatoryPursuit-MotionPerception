@@ -2,21 +2,21 @@ initializeParas;
 
 % different parameters to look at
 checkParas = {'pursuit.APvelocityX' ...
-    'pursuit.initialMeanVelocityX' 'pursuit.initialPeakVelocityX' 'pursuit.initialMeanAccelerationX' ...
+    'pursuit.initialMeanVelocityX' 'pursuit.initialPeakVelocityX' 'pursuit.initialMeanAccelerationX' 'pursuit.initialVelChangeX'...
     'pursuit.gainX' 'pursuit.gainSacSumAmpX' ...
     'saccades.X.number' 'saccades.X.meanAmplitude' 'saccades.X.sumAmplitude'}; % field name in eyeTrialData
 pdfNames = {'APvelX' ...
-    'olpMeanVelX' 'olpPeakVelX' 'olpMeanAcceleration' ...
+    'olpMeanVelX' 'olpPeakVelX' 'olpMeanAcceleration' 'olpVelChangeX'...
     'clpGainX' 'clpGainSacSumAmpX'...
     'sacNumX' 'sacMeanAmpX' 'sacSumAmpX'}; % name for saving the pdf
-sacStart = 6; % from the n_th parameter is saccade
+sacStart = 7; % from the n_th parameter is saccade
 
 % some settings
 individualPlots = 1;
-averagedPlots = 1;
+averagedPlots = 0;
 scatterPlots = 0;
 yLabels = {'AP horizontal velocity (deg/s)' ...
-    'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)'...
+    'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
     'clp gain (horizontal)' 'clp gain + sum sac amp/radius (horizontal)'...
     'saccade number (horizontal)' 'saccade mean amplitude (horizontal)' 'saccade sum amplitude (horizontal)'};
 % for plotting, each parameter has a specific y value range
@@ -40,7 +40,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 6:6%:size(checkParas, 2) % automatically loop through the parameters... just too much of them
+    for paraN = 5:5%:size(checkParas, 2) % automatically loop through the parameters... just too much of them
         yValues{paraN, subN}.standard = NaN(500, size(probSub, 2));
         yValues{paraN, subN}.perceptual = NaN(182, size(probSub, 2));
         yValuesL{paraN, subN}.standard = NaN(500, size(probSub, 2));
@@ -69,11 +69,15 @@ for subN = 1:size(names, 2)
             eval(['yValuesR{paraN, subN}.standard(1:length(validIR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIR);'])
             %             end
             % then perceptual trials
+            %             validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            %                 & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+                & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             eval(['yValuesL{paraN, subN}.perceptual(1:length(validIL), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIL);'])
+            %             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            %                 & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+                & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             eval(['yValuesR{paraN, subN}.perceptual(1:length(validIR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIR);'])
         end
         
@@ -107,24 +111,24 @@ for subN = 1:size(names, 2)
                 %                 saveas(gca, [pdfNames{paraN}, '_boxplot_', names{subN}, '.pdf'])
                 
                 % barplots, left&right trials not merged
-                % standard trials
-                plotMean = [];
-                plotSte = [];
-                for probSubN = 1:size(probSub, 2)
-                    plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN)); % left
-                    plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN)); % right
-                    plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % left
-                    plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % right
-                end
-                errorbar_groups(plotMean, plotSte,  ...
-                    'bar_width',0.75,'errorbar_width',0.5, ...
-                    'bar_names',probNames{probNameI});
-                legend({'leftward trials' 'rightward trials'})
-                title('standard trials')
-                ylabel(yLabels{paraN})
-                %         ylim([0 1.3])
-                box off
-                saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR_' , names{subN}, '.pdf'])
+                %                 % standard trials
+                %                 plotMean = [];
+                %                 plotSte = [];
+                %                 for probSubN = 1:size(probSub, 2)
+                %                     plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.standard(:, probSubN)); % left
+                %                     plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.standard(:, probSubN)); % right
+                %                     plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % left
+                %                     plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.standard(:, probSubN))/sqrt(size(names, 2)); % right
+                %                 end
+                %                 errorbar_groups(plotMean, plotSte,  ...
+                %                     'bar_width',0.75,'errorbar_width',0.5, ...
+                %                     'bar_names',probNames{probNameI});
+                %                 legend({'leftward trials' 'rightward trials'})
+                %                 title('standard trials')
+                %                 ylabel(yLabels{paraN})
+                %                 %         ylim([0 1.3])
+                %                 box off
+                %                 saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR_' , names{subN}, '.pdf'])
                 
                 % left and right seperated, perceptual trials
                 plotMean = [];
@@ -138,12 +142,13 @@ for subN = 1:size(names, 2)
                 errorbar_groups(plotMean, plotSte,  ...
                     'bar_width',0.75,'errorbar_width',0.5, ...
                     'bar_names',probNames{probNameI});
-                legend({'leftward trials' 'rightward trials'})
+                %                 legend({'leftward trials' 'rightward trials'})
+                legend({'perceived left trials' 'perceived right trials'})
                 title('perceptual trials')
                 ylabel(yLabels{paraN})
                 %     ylim([-0.5 5])
                 box off
-                saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
+                saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice_' , names{subN}, '.pdf'])
             end
         end
     end
@@ -158,21 +163,6 @@ for paraN = 6:6%size(checkParas, 2)
     subMeanP{paraN} = NaN(size(names, 2), 3); % perceptual trials
     subMeanPL{paraN} = NaN(size(names, 2), 3);
     subMeanPR{paraN} = NaN(size(names, 2), 3);
-    
-    if strcmp(checkParas{paraN}, 'pursuit.initialMeanVelocityX') % shifted olp mean vel to see the trend
-        for subN = 1:size(names, 2)
-%             probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
-%             if probSub(1)==10 % flip the left and right trials
-%             else
-            yValues{paraN, subN}.standard = yValues{paraN, subN}.standard-min(yValues{paraN, subN}.standard);
-            yValues{paraN, subN}.perceptual = yValues{paraN, subN}.perceptual-min(yValues{paraN, subN}.perceptual);
-            yValuesL{paraN, subN}.standard = yValuesL{paraN, subN}.standard-min(yValuesL{paraN, subN}.standard);
-            yValuesL{paraN, subN}.perceptual = yValuesL{paraN, subN}.perceptual-min(yValuesL{paraN, subN}.perceptual);
-            yValuesR{paraN, subN}.standard = yValuesR{paraN, subN}.standard-min(yValuesR{paraN, subN}.standard);
-            yValuesR{paraN, subN}.perceptual = yValuesR{paraN, subN}.perceptual-min(yValuesR{paraN, subN}.perceptual);
-%             end
-        end
-    end
     
     for probN= 1:3 % here probN is merged, 50, 70, and 90
         for subN = 1:size(names, 2)
@@ -234,14 +224,14 @@ for paraN = 6:6%size(checkParas, 2)
             cd(saccadeFolder)
         end
         % plot
-%         errorbar_groups(meanYs_all{paraN},  steYs_all{paraN}, ...
-%             'bar_width',0.75,'errorbar_width',0.5, ...
-%             'bar_names',{'50','70','90'});
-%         title('standard trials')
-%         ylabel(yLabels{paraN})
-%         %     ylim([-0.5 5])
-%         box off
-%         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
+        %         errorbar_groups(meanYs_all{paraN},  steYs_all{paraN}, ...
+        %             'bar_width',0.75,'errorbar_width',0.5, ...
+        %             'bar_names',{'50','70','90'});
+        %         title('standard trials')
+        %         ylabel(yLabels{paraN})
+        %         %     ylim([-0.5 5])
+        %         box off
+        %         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsMerged.pdf'])
         
         errorbar_groups(meanYp_all{paraN},  steYp_all{paraN}, ...
             'bar_width',0.75,'errorbar_width',0.5, ...
@@ -252,27 +242,28 @@ for paraN = 6:6%size(checkParas, 2)
         box off
         saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsMerged.pdf'])
         
-%         % left and right seperated, standard trials
-%         errorbar_groups(meanYs{paraN}, steYs{paraN},  ...
-%             'bar_width',0.75,'errorbar_width',0.5, ...
-%             'bar_names',{'50','70','90'});
-%         legend({'leftward trials' 'rightward trials'})
-%         title('standard trials')
-%         ylabel(yLabels{paraN})
-%         %         ylim([0 1.3])
-%         box off
-%         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
-%         
+        %         % left and right seperated, standard trials
+        %         errorbar_groups(meanYs{paraN}, steYs{paraN},  ...
+        %             'bar_width',0.75,'errorbar_width',0.5, ...
+        %             'bar_names',{'50','70','90'});
+        %         legend({'leftward trials' 'rightward trials'})
+        %         title('standard trials')
+        %         ylabel(yLabels{paraN})
+        %         %         ylim([0 1.3])
+        %         box off
+        %         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
+        %
         % left and right seperated, perceptual trials
         errorbar_groups(meanYp{paraN}, steYp{paraN},  ...
             'bar_width',0.75,'errorbar_width',0.5, ...
             'bar_names',{'50','70','90'});
-        legend({'leftward trials' 'rightward trials'})
+        %         legend({'leftward trials' 'rightward trials'})
+        legend({'perceived left trials' 'perceived right trials'})
         title('perceptual trials')
         ylabel(yLabels{paraN})
         %     ylim([-0.5 5])
         box off
-        saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR.pdf'])
+        saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice.pdf'])
     end
     %     % probability not merged... not correct = =
     %     for probN= 1:size(probCons, 2)
@@ -366,17 +357,17 @@ for paraN = 1:1%sacStart-1%size(checkParas, 2)
             hold on
             scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
         end
-%         for probNmerged = 1:3
-%             hold on
-%             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
-%                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
-%         end
-%         legend({'50','70','90'})
+        %         for probNmerged = 1:3
+        %             hold on
+        %             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
+        %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
+        %         end
+        %         legend({'50','70','90'})
         title('perceptual trials')
         xlabel('PSE')
         ylabel(yLabels{paraN})
         %     ylim([-0.5 5])
         box off
-%         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
+        %         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
     end
 end
