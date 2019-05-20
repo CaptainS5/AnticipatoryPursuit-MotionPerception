@@ -21,8 +21,9 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1310; % 1310 for p7... chose trial you want to look at here; default =
-% 1; choose later with trial type information
+currentTrial = 1; % 1733 for p9, 326 for p12, 1 for p13... 
+% p7 and p11 not finished, but might do later--opposite perception...
+% chose trial you want to look at here; default = 1; 
 c = 1; % counter
 % monitor and setup specific parameters
 sampleRate = 1000;

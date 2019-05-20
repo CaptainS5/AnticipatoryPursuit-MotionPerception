@@ -379,7 +379,11 @@ while recordFlag==0
     [keyIsDown, secs, keyCode, deltaSecs] = KbCheck();
     if keyIsDown
         key = KbName(keyCode);
+        
         % wait until the valid keys are pressed
+        if sum(keyCode)>1 % pressing two keys at the same time
+            key = 'wrong';
+        end
         if strcmp(key, prm.leftKey) || strcmp(key, prm.rightKey) || strcmp(key, prm.stopKey)
             rt = secs-rdkOffTime;
             recordFlag = 1;
@@ -389,7 +393,7 @@ while recordFlag==0
             DrawFormattedText(prm.screen.windowPtr, respText,...
                 'center', 'center', prm.textColour);
             Screen('Flip', prm.screen.windowPtr);
-            clear KbCheck
+            clear KbCheck keyCode
         end
     end
     %% end of button response
@@ -399,7 +403,7 @@ end
 % end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
-if blockN==0 % prectice block, give feedback
+if blockN==0 % practice block, give feedback
     if (rdkDir<0 && strcmp(key, prm.leftKey)) || (rdkDir>0 && strcmp(key, prm.rightKey))
         feedbackText = 'corrrect';
     else

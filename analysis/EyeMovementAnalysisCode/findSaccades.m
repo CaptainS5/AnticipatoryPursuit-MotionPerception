@@ -64,7 +64,33 @@ speedOffsets = find(speedOffsets);
 middle = acceleration/1000;
 predecessor = [middle(2:end); 0];
 signSwitches = find((middle .* predecessor) <= 0)+1; % either sign switch, or rapid change of speed
-accelerationAbs = find(abs(acceleration)<accelerationThreshold)+1; 
+% only count if consecutive 15 frames acceleration are all below the
+% threshold; to ensure that the "saccade tails" do not survive...
+accelerationAbs = abs(acceleration)<accelerationThreshold;
+% accDiff = diff(accelerationAbs);
+% validFrameN = 15;
+% accelerationThres(1) = accelerationAbs(1);
+% for ii = 1:length(accDiff)
+%     if accDiff==-1 % change from 1 to 0, check if frames of 0 meets the requirement
+%         if
+%         end
+%     else
+%         accelerationThres(ii+1) = accelerationAbs(ii+1);
+%     end
+% end
+
+% % only five frames
+% preAccAbs = [accelerationAbs(2:end); 0];
+% sucAccAbs = [0; accelerationAbs(1:end-1)];
+% prepreAccAbs = [preAccAbs(2:end); 0];
+% sucsucAccAbs = [0; sucAccAbs(1:end-1)];
+% relevantAcc = accelerationAbs+preAccAbs+sucAccAbs+prepreAccAbs+sucsucAccAbs ==5;
+% 
+% accelerationThres = find(relevantAcc==1);
+
+% original code which doesn't care about consecutive frames...
+accelerationThres = find(abs(acceleration)<accelerationThreshold)+1; %
+
 % use acceleration to judge rapid change of speed; these are frames preceeded by frames below
 % the acceleration threshold, so could serve as onset/offset
 
@@ -82,9 +108,9 @@ for i = 1:length(speedOnsets)
     end
     
     onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
-       accelerationAbs(accelerationAbs < speedOnsets(i))]);
+       accelerationThres(accelerationThres < speedOnsets(i))]);
     offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
-        accelerationAbs(accelerationAbs > speedOffsets(i))])-1;
+        accelerationThres(accelerationThres > speedOffsets(i))])-1;
 end
 
 % trim to delete NaNs
