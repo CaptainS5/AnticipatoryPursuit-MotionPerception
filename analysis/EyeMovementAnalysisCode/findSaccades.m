@@ -27,7 +27,7 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 150;
+accelerationThreshold = 180;
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the

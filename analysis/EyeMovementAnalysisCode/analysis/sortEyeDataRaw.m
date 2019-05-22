@@ -4,12 +4,15 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9'};
-subStartI = 1;
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10'};
+subStartI = 8;
+if subStartI>1 % load eyeTrialDataAll
+    load('eyeTrialData_all.mat')
+end
 cd ..
 analysisPath = pwd;
-dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-% dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+% dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
+dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
@@ -28,10 +31,6 @@ saccadeThreshold = 15;
 microSaccadeThreshold = 5;
 
 %% All trials
-if subStartI>1 % load eyeTrialDataAll
-    load('eyeTrialData_all.mat')
-end
-
 for subN = subStartI:length(names)
     currentSubject = names{subN};
     cd(dataPath)
