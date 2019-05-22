@@ -27,7 +27,7 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 250;
+accelerationThreshold = 150;
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
@@ -65,19 +65,28 @@ middle = acceleration/1000;
 predecessor = [middle(2:end); 0];
 signSwitches = find((middle .* predecessor) <= 0)+1; % either sign switch, or rapid change of speed
 % only count if consecutive 15 frames acceleration are all below the
-% threshold; to ensure that the "saccade tails" do not survive...
+% threshold; to ensure that the tails of saccades do not survive...
 accelerationAbs = abs(acceleration)<accelerationThreshold;
-% accDiff = diff(accelerationAbs);
-% validFrameN = 15;
-% accelerationThres(1) = accelerationAbs(1);
-% for ii = 1:length(accDiff)
-%     if accDiff==-1 % change from 1 to 0, check if frames of 0 meets the requirement
-%         if
-%         end
-%     else
-%         accelerationThres(ii+1) = accelerationAbs(ii+1);
-%     end
-% end
+accDiff = diff(accelerationAbs);
+validFrameN = 25;
+ii = 1;
+while ii <= length(accDiff)
+    if accDiff(ii)==1 % change from 0 to 1, check if frames of 1 meets the requirement
+        validIdx = min([validFrameN; length(accDiff)-ii+1]); % length of frames left or consecutive number of frames required
+        if sum(accelerationAbs(ii+1:ii+validIdx, 1))~=validIdx
+            % less that the defined consecutive frames is below threshold,
+            % treat it as tails of saccades, change to above threshold (1)
+            idx = find(accelerationAbs(ii+1:ii+validIdx, 1)==0);
+            idx = idx(1);
+            accelerationAbs(ii+1:ii+idx, 1) = 0;
+            ii = ii+idx;
+        else
+            ii = ii+1;
+        end
+    else
+        ii = ii+1;
+    end
+end
 
 % % only five frames
 % preAccAbs = [accelerationAbs(2:end); 0];
@@ -88,8 +97,7 @@ accelerationAbs = abs(acceleration)<accelerationThreshold;
 % 
 % accelerationThres = find(relevantAcc==1);
 
-% original code which doesn't care about consecutive frames...
-accelerationThres = find(abs(acceleration)<accelerationThreshold)+1; %
+accelerationThres = find(accelerationAbs==1); %
 
 % use acceleration to judge rapid change of speed; these are frames preceeded by frames below
 % the acceleration threshold, so could serve as onset/offset
@@ -102,15 +110,29 @@ for i = 1:length(speedOnsets)
     % make sure, that there is always both, an onset and an offset
     % otherwise, skip this saccade
     if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) ...
-            || abs(acceleration(speedOnsets(i)))<accelerationThreshold ...
-            || abs(acceleration(speedOffsets(i)))<accelerationThreshold
+            || (abs(acceleration(speedOnsets(i)))<accelerationThreshold ...
+            && abs(acceleration(speedOffsets(i)))<accelerationThreshold) ...
+            || speedOnsets(i) < min(accelerationThres) || speedOffsets(i) > max(accelerationThres)
         continue
     end
     
-    onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
-       accelerationThres(accelerationThres < speedOnsets(i))]);
-    offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
-        accelerationThres(accelerationThres > speedOffsets(i))])-1;
+    onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
+    offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
+    % for saccades that are really close, separate...
+    if length(signSwitches(signSwitches >= onsets(i) & signSwitches <= offsets(i)))>4
+        if i>1 && onsets(i)==onsets(i-1) % the second in overlapping saccades
+            onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
+                offsets(i-1)+11])-10;
+        else
+%             onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
+%                 offsets(i-1)+11])-10;
+            offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i)))+10;
+        end
+    end
+%     onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
+%        accelerationThres(accelerationThres < speedOnsets(i))]);
+%     offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
+%         accelerationThres(accelerationThres > speedOffsets(i))])-1;
 end
 
 % trim to delete NaNs

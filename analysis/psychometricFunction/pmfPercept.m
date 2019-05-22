@@ -2,7 +2,7 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p13'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' 'p15'};
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
@@ -30,7 +30,7 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
-for subN = 8:8%size(names, 2)
+for subN = 9:9%size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.coh==1, :) = [];
