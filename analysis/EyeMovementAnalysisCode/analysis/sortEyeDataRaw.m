@@ -8,8 +8,8 @@ names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9'};
 subStartI = 1;
 cd ..
 analysisPath = pwd;
-% dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
+% dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters

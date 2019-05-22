@@ -120,14 +120,14 @@ for i = 1:length(speedOnsets)
     offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
     % for saccades that are really close, separate...
     if length(signSwitches(signSwitches >= onsets(i) & signSwitches <= offsets(i)))>4
-        if i>1 && onsets(i)==onsets(i-1) % the second in overlapping saccades
-            onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
+        if i>1 && onsets(i)<=offsets(i-1) % the second in overlapping saccades
+            onsets(i) = max([signSwitches(signSwitches < speedOnsets(i)); ...
                 offsets(i-1)+11])-10;
         else
-%             onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
-%                 offsets(i-1)+11])-10;
-            offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i)))+10;
+            onsets(i) = max([signSwitches(signSwitches < speedOnsets(i)); ...
+                stim_onset+11])-10;
         end
+        offsets(i) = min(signSwitches(signSwitches > speedOffsets(i)))+10;
     end
 %     onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
 %        accelerationThres(accelerationThres < speedOnsets(i))]);
@@ -144,7 +144,6 @@ earlyOnsets = find(diff(reshape([onsets;offsets],1,[]))<0)/2+1;
 previousOffsets = earlyOnsets - 1;
 onsets(earlyOnsets) = [];
 offsets(previousOffsets) = [];
-
 % for i = 1:length(onsets) % if there is pursuit right after saccades before the sign switch, find earlier offset
 %     if abs(speed(offsets(i)-startFrame)-speed(onsets(i)-startFrame))>8
 %         offsets(i) = max(find(abs(speed(onsets(i)-startFrame:offsets(i)-startFrame)-speed(onsets(i)-startFrame))<=2))+onsets(i)-1; % just define the offset to be around the same speed as the onset

@@ -38,7 +38,7 @@ trial.timeWindow.excludeEndDuration = ms2frames(100); % exclude the last x ms of
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
 onset = 1;
-offset = min(trial.stim_offset+ms2frames(300), size(trial.eyeDX_filt, 1)); % to be able to detect saccades at the end of display
+offset = min(trial.stim_offset+ms2frames(200), size(trial.eyeDX_filt, 1)); % to be able to detect saccades at the end of display
 if trial.log.coh==0
     stimulusVelocityX = 0;
 else
