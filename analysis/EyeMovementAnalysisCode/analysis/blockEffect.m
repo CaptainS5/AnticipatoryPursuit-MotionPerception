@@ -13,7 +13,7 @@ sacStart = 9; % from the n_th parameter is saccade
 
 % some settings
 individualPlots = 1;
-averagedPlots = 0;
+averagedPlots = 1;
 scatterPlots = 0;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
@@ -40,7 +40,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 5:5%:size(checkParas, 2) % automatically loop through the parameters... just too much of them
+    for paraN = 7:7%:size(checkParas, 2) % automatically loop through the parameters... just too much of them
         yValues{paraN, subN}.standard = NaN(500, size(probSub, 2));
         yValues{paraN, subN}.perceptual = NaN(182, size(probSub, 2));
         yValuesL{paraN, subN}.standard = NaN(500, size(probSub, 2));
@@ -69,19 +69,19 @@ for subN = 1:size(names, 2)
             eval(['yValuesR{paraN, subN}.standard(1:length(validIR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIR);'])
             %             end
             % then perceptual trials
-%             % sort by visual motion direction
-%             validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-%                 & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-                        % sort by choice
-                        validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                            & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+            % sort by visual motion direction
+            validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+                & eyeTrialData.rdkDir(subN, :)==-1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+%                         % sort by choice
+%                         validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+%                             & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             eval(['yValuesL{paraN, subN}.perceptual(1:length(validIL), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIL);'])
-%             % sort by visual motion direction
-%             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-%                 & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-            % sort by choice
+            % sort by visual motion direction
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+                & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+%             % sort by choice
+%             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+%                 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             eval(['yValuesR{paraN, subN}.perceptual(1:length(validIR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIR);'])
         end
         
@@ -152,8 +152,8 @@ for subN = 1:size(names, 2)
                 ylabel(yLabels{paraN})
                 %     ylim([-0.5 5])
                 box off
-%                 saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
-                saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice_' , names{subN}, '.pdf'])
+                saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
+%                 saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice_' , names{subN}, '.pdf'])
             end
         end
     end
@@ -161,7 +161,7 @@ end
 
 %% grouped bars of the mean of all participants
 % sort data of different participants together
-for paraN = 5:5%size(checkParas, 2)
+for paraN = 7:7%size(checkParas, 2)
     subMeanS{paraN} = NaN(size(names, 2), 3); % standard trials
     subMeanSL{paraN} = NaN(size(names, 2), 3);
     subMeanSR{paraN} = NaN(size(names, 2), 3);

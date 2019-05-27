@@ -5,14 +5,14 @@
 
 clear all; close all; clc
 names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10'};
-subStartI = 8;
+subStartI = 1;
 if subStartI>1 % load eyeTrialDataAll
     load('eyeTrialData_all.mat')
 end
 cd ..
 analysisPath = pwd;
-% dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
+% dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
@@ -27,7 +27,7 @@ distance = 55; % 57.29 for tW
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 15;
+saccadeThreshold = 5;
 microSaccadeThreshold = 5;
 
 %% All trials
@@ -56,7 +56,7 @@ for subN = subStartI:length(names)
         eyeTrialData.coh(subN, currentTrial) = parameters.coh(currentTrial, 1)*parameters.rdkDir(currentTrial, 1); % negative-left, positive-right
         eyeTrialData.choice(subN, currentTrial) = parameters.choice(currentTrial, 1); % 0-left, 1-right
         eyeTrialData.errorStatus(subN, currentTrial) = errors.errorStatus(currentTrial, 1);
-        if errors.errorStatus(currentTrial, 1)~=-1
+        if errors.errorStatus(currentTrial, 1)==0
             analyzeTrial;
             
             eyeTrialData.frameLog.fixationOn(subN, currentTrial) = trial.log.trialStart;
@@ -76,6 +76,7 @@ for subN = subStartI:length(names)
             eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = trial.pursuit.initialPeakAccelerationX;
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = trial.pursuit.closedLoopMeanVelX;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = trial.pursuit.gainX;
+            eyeTrialData.pursuit.gainX_interpol(subN, currentTrial) = trial.pursuit.gainX_interpol;
             eyeTrialData.pursuit.initialVelChangeX(subN, currentTrial) = -nanmean(trial.DX_noSac( (trial.pursuit.openLoopStartFrame-ms2frames(5)) : (trial.pursuit.openLoopStartFrame+ms2frames(5)) )) ...
                 +nanmean(trial.DX_noSac( (trial.pursuit.openLoopEndFrame-ms2frames(5)) : (trial.pursuit.openLoopEndFrame+ms2frames(5)) ));
             
@@ -147,6 +148,7 @@ for subN = subStartI:length(names)
             eyeTrialData.pursuit.initialPeakAccelerationX(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.gainX(subN, currentTrial) = NaN;
+            eyeTrialData.pursuit.gainX_interpol(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = NaN;
             eyeTrialData.pursuit.initialVelChangeX(subN, currentTrial) = NaN;
              

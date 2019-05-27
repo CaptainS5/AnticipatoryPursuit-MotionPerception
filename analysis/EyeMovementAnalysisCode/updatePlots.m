@@ -16,7 +16,7 @@
 
 function [] = updatePlots(trial)
 % define window for which you want to plot your data
-startFrame = max(1, trial.log.fixationOff-ms2frames(900));
+startFrame = max(1, trial.log.fixationOff-ms2frames(100));
 endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this is all recorded eye movement data
 % if the interval looking at micro-saccades differs define it here
 % msStart = trial.log.microSaccade.onset; 
@@ -32,13 +32,17 @@ minPosY = -25;
 maxPosY = 25;
 minVel = -30;
 maxVel = 30;
+minAcc = -600;
+maxAcc = 600;
+minJerk = -60000;
+maxJerk = 60000;
 % in subplot we divide the screen into potential plotting windows; i.e.
 % subplot(2,2) means that the figure is divided into a grid of 2x2 and we
 % are plotting in the first position; 'replace' allows us to refresh the
 % plot every time we "click through"
 
 % eye position plot over time
-subplot(2,1,1,'replace');
+subplot(2,2,1,'replace');
 % define some plot parameters
 axis([startFrame endFrame minPosAbs maxPosAbs]);
 hold on;
@@ -53,8 +57,8 @@ plot(trial.saccades.X_right.onsets,trial.eyeX_filt(trial.saccades.X_right.onsets
 plot(trial.saccades.X_right.offsets,trial.eyeX_filt(trial.saccades.X_right.offsets),'m*');
 plot(trial.saccades.Y.onsets,trial.eyeY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeY_filt(trial.saccades.Y.offsets),'c*');
-legend({'x pos','y pos', 'sacLeftOn', 'sacLeftOff', 'sacRightOn', 'sacRightOff', ...
-    'sacOn', 'sacOff'},'Location','NorthWest');%, 'AutoUpdate','off');
+% legend({'x pos','y pos', 'sacLeftOn', 'sacLeftOff', 'sacRightOn', 'sacRightOff', ...
+%     'sacOn', 'sacOff'},'Location','NorthWest');%, 'AutoUpdate','off');
 % vertical lines indicate events/target onsets
 line([trial.log.fixationOff trial.log.fixationOff], [minPosAbs maxPosAbs],'Color','b','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minPosAbs maxPosAbs],'Color','k','LineStyle','--');
@@ -68,7 +72,7 @@ end
 % end
 
 % velocity plot over time
-subplot(2,1,2,'replace');
+subplot(2,2,2,'replace');
 axis([startFrame endFrame minVel maxVel]);
 hold on;
 xlabel('Time(ms)', 'fontsize', 12);
@@ -95,6 +99,58 @@ end
 % if ~isempty(trial.pursuit.onsetSteadyState)
 %     line([trial.pursuit.onsetSteadyState trial.pursuit.onsetSteadyState], [minVel maxVel],'Color','r','LineStyle','--');
 % end
+
+% acceleration plot over time
+subplot(2,2,3,'replace');
+axis([startFrame endFrame minAcc maxAcc]);
+hold on;
+xlabel('Time(ms)', 'fontsize', 12);
+ylabel('Acceleration', 'fontsize', 12);
+% plot x- and y- eye velocity over time
+plot(startFrame:endFrame,trial.eyeDDX_filt(startFrame:endFrame),'k');
+% plot(startFrame:endFrame,trial.eyeDDY_filt(startFrame:endFrame),'b');
+% plot saccade onsets in x- and y with different colors
+plot(trial.saccades.X_left.onsets,trial.eyeDDX_filt(trial.saccades.X_left.onsets),'go');
+plot(trial.saccades.X_left.offsets,trial.eyeDDX_filt(trial.saccades.X_left.offsets),'mo');
+plot(trial.saccades.X_right.onsets,trial.eyeDDX_filt(trial.saccades.X_right.onsets),'g*');
+plot(trial.saccades.X_right.offsets,trial.eyeDDX_filt(trial.saccades.X_right.offsets),'m*');
+% plot(trial.saccades.Y.onsets,trial.eyeDDY_filt(trial.saccades.Y.onsets),'y*');
+% plot(trial.saccades.Y.offsets,trial.eyeDDY_filt(trial.saccades.Y.offsets),'c*');
+% vertical lines indicate events/target onsets
+line([trial.log.fixationOff trial.log.fixationOff], [minAcc maxAcc],'Color','b','LineStyle','--');
+line([trial.log.targetOnset trial.log.targetOnset], [minAcc maxAcc],'Color','k','LineStyle','--');
+line([trial.stim_offset trial.stim_offset], [minAcc maxAcc],'Color','k','LineStyle','--');
+if ~isempty(trial.pursuit.onset)
+    line([trial.pursuit.onset trial.pursuit.onset], [minAcc maxAcc],'Color','r','LineStyle','--');
+    line([trial.pursuit.onsetTrue trial.pursuit.onsetTrue], [minAcc maxAcc],'Color','r','LineStyle','-.');
+    line([trial.pursuit.openLoopEndFrame trial.pursuit.openLoopEndFrame], [minAcc maxAcc],'Color','m','LineStyle','--');
+end
+
+% jerk plot over time
+subplot(2,2,4,'replace');
+axis([startFrame endFrame minJerk maxJerk]);
+hold on;
+xlabel('Time(ms)', 'fontsize', 12);
+ylabel('Jerk', 'fontsize', 12);
+% plot x- and y- eye velocity over time
+plot(startFrame:endFrame,trial.eyeDDDX(startFrame:endFrame),'k');
+% plot(startFrame:endFrame,trial.eyeDDDY(startFrame:endFrame),'b');
+% plot saccade onsets in x- and y with different colors
+plot(trial.saccades.X_left.onsets,trial.eyeDDDX(trial.saccades.X_left.onsets),'go');
+plot(trial.saccades.X_left.offsets,trial.eyeDDDX(trial.saccades.X_left.offsets),'mo');
+plot(trial.saccades.X_right.onsets,trial.eyeDDDX(trial.saccades.X_right.onsets),'g*');
+plot(trial.saccades.X_right.offsets,trial.eyeDDDX(trial.saccades.X_right.offsets),'m*');
+% plot(trial.saccades.Y.onsets,trial.eyeDDDY(trial.saccades.Y.onsets),'y*');
+% plot(trial.saccades.Y.offsets,trial.eyeDDDY(trial.saccades.Y.offsets),'c*');
+% vertical lines indicate events/target onsets
+line([trial.log.fixationOff trial.log.fixationOff], [minJerk maxJerk],'Color','b','LineStyle','--');
+line([trial.log.targetOnset trial.log.targetOnset], [minJerk maxJerk],'Color','k','LineStyle','--');
+line([trial.stim_offset trial.stim_offset], [minJerk maxJerk],'Color','k','LineStyle','--');
+if ~isempty(trial.pursuit.onset)
+    line([trial.pursuit.onset trial.pursuit.onset], [minJerk maxJerk],'Color','r','LineStyle','--');
+    line([trial.pursuit.onsetTrue trial.pursuit.onsetTrue], [minJerk maxJerk],'Color','r','LineStyle','-.');
+    line([trial.pursuit.openLoopEndFrame trial.pursuit.openLoopEndFrame], [minJerk maxJerk],'Color','m','LineStyle','--');
+end
 
 % % absolute position plot
 % % we will have 3 plots in the bottom row, so we need to make a subplot with

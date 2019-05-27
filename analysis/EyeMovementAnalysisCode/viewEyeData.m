@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1; % 1 for p14... 
+currentTrial = 53; % 683 for p14... 
 % p7 and p11 not finished, but might do later--opposite perception...
 % chose trial you want to look at here; default = 1; 
 c = 1; % counter
@@ -31,13 +31,13 @@ screenSizeX = 39.7;
 screenSizeY = 29.5;
 screenResX = 1600; 
 screenResY = 1200;
-distance = 55;
+distance = 55; 
 % saccade algorithm threshold --> depends on your stimulus speed and
 % expected saccade size
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 15;
+saccadeThreshold = 5; % ~10^2--jerk; ~15-velocity
 microSaccadeThreshold = 5;
 % this is a csv files that will contain information about discarded trials
 % errors = load('errors.csv'); ???

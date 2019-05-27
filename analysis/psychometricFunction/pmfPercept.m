@@ -30,7 +30,7 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
-for subN = 9:9%size(names, 2)
+for subN = 9:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.coh==1, :) = [];

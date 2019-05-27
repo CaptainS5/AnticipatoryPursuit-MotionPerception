@@ -178,7 +178,9 @@ else
     end
     
     % only horizontal
+    % gain with saccades removed
     speedX_noSac = trial.DX_noSac; %sqrt((trial.DX_noSac).^2);
+    speedX_interpolSac = trial.DX_interpolSac; %sqrt((trial.DX_noSac).^2);
     % absoluteVelX = repmat(abs(trial.stimulus.absoluteVelocity), size(speedX_noSac));
     % since it's possible to pursuit to the opposite direction in low coherence trials...
     % not using absolute value, but preserve the signs for both eye
@@ -199,6 +201,12 @@ else
     pursuit.gainX= nanmean(pursuitGainX);
     if length(pursuitGainX) < ms2frames(50)
         pursuit.gainX = NaN;
+    end
+    
+    pursuitGainX_interpol = speedX_interpolSac(closedLoop)./absoluteVelX(closedLoop);
+    pursuit.gainX_interpol= nanmean(pursuitGainX_interpol);
+    if length(pursuitGainX_interpol) < ms2frames(50)
+        pursuit.gainX_interpol = NaN;
     end
 end
 % % calculate position error

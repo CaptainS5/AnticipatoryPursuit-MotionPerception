@@ -33,7 +33,7 @@ trial.length = trial.stim_offset;
 trial.timeWindow.APnegative = ms2frames(-50);
 trial.timeWindow.APpositive = ms2frames(50);
 trial.timeWindow.openLoopDuration = ms2frames(140); % fixed duration; may not be used, see analyzePursuit.m
-trial.timeWindow.excludeEndDuration = ms2frames(100); % exclude the last x ms of stimulus display
+trial.timeWindow.excludeEndDuration = ms2frames(150); % exclude the last x ms of stimulus display
 
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
@@ -45,8 +45,12 @@ else
     stimulusVelocityX = 10*trial.log.coh; % deg/s, became slower with low coherence
 end
 stimulusVelocityY = 0;
-[saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, threshold, stimulusVelocityX);
-[saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, threshold, stimulusVelocityY);
+% % use acceleration to find saccades...
+% [saccades.X.onsets, saccades.X.offsets] = findSaccadesAcc(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold);
+% [saccades.Y.onsets, saccades.Y.offsets] = findSaccadesAcc(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold);
+% use combination of velocity, acceleration, and jerk to find saccades
+[saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold, stimulusVelocityX);
+[saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold, stimulusVelocityY);
 % remove saccades
 trial = removeSaccades(trial, saccades);
 clear saccades;

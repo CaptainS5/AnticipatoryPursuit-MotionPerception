@@ -16,25 +16,29 @@
 % output: onsets --> saccade onsets
 %         offsets --> saccade offsets
 
-function [onsets, offsets] = findSaccades(stim_onset, stim_offset, speed, acceleration, threshold, stimulusSpeed)
+function [onsets, offsets] = findSaccades(stim_onset, stim_offset, speed, acceleration, jerk, threshold, stimulusSpeed)
 global trial
 % set up data
 startFrame = stim_onset; % fixation onset
-rdkFrame = trial.stim_onset+ms2frames(100); % rdk onset
+rdkOnFrame = trial.stim_onset+ms2frames(100); % rdk onset+100ms
+rdkOffFrame =  trial.stim_offset; % rdk offset
 endFrame = stim_offset;
 upperThreshold = stimulusSpeed + threshold;
 lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 180;
+accelerationThreshold = 200;
+jerk = jerk(startFrame:endFrame);
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
 % relevant frames, i.e. the frames in which the eye supposedly is in a
 % saccade
-middle(1:rdkFrame-startFrame, 1) = speed(1:rdkFrame-startFrame)<-threshold | speed(1:rdkFrame-startFrame)>threshold; % when there isn't motion
-middle(rdkFrame-startFrame+1:endSpeedF, 1) = speed(rdkFrame-startFrame+1:end)<lowerThreshold | speed(rdkFrame-startFrame+1:end)>upperThreshold; % when there is motion
+middle(1:rdkOnFrame-startFrame, 1) = speed(1:rdkOnFrame-startFrame)<-threshold | speed(1:rdkOnFrame-startFrame)>threshold; % when there isn't motion
+middle(rdkOnFrame-startFrame+1:rdkOffFrame-startFrame+1, 1) = speed(rdkOnFrame-startFrame+1:rdkOffFrame-startFrame+1)<lowerThreshold | speed(rdkOnFrame-startFrame+1:rdkOffFrame-startFrame+1)>upperThreshold; % when there is motion
+middle(rdkOffFrame-startFrame+1:endSpeedF, 1) = speed(rdkOffFrame-startFrame+1:end)<-threshold | speed(rdkOffFrame-startFrame+1:end)>threshold; % when there is no motion again
+
 predecessor = [middle(2:end); 0];
 successor = [0; middle(1:end-1)];
 
@@ -112,27 +116,36 @@ for i = 1:length(speedOnsets)
     if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) ...
             || (abs(acceleration(speedOnsets(i)))<accelerationThreshold ...
             && abs(acceleration(speedOffsets(i)))<accelerationThreshold) ...
-            || speedOnsets(i) < min(accelerationThres) || speedOffsets(i) > max(accelerationThres)
+            || speedOnsets(i) < min(accelerationThres) || speedOffsets(i) > max(accelerationThres) ...
+            || max(abs(jerk(speedOnsets(i):speedOffsets(i))))<30000
         continue
     end
     
-    onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
+%     onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
     offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
+    onsets (i) = max(accelerationThres(accelerationThres < offsets(i)));
     % for saccades that are really close, separate...
     if length(signSwitches(signSwitches >= onsets(i) & signSwitches <= offsets(i)))>4
         if i>1 && onsets(i)<=offsets(i-1) % the second in overlapping saccades
             onsets(i) = max([signSwitches(signSwitches < speedOnsets(i)); ...
                 offsets(i-1)+11])-10;
         else
-            onsets(i) = max([signSwitches(signSwitches < speedOnsets(i)); ...
-                stim_onset+11])-10;
+            onsets(i) = max([signSwitches(signSwitches < speedOnsets(i))-10; ...
+                stim_onset+1]);
         end
-        offsets(i) = min(signSwitches(signSwitches > speedOffsets(i)))+10;
+        offsets(i) = min([signSwitches(signSwitches > speedOffsets(i))+10; ...
+            stim_offset]);
     end
-%     onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
-%        accelerationThres(accelerationThres < speedOnsets(i))]);
-%     offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
-%         accelerationThres(accelerationThres > speedOffsets(i))])-1;
+    % check jerk again...
+    if max(abs(jerk(onsets(i):offsets(i))))<30000 || onsets(i)>=offsets(i)
+        onsets(i) = NaN;
+        offsets(i) = NaN;
+    end
+    
+    %     onsets(i) = max([signSwitches(signSwitches <= speedOnsets(i)); ...
+    %        accelerationThres(accelerationThres < speedOnsets(i))]);
+    %     offsets(i) = min([signSwitches(signSwitches >= speedOffsets(i)); ...
+    %         accelerationThres(accelerationThres > speedOffsets(i))])-1;    
 end
 
 % trim to delete NaNs

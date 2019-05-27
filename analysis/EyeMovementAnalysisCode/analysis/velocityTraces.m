@@ -44,10 +44,10 @@ for probN = 1:size(probCons, 2)
     for subN = 1:size(names, 2)
         if ~isempty(find(eyeTrialData.prob(subN, :)==probCons(probN)))
             tempStartI = maxFrameLength-frameLength(subN)+1;
-            leftSIdx = find(eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
-            rightSIdx = find(eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
-            leftPIdx = find(eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
-            rightPIdx = find(eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
+            leftSIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
+            rightSIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==1);
+            leftPIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
+            rightPIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))<1);
             
             meanVel{probN}.leftStandard(subN, tempStartI:end) = nanmean(frames{subN}(leftSIdx, :));
             meanVel{probN}.rightStandard(subN, tempStartI:end) = nanmean(frames{subN}(rightSIdx, :));
@@ -71,7 +71,7 @@ for probN = 1:size(probCons, 2)
     velMean{probN}.rightPerceptual = nanmean(meanVel{probN}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end), 1);
 end
 
-% plot mean traces in all probabilities for each participant
+%% plot mean traces in all probabilities for each participant
 for subN = 1:size(names, 2)
     probSub = unique(eyeTrialData.prob(subN, :));
     if probSub(1)<50
@@ -119,7 +119,8 @@ for subN = 1:size(names, 2)
     saveas(gca, ['velocityAllProbs_' names{subN} '.pdf'])
 end
 
-figure % plot mean traces of all participants in all probabilities 
+%% plot mean traces of all participants in all probabilities 
+figure 
 subplot(2, 1, 1)
 for probN = 1:size(probCons, 2)
     plot(timePoints, velMean{probN}.leftStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
