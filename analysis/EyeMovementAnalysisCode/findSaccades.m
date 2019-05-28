@@ -79,7 +79,7 @@ while ii <= length(accDiff)
         validIdx = min([validFrameN; length(accDiff)-ii+1]); % length of frames left or consecutive number of frames required
         if sum(accelerationAbs(ii+1:ii+validIdx, 1))~=validIdx
             % less that the defined consecutive frames is below threshold,
-            % treat it as tails of saccades, change to above threshold (1)
+            % treat it as tails of saccades, change to above threshold (0)
             idx = find(accelerationAbs(ii+1:ii+validIdx, 1)==0);
             idx = idx(1);
             accelerationAbs(ii+1:ii+idx, 1) = 0;
@@ -114,16 +114,20 @@ for i = 1:length(speedOnsets)
     % make sure, that there is always both, an onset and an offset
     % otherwise, skip this saccade
     if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) ...
-            || (abs(acceleration(speedOnsets(i)))<accelerationThreshold ...
-            && abs(acceleration(speedOffsets(i)))<accelerationThreshold) ...
+            || (accelerationAbs(speedOnsets(i))==1 ...
+            && accelerationAbs(speedOffsets(i))==1) ...
             || speedOnsets(i) < min(accelerationThres) || speedOffsets(i) > max(accelerationThres) ...
-            || max(abs(jerk(speedOnsets(i):speedOffsets(i))))<30000
+%             || max(abs(jerk(speedOnsets(i):speedOffsets(i))))<30000
         continue
     end
     
-%     onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
-    offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
-    onsets (i) = max(accelerationThres(accelerationThres < offsets(i)));
+    if accelerationAbs(speedOffsets(i))==1 % if offset is too far, which could happen during initiation phase
+        onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
+        offsets(i) = min(accelerationThres(accelerationThres > onsets(i)));
+    else % otherwise locate saccade offset first, which is usually more accurate
+        offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
+        onsets(i) = max(accelerationThres(accelerationThres < offsets(i)));
+    end
     % for saccades that are really close, separate...
     if length(signSwitches(signSwitches >= onsets(i) & signSwitches <= offsets(i)))>4
         if i>1 && onsets(i)<=offsets(i-1) % the second in overlapping saccades

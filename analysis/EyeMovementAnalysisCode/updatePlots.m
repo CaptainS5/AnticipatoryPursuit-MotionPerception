@@ -88,8 +88,9 @@ plot(trial.saccades.X_right.offsets,trial.eyeDX_filt(trial.saccades.X_right.offs
 plot(trial.saccades.Y.onsets,trial.eyeDY_filt(trial.saccades.Y.onsets),'y*');
 plot(trial.saccades.Y.offsets,trial.eyeDY_filt(trial.saccades.Y.offsets),'c*');
 % vertical lines indicate events/target onsets
-line([trial.log.fixationOff trial.log.fixationOff], [minVel maxVel],'Color','b','LineStyle','--');
+line([trial.log.fixationOff trial.log.fixationOff], [minVel maxVel],'Color','k','LineStyle','--');
 line([trial.log.targetOnset trial.log.targetOnset], [minVel maxVel],'Color','k','LineStyle','--');
+line([trial.stim_offset-ms2frames(100) trial.stim_offset-ms2frames(100)], [minVel maxVel],'Color','b','LineStyle','--');
 line([trial.stim_offset trial.stim_offset], [minVel maxVel],'Color','k','LineStyle','--');
 if ~isempty(trial.pursuit.onset)
     line([trial.pursuit.onset trial.pursuit.onset], [minVel maxVel],'Color','r','LineStyle','--');

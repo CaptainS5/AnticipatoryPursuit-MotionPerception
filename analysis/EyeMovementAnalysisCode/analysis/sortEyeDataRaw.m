@@ -4,7 +4,7 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
 subStartI = 1;
 if subStartI>1 % load eyeTrialDataAll
     load('eyeTrialData_all.mat')
