@@ -13,16 +13,18 @@ for subN = 1:size(names, 2)
     lengthT = size(eyeTrialDataSub.trial, 2);
     frames{subN} = NaN(lengthT, frameLength(subN));
     
-    for trialN = 1:lengthT        
-        endI = eyeTrialData.frameLog.rdkOff(subN, trialN);
-        if endI>frameLength(subN)
-            startI = endI-frameLength(subN)+1;
-            startIF = 1;
-        else
-            startI = eyeTrialData.frameLog.fixationOn(subN, trialN);
-            startIF = frameLength(subN)-endI+1;
+    for trialN = 1:lengthT    
+        if eyeTrialData.errorStatus(subN, trialN)==0
+            endI = eyeTrialData.frameLog.rdkOff(subN, trialN);
+            if endI>frameLength(subN)
+                startI = endI-frameLength(subN)+1;
+                startIF = 1;
+            else
+                startI = eyeTrialData.frameLog.fixationOn(subN, trialN);
+                startIF = frameLength(subN)-endI+1;
+            end
+            frames{subN}(trialN, startIF:end) = eyeTrialDataSub.trial{1, trialN}.DX_interpolSac(startI:endI);
         end
-        frames{subN}(trialN, startIF:end) = eyeTrialDataSub.trial{1, trialN}.DX_interpolSac(startI:endI);
     end
 end
 maxFrameLength = max(frameLength);
