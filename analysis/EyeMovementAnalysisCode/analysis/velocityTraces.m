@@ -122,41 +122,41 @@ for subN = 1:size(names, 2)
 end
 
 %% plot mean traces of all participants in all probabilities 
-figure 
-subplot(2, 1, 1)
-for probN = 1:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
-    hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
-end
-% line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
-% line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-% line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-legend([p{1}, p{2}, p{3}, p{4}, p{5}], {'10', '30', '50', '70', '90'}, 'Location', 'NorthWest')
-title('standard trials')
-xlabel('Time (ms)')
-ylabel('Horizontal velocity (deg/s)')
-xlim([-500 700])
-ylim(yStandardRange)
-box off
-
-subplot(2, 1, 2)
-for probN = 1:size(probCons, 2)
-    plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
-    hold on
-    p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
-end
-% line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
-% line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-% line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-legend([p{1}, p{2}, p{3}, p{4}, p{5}], {'10', '30', '50', '70', '90'}, 'Location', 'NorthWest')
-title('perceptual trials')
-xlabel('Time (ms)')
-ylabel('Horizontal velocity (deg/s)')
-xlim([-500 700])
-ylim(yPerceptRange)
-box off
-saveas(gca, ['velocityAllProbs_all.pdf'])
+% figure 
+% subplot(2, 1, 1)
+% for probN = 1:size(probCons, 2)
+%     plot(timePoints, velMean{probN}.leftStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+%     hold on
+%     p{probN} = plot(timePoints, velMean{probN}.rightStandard, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+% end
+% % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% % line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% legend([p{1}, p{2}, p{3}, p{4}, p{5}], {'10', '30', '50', '70', '90'}, 'Location', 'NorthWest')
+% title('standard trials')
+% xlabel('Time (ms)')
+% ylabel('Horizontal velocity (deg/s)')
+% xlim([-500 700])
+% ylim(yStandardRange)
+% box off
+% 
+% subplot(2, 1, 2)
+% for probN = 1:size(probCons, 2)
+%     plot(timePoints, velMean{probN}.leftPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+%     hold on
+%     p{probN} = plot(timePoints, velMean{probN}.rightPerceptual, 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+% end
+% % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% % line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% legend([p{1}, p{2}, p{3}, p{4}, p{5}], {'10', '30', '50', '70', '90'}, 'Location', 'NorthWest')
+% title('perceptual trials')
+% xlabel('Time (ms)')
+% ylabel('Horizontal velocity (deg/s)')
+% xlim([-500 700])
+% ylim(yPerceptRange)
+% box off
+% saveas(gca, ['velocityAllProbs_all_set' num2str(setN) '.pdf'])
 
 %% generate csv files, each file for one probability condition
 % % each row is the mean velocity trace of one participant

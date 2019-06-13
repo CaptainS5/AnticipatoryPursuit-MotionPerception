@@ -2,7 +2,11 @@
 
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
+nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
+nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
+setN = 1; % choose which set to analyze
+names = nameSets{setN};
+
 sampleRate = 1000;
 
 analysisFolder = pwd;
@@ -18,8 +22,14 @@ perceptFolder = pwd;
 cd ..
 cd('velocityTraces')
 velTraceFolder = pwd;
+cd ..
+cd('correlationPlots')
+correlationFolder = pwd;
+cd ..
+cd('mausAnalysis')
+mausFolder = pwd;
 cd(analysisFolder)
-load(['eyeTrialData_all.mat']);
+load(['eyeTrialData_all_set' num2str(setN) '.mat']);
 
 probCons = [10 30 50 70 90];
 probNames{1} = {'10', '30', '50'};

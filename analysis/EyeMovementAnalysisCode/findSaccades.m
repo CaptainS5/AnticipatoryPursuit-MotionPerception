@@ -115,19 +115,23 @@ for i = 1:length(speedOnsets)
     % otherwise, skip this saccade
     if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) ...
             || isempty(find(accelerationAbs(speedOnsets(i):speedOffsets(i))==0))...
-            || speedOnsets(i) < min(accelerationThres) || speedOffsets(i) > max(accelerationThres) ...
+            || speedOnsets(i) < min(accelerationThres) ...
+            % || speedOffsets(i) > max(accelerationThres) ...
 %             || max(abs(jerk(speedOnsets(i):speedOffsets(i))))<30000
         continue
     end
     
     if accelerationAbs(speedOffsets(i))==1 && accelerationAbs(speedOnsets(i))==1 % saccade is included in between
-        onsets(i) = min(accelerationThres(accelerationThres > speedOnsets(i)));
-        offsets(i) = max(accelerationThres(accelerationThres < speedOffsets(i)));
+        idx = find(accelerationAbs==0);
+        idx(idx<speedOnsets(i) | idx>speedOffsets(i))=[];
+        onsets(i) = min(idx);
+        offsets(i) = max(idx);
     elseif accelerationAbs(speedOffsets(i))==1 % if offset is too far, which could happen during initiation phase
         onsets(i) = max(accelerationThres(accelerationThres <= speedOnsets(i)));
         offsets(i) = min(accelerationThres(accelerationThres > onsets(i)));
     else % otherwise locate saccade offset first, which is usually more accurate
-        offsets(i) = min(accelerationThres(accelerationThres >= speedOffsets(i)));
+        offsets(i) = min([accelerationThres(accelerationThres >= speedOffsets(i)); ...
+            endFrame]);
         onsets(i) = max(accelerationThres(accelerationThres < offsets(i)));
     end
     % for saccades that are really close, separate...
@@ -147,6 +151,9 @@ for i = 1:length(speedOnsets)
         onsets(i) = NaN;
         offsets(i) = NaN;
     elseif max(abs(jerk(onsets(i):offsets(i))))<30000
+        onsets(i) = NaN;
+        offsets(i) = NaN;
+    elseif i>1 && onsets(i)<offsets(i-1)
         onsets(i) = NaN;
         offsets(i) = NaN;
     end

@@ -19,6 +19,7 @@ positiveAPwindow = trial.timeWindow.APpositive;
 % calculate AP...
 pursuit.APvelocity = nanmean(sqrt( trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 + trial.DY_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)).^2 ));
 pursuit.APvelocityX = nanmean(trial.DX_noSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
+pursuit.APvelocityX_interpol = nanmean(trial.DX_interpolSac((trial.stim_onset+negativeAPwindow):(trial.stim_onset+positiveAPwindow)));
 
 % define the window you want to analyze open-loop pursuit in
 openLoopLength = trial.timeWindow.openLoopDuration;
