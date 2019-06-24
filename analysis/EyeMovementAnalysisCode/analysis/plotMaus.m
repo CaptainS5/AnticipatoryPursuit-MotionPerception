@@ -3,16 +3,18 @@ initializeParas;
 initializePSE;
 
 wMax = 50; % largest window size, how many trials before
-binMax = 3; % number of bins
-binLegend = {'perceived lefter' 'medium' 'perceived righter'};
+binMax = 5; % number of bins
+% binLegend = {'perceived leftmost' 'medium' 'perceived rightmost'};
+% binLegend = {'perceived leftmost' 'less lefter' 'medium' 'less righter' 'perceived rightmost'};
+binLegend = {'visual leftmost' 'medium' 'visual rightmost'};
+binLegend = {'visual leftmost' 'less lefter' 'medium' 'less righter' 'visual rightmost'};
 aveWinP = zeros(wMax, 1); % whether to plot the average perceptual psychometric function plot of this window size
-% aveWinP(1) = 1;
 aveWinP(15) = 1;
-aveWinP(40) = 1;% change the ones you want to plot to 1
-aveWinAP = zeros(wMax, 1);; % whether to plot the average AP psychometric function plot of this window size
+% aveWinP(40) = 1;% change the ones you want to plot to 1
+aveWinAP = zeros(wMax, 1); % whether to plot the average AP psychometric function plot of this window size
 aveWinAP(2) = 1; % change the ones you want to plot to 1
-aveWinAP(15) = 1; % change the ones you want to plot to 1
-perceptPlots = 0;
+% aveWinAP(15) = 1; % change the ones you want to plot to 1
+perceptPlots = 1;
 APplots = 1;
 
 cohLevels = unique(eyeTrialData.coh(1, eyeTrialData.trialType(1, :)==0))';
@@ -30,14 +32,30 @@ if perceptPlots==1
                 binMaxTemp = binMax;
             end
             
-            %% plot the average psychometric functions
+            %% plot the average psychometric functions in each bin
             for probNmerged = 1:3
                 clear f
                 figure
                 hold on
                 for binN = 1:binMaxTemp
-                    numRight = mean(dataM.percept.numRight{windowSize, probNmerged}{binN})'; % choice 1=right, 0=left
-                    outOfNum = mean(dataM.percept.outOfNum{windowSize, probNmerged}{binN})'; % total trial numbers
+                    % this is when all coh levels have data, which may not
+                    % be true if we have many bins
+                    %                     numRight = mean(dataM.percept.numRight{windowSize, probNmerged}{binN})'; % choice 1=right, 0=left
+                    %                     outOfNum = mean(dataM.percept.outOfNum{windowSize, probNmerged}{binN})'; % total trial numbers
+                    
+                    % get the mean proportion right for each coherence
+                    % level...
+                    probTemp = NaN(size(names, 2), length(cohLevels));
+                    for subN = 1:size(names, 2)
+                        for cohSub = 1:length(dataM.percept.cohLevels{windowSize, probNmerged}{binN, subN})
+                            cohI = find(cohLevels==dataM.percept.cohLevels{windowSize, probNmerged}{binN, subN}(cohSub));
+                            if ~isempty(cohI)
+                                probTemp(subN, cohI) = dataM.percept.ProportionCorrectObserved{windowSize, probNmerged}{binN, subN}(cohSub);
+                            end
+                        end
+                    end
+                    outOfNum = 100*ones(size(cohLevels));
+                    numRight = nanmean(probTemp)'.*outOfNum;
                     
                     %Perform fit
                     [paramsValuesAll LL exitflag] ...
@@ -45,11 +63,11 @@ if perceptPlots==1
                         outOfNum, searchGrid, paramsFree, PF);
                     
                     % plotting
-                    ProportionCorrectObserved = numRight./outOfNum;
+                    ProportionCorrectObserved{probNmerged, binN} = numRight./outOfNum;
                     StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
                     ProportionCorrectModel = PF(paramsValuesAll,StimLevelsFineGrain);
-                    f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', (binN-1)/binMax*ones(1, 3), 'linewidth', 2);
-                    plot(cohLevels, ProportionCorrectObserved,'.', 'color', (binN-1)/binMax*ones(1, 3), 'markersize', 30);
+                    f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', (binN-1)/binMaxTemp*ones(1, 3), 'linewidth', 2);
+                    plot(cohLevels, ProportionCorrectObserved{probNmerged, binN},'.', 'color', (binN-1)/binMaxTemp*ones(1, 3), 'markersize', 30);
                 end
                 set(gca, 'fontsize',16);
                 set(gca, 'Xtick',cohLevels);
@@ -59,7 +77,7 @@ if perceptPlots==1
                 ylabel('Proportion right (perception)');
                 legend([f{:}], binLegend, ...
                     'box', 'off', 'location', 'northwest')
-                saveas(gcf, ['pf_merged' probNames{2}{probNmerged} '_average_' num2str(windowSize) 'trials.pdf'])
+                saveas(gcf, ['pf_merged' probNames{2}{probNmerged} '_binMax' num2str(binMax) '_average' num2str(windowSize) 'trials.pdf'])
             end
             
             %% plot PSE vs previous directions
@@ -77,9 +95,33 @@ if perceptPlots==1
                 title([probNames{2}(probNmerged)])
                 xlabel('Previous perceived direction')
                 ylabel('PSE')
-                saveas(gcf, ['PSEvsPreviousD_merged' probNames{2}{probNmerged} '_' num2str(windowSize) 'trials.pdf'])
+                saveas(gcf, ['PSEvsPreviousD_merged' probNames{2}{probNmerged} '_binMax' num2str(binMax) '_' num2str(windowSize) 'trials.pdf'])
             end
             
+            %% plot the fit to all data with data points of each bin...
+            for probNmerged=1:3
+                figure
+                hold on
+                % fit to all data
+                StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+                ProportionCorrectModel = PF(dataM.percept.paramsValuesAll{probNmerged},StimLevelsFineGrain);
+                plot(StimLevelsFineGrain, ProportionCorrectModel, '-b', 'linewidth', 2);
+                
+                % data points of each bin
+                for binN = 1:binMaxTemp
+                    f{binN} = plot(cohLevels, ProportionCorrectObserved{probNmerged, binN},'.', 'color', (binN-1)/binMaxTemp*ones(1, 3), 'markersize', 30);
+                end
+                set(gca, 'fontsize',16);
+                set(gca, 'Xtick',cohLevels);
+                axis([min(cohLevels) max(cohLevels) 0 1]);
+                title([probNames{2}{probNmerged} ', ' num2str(windowSize) ' trials'])
+                xlabel('Stimulus Intensity');
+                ylabel('Proportion right (perception)');
+                legend([f{:}], binLegend, ...
+                    'box', 'off', 'location', 'northwest')
+                saveas(gcf, ['pfFitAll_merged' probNames{2}{probNmerged} '_binMax' num2str(binMax) '_average' num2str(windowSize) 'trials.pdf'])
+            end
+        
             %% plot residuals vs previous directions
             clear s
             for probNmerged = 1:3
@@ -99,7 +141,7 @@ if perceptPlots==1
                 end
                 xlabel('Previous perceived direction')
                 ylabel('Perceptual residuals')
-                saveas(gcf, ['PerceptResidualsVSpreviousD_merged' probNames{2}{probNmerged} '_' num2str(windowSize) 'trials.pdf'])
+                saveas(gcf, ['PerceptResidualsVSpreviousD_merged' probNames{2}{probNmerged} '_binMax' num2str(binMax) '_' num2str(windowSize) 'trials.pdf'])
             end
         end
     end
@@ -112,7 +154,7 @@ if perceptPlots==1
     legend(probNames{2}, 'box', 'off', 'location', 'best')
     xlabel('Trial history length')
     ylabel('Correlation (perception residuals)')
-    saveas(gcf, ['correlationVStrialHistoryLength_perception.pdf'])
+    saveas(gcf, ['correlationVStrialHistoryLength_perception_binMax' num2str(binMax) '.pdf'])
 end
 close all
 
@@ -120,7 +162,7 @@ close all
 if APplots==1
     cd(mausFolder)
     % for plotting velocity traces
-    yPerceptRange = [-7 7];
+    yPerceptRange = [-6 6];
     
     for windowSize = 1:wMax
         if aveWinAP(windowSize)==1
@@ -227,20 +269,21 @@ if APplots==1
                 hold on
                 for binN = 1:binMaxTemp
                     velMean{probNmerged}{binN} = nanmean(meanVelMerged{probNmerged}{binN}(:, (maxFrameLength-minFrameLength+1):end), 1);
-                    p{binN} = plot(timePoints, velMean{probNmerged}{binN}, 'color', (binN-1)/binMax*ones(1, 3)); %, 'LineWidth', 1);
+                    p{binN} = plot(timePoints, velMean{probNmerged}{binN}, 'color', (binN-1)/binMaxTemp*ones(1, 3)); %, 'LineWidth', 1);
                 end
                 if probNmerged==1
                     legend([p{:}], binLegend, 'Location', 'NorthWest')
                 end
                 title([probNames{2}{probNmerged} ', ' num2str(windowSize) ' trials'])
+                xlim([-200 200])
                 xlabel('Time (ms)')
                 ylabel('Horizontal velocity (deg/s)')
-                xlim([-500 700])
-                ylim(yPerceptRange)
+%                 xlim([-500 700])
+                ylim([-4 4])
                 box off
             end
             
-            saveas(gca, ['velocityAllProbs_allSet' num2str(setN) '_' num2str(windowSize) 'trials.pdf'])
+            saveas(gca, ['velocityAllProbs_allSet' num2str(setN) '_binMax' num2str(binMax) '_' num2str(windowSize) 'trials.pdf'])
             
             % plot proportion right vs previous directions
             clear s
@@ -263,7 +306,7 @@ if APplots==1
                 end
                 xlabel('Previous perceived direction')
                 ylabel('AP velocity proportion of right trials')
-                saveas(gcf, ['APbinaryVSpreviousD_merged' probNames{2}{probNmerged} '_' num2str(windowSize) 'trials.pdf'])
+                saveas(gcf, ['APbinaryVSpreviousD_merged' probNames{2}{probNmerged} '_binMax' num2str(binMax) '_' num2str(windowSize) 'trials.pdf'])
             end
         end
     end
@@ -275,6 +318,6 @@ if APplots==1
     end
     legend(probNames{2}, 'box', 'off', 'location', 'best')
     xlabel('Trial history length')
-    ylabel('Correlation (perception residuals)')
-    saveas(gcf, ['correlationVStrialHistoryLength_AP.pdf'])
+    ylabel('Correlation (AP binary)')
+    saveas(gcf, ['correlationVStrialHistoryLength_AP_binMax' num2str(binMax) '.pdf'])
 end
