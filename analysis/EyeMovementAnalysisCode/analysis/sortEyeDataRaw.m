@@ -98,33 +98,33 @@ for setN = 1:length(subStartI)
                 %             eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X.onsets_pursuit;
                 %             eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X.offsets_pursuit;
                 %
-                % only check for forward saccades
-                if trial. log.rdkDir>0 || (trial.log.rdkDir==0 && trial.pursuit.closedLoopMeanVelX>=0)% first use rdk dir to judge, then see pursuit; trial.pursuit.closedLoopMeanVelX>=0 % right ward pursuit
-                    eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X_right.number;
-                    eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X_right.meanAmplitude;
+                % record saccades in both directions...
+%                 if trial. log.rdkDir>0 || (trial.log.rdkDir==0 && trial.pursuit.closedLoopMeanVelX>=0)% first use rdk dir to judge, then see pursuit; trial.pursuit.closedLoopMeanVelX>=0 % right ward pursuit
+                    eyeTrialData.saccades.X_right.number(subN, currentTrial) = trial.saccades.X_right.number;
+                    eyeTrialData.saccades.X_right.meanAmplitude(subN, currentTrial) = trial.saccades.X_right.meanAmplitude;
                     %                 eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = trial.saccades.X_right.maxAmplitude;
-                    eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = trial.saccades.X_right.meanDuration;
-                    eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = trial.saccades.X_right.sumAmplitude;
+                    eyeTrialData.saccades.X_right.meanDuration(subN, currentTrial) = trial.saccades.X_right.meanDuration;
+                    eyeTrialData.saccades.X_right.sumAmplitude(subN, currentTrial) = trial.saccades.X_right.sumAmplitude;
                     %                 eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = trial.saccades.X_right.peakVelocity;
                     %                 eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = trial.saccades.X_right.meanVelocity;
-                    eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X_right.onsets_pursuit;
-                    eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X_right.offsets_pursuit;
-                elseif trial. log.rdkDir<0 || (trial.log.rdkDir==0 && trial.pursuit.closedLoopMeanVelX<0)
-                    eyeTrialData.saccades.X.number(subN, currentTrial) = trial.saccades.X_left.number;
-                    eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = trial.saccades.X_left.meanAmplitude;
+                    eyeTrialData.saccades.X_right.onsets_pursuit{subN, currentTrial} = trial.saccades.X_right.onsets_pursuit;
+                    eyeTrialData.saccades.X_right.offsets_pursuit{subN, currentTrial} = trial.saccades.X_right.offsets_pursuit;
+%                 elseif trial. log.rdkDir<0 || (trial.log.rdkDir==0 && trial.pursuit.closedLoopMeanVelX<0)
+                    eyeTrialData.saccades.X_left.number(subN, currentTrial) = trial.saccades.X_left.number;
+                    eyeTrialData.saccades.X_left.meanAmplitude(subN, currentTrial) = trial.saccades.X_left.meanAmplitude;
                     %                 eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = trial.saccades.X_left.maxAmplitude;
-                    eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = trial.saccades.X_left.meanDuration;
-                    eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = trial.saccades.X_left.sumAmplitude;
+                    eyeTrialData.saccades.X_left.meanDuration(subN, currentTrial) = trial.saccades.X_left.meanDuration;
+                    eyeTrialData.saccades.X_left.sumAmplitude(subN, currentTrial) = trial.saccades.X_left.sumAmplitude;
                     %                 eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = trial.saccades.X_left.peakVelocity;
                     %                 eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = trial.saccades.X_left.meanVelocity;
-                    eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = trial.saccades.X_left.onsets_pursuit;
-                    eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = trial.saccades.X_left.offsets_pursuit;
-                end
-                if ~isnan(eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial))
-                    eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = eyeTrialData.pursuit.gainX(subN, currentTrial)+eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial)/10;
-                else
-                    eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = eyeTrialData.pursuit.gainX(subN, currentTrial);
-                end
+                    eyeTrialData.saccades.X_left.onsets_pursuit{subN, currentTrial} = trial.saccades.X_left.onsets_pursuit;
+                    eyeTrialData.saccades.X_left.offsets_pursuit{subN, currentTrial} = trial.saccades.X_left.offsets_pursuit;
+%                 end
+%                 if ~isnan(eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial))
+%                     eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = eyeTrialData.pursuit.gainX(subN, currentTrial)+eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial)/10;
+%                 else
+%                     eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = eyeTrialData.pursuit.gainX(subN, currentTrial);
+%                 end
                 
                 eyeTrialDataSub.trial{1, currentTrial}.eyeX_filt = trial.eyeX_filt; % for velocity traces
                 eyeTrialDataSub.trial{1, currentTrial}.eyeY_filt = trial.eyeY_filt;
@@ -158,18 +158,28 @@ for setN = 1:length(subStartI)
                 eyeTrialData.pursuit.closedLoopMeanVelX(subN, currentTrial) = NaN;
                 eyeTrialData.pursuit.gainX(subN, currentTrial) = NaN;
                 eyeTrialData.pursuit.gainX_interpol(subN, currentTrial) = NaN;
-                eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = NaN;
+%                 eyeTrialData.pursuit.gainSacSumAmpX(subN, currentTrial) = NaN;
                 eyeTrialData.pursuit.initialVelChangeX(subN, currentTrial) = NaN;
                 
-                eyeTrialData.saccades.X.number(subN, currentTrial) = NaN;
-                eyeTrialData.saccades.X.meanAmplitude(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_right.number(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_right.meanAmplitude(subN, currentTrial) = NaN;
                 %             eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = NaN;
-                eyeTrialData.saccades.X.meanDuration(subN, currentTrial) = NaN;
-                eyeTrialData.saccades.X.sumAmplitude(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_right.meanDuration(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_right.sumAmplitude(subN, currentTrial) = NaN;
                 %             eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = NaN;
                 %             eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = NaN;
-                eyeTrialData.saccades.X.onsets_pursuit{subN, currentTrial} = NaN;
-                eyeTrialData.saccades.X.offsets_pursuit{subN, currentTrial} = NaN;
+                eyeTrialData.saccades.X_right.onsets_pursuit{subN, currentTrial} = NaN;
+                eyeTrialData.saccades.X_right.offsets_pursuit{subN, currentTrial} = NaN;
+                
+                eyeTrialData.saccades.X_left.number(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_left.meanAmplitude(subN, currentTrial) = NaN;
+                %             eyeTrialData.saccades.X.maxAmplitude(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_left.meanDuration(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_left.sumAmplitude(subN, currentTrial) = NaN;
+                %             eyeTrialData.saccades.X.peakVelocity(subN, currentTrial) = NaN;
+                %             eyeTrialData.saccades.X.meanVelocity(subN, currentTrial) = NaN;
+                eyeTrialData.saccades.X_left.onsets_pursuit{subN, currentTrial} = NaN;
+                eyeTrialData.saccades.X_left.offsets_pursuit{subN, currentTrial} = NaN;
                 
                 eyeTrialDataSub.trial{1, currentTrial} = NaN; % for velocity traces
             end

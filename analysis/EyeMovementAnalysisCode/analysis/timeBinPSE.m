@@ -1,7 +1,6 @@
-% to quickly check the relative motion hypothesis
-% separate trials into two bins: lower AP trials, and higher AP trials
-% if relative motion during AP plays a role, we may expect different
-% psychometric functions of the two bins of trials
+% to quickly check the evolution of perception
+% separate perceptual trials into two bins: early trials, and later trials
+% then fit the psychometric functions of the two bins of trials
 initializeParas;
 initializePSE;
 
@@ -28,45 +27,15 @@ for subN = 1:length(names)
     end
     dataPercept.probSub(subN, 1:length(probSub)) = probSub;
     
-    % plot the AP velocity distribution as a sanity check
 %     figure
+%     hold on
     for probSubN = 1:size(probSub, 2)
         idxP = find(eyeTrialData.trialType(subN, :)==0 & eyeTrialData.errorStatus(subN, :)==0 ...
-            & eyeTrialData.prob(subN, :)==probSub(probSubN) & ~isnan(eyeTrialData.pursuit.APvelocityX_interpol(subN, :))); % perceptual trials
-        % first, as a sanity check, later to plot the distribution of AP 
-        % to see if the separation of bins is meaningful--if AP velocities 
-        % are fairly wide-spread
-        apDis{subN, probSubN} = eyeTrialData.pursuit.APvelocityX_interpol(subN, idxP);
-        % and get median to split the bins later
-        medianAP{subN, probSubN} = median(eyeTrialData.pursuit.APvelocityX_interpol(subN, idxP));
+            & eyeTrialData.prob(subN, :)==probSub(probSubN)); % perceptual trials
+        halfN = round(length(idxP)/2);
+        idxT{1} = idxP(1:halfN); % the first half
+        idxT{2} = idxP(halfN+1:end); % the second half
         
-        % figure out the direction of trials included...
-        idxL = find(eyeTrialData.trialType(subN, :)==0 & ( eyeTrialData.errorStatus(subN, :)~=0 ...
-            | isnan(eyeTrialData.pursuit.APvelocityX_interpol(subN, :)) )...
-            & eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.rdkDir < 0); % left trials excluded
-        idxR = find(eyeTrialData.trialType(subN, :)==0 & ( eyeTrialData.errorStatus(subN, :)~=0 ...
-            | isnan(eyeTrialData.pursuit.APvelocityX_interpol(subN, :)) )...
-            & eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.rdkDir > 0); % right trials excluded
-        
-%         subplot(3, 1, probSubN)
-%         histogram(apDis{subN, probSubN}, 'NumBins', 30, 'normalization', 'probability')
-%         hold on
-%         line([medianAP{subN, probSubN} medianAP{subN, probSubN}], [0 0.2], 'color', 'r')
-%         ylabel('AP velocity X interpolated')
-%         title([num2str(probSub(probSubN)) ' left ' num2str(length(idxL)) ' out, right ' num2str(length(idxR)) ' out'])
-    end
-%     saveas(gcf, ['apVelXinterpol_histogram_', names{subN}, '.pdf'])
-    
-    figure
-    hold on
-    for probSubN = 1:size(probSub, 2)
-            idxT{1} = find(eyeTrialData.trialType(subN, :)==0 & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.prob(subN, :)==probSub(probSubN) & ~isnan(eyeTrialData.pursuit.APvelocityX_interpol(subN, :)) ...
-                & eyeTrialData.pursuit.APvelocityX_interpol(subN, :) <= medianAP{subN, probSubN}); % ap < median
-            idxT{2} = find(eyeTrialData.trialType(subN, :)==0 & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.prob(subN, :)==probSub(probSubN) & ~isnan(eyeTrialData.pursuit.APvelocityX_interpol(subN, :)) ...
-                & eyeTrialData.pursuit.APvelocityX_interpol(subN, :) > medianAP{subN, probSubN}); % ap > median
-                
         % then fit the psychometric curves for each bin
         for binN = 1:2
             data.cohFit = eyeTrialData.coh(subN, idxT{binN})';
@@ -92,12 +61,12 @@ for subN = 1:length(names)
             ProportionCorrectObserved=numRight{probN, binN}(subN, :)./outOfNum{probN, binN}(subN, :);
             StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
             ProportionCorrectModel = PF(paramsValues{subN, probSubN}{binN},StimLevelsFineGrain);
-            if binN==1
-                plot(StimLevelsFineGrain, ProportionCorrectModel,'--','color', colorProb(probN, :), 'linewidth', 2);
-            else
-                f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
-            end
-            plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
+%             if binN==1
+%                 plot(StimLevelsFineGrain, ProportionCorrectModel,'--','color', colorProb(probN, :), 'linewidth', 2);
+%             else
+%                 f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
+%             end
+%             plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
             
             % saving parameters
             if probSub(1)<50
@@ -110,19 +79,19 @@ for subN = 1:length(names)
             dataPercept.gamma{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(3); % guess rate, or baseline
             dataPercept.lambda{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(4); % lapse rate
         end
-        set(gca, 'fontsize',16);
-        set(gca, 'Xtick',cohLevels);
-        axis([min(cohLevels) max(cohLevels) 0 1]);
-        title(['slower (dashed) vs faster (solid) AP trials'])
-        xlabel('Stimulus Intensity');
-        ylabel('Proportion right');
-        legend([f{:}], probNames{probNameI}, 'box', 'off', 'location', 'northwest')
-        
-        cd(perceptFolder)
-        saveas(gcf, ['pf_APbins_', names{subN}, '.pdf'])
+%         set(gca, 'fontsize',16);
+%         set(gca, 'Xtick',cohLevels);
+%         axis([min(cohLevels) max(cohLevels) 0 1]);
+%         title(['First half (dashed) vs second half (solid) perceptual trials'])
+%         xlabel('Stimulus Intensity');
+%         ylabel('Proportion right');
+%         legend([f{:}], probNames{probNameI}, 'box', 'off', 'location', 'northwest')
+%         
+%         cd(perceptFolder)
+%         saveas(gcf, ['pf_timeBins_', names{subN}, '.pdf'])
     end
 end
-save('dataPercept_APbins', 'dataPercept');
+save('dataPercept_timeBins', 'dataPercept');
 
 %% plot bars of the difference between the two bins in each probability
 % diffMean = mean(dataPercept.alpha{2}-dataPercept.alpha{1});
@@ -131,18 +100,18 @@ save('dataPercept_APbins', 'dataPercept');
 % figure
 % boxplot(dataPercept.alpha{2}-dataPercept.alpha{1}, 'Labels', {'50','70','90'})
 % xlabel('Probability of right');
-% ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
+% ylabel('Second half trials-first half trials PSE (right is positive)');
 % cd(perceptFolder)
-% saveas(gcf, ['PSE_APbins_box.pdf'])
+% saveas(gcf, ['PSE_timeBins_box.pdf'])
 % 
 % % bar plot
 % errorbar_groups(diffMean, diffSte,  ...
 %     'bar_width',0.75,'errorbar_width',0.5, ...
 %     'bar_names',{'50','70','90'})
 % xlabel('Probability of right');
-% ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
+% ylabel('Second half trials-first half trials PSE (right is positive)');
 % cd(perceptFolder)
-% saveas(gcf, ['PSE_APbins_bar.pdf'])
+% saveas(gcf, ['PSE_timeBins_bar.pdf'])
 
 %% save csv for ANOVA
 cd(analysisFolder)
@@ -157,26 +126,25 @@ for subN = 1:length(names)
         for binN = 1:2
             data.sub(count, 1) = subN;
             data.prob(count, 1) = probCons(probNmerged+2);
-            data.relativeMotion(count, 1) = binN;
+            data.timeBin(count, 1) = binN;
             data.PSE(count, 1) = dataPercept.alpha{binN}(subN, probNmerged);
             data.slope(count, 1) = dataPercept.beta{binN}(subN, probNmerged);
             count = count+1;
         end
     end
 end
-writetable(data, 'relativeMotionPSE.csv')
-
+writetable(data, 'earlyLatePSE.csv')
 
 data = table();
 count = 1;
 for subN = 1:length(names)
     for probNmerged = 1:3
+        for binN = 1:2
             data.sub(count, 1) = subN;
             data.prob(count, 1) = probCons(probNmerged+2);
-%             data.relativeMotion(count, 1) = binN;
             data.PSEDiff(count, 1) = dataPercept.alpha{2}(subN, probNmerged)-dataPercept.alpha{1}(subN, probNmerged);
-%             data.slope(count, 1) = dataPercept.beta{binN}(subN, probNmerged);
             count = count+1;
+        end
     end
 end
-writetable(data, 'relativeMotionPSEDiff.csv')
+writetable(data, 'earlyLatePSEDiff.csv')

@@ -28,6 +28,9 @@ correlationFolder = pwd;
 cd ..
 cd('mausAnalysis')
 mausFolder = pwd;
+cd ..
+cd('slidingWindows')
+slidingWFolder = pwd;
 cd(analysisFolder)
 load(['eyeTrialData_all_set' num2str(setN) '.mat']);
 
@@ -39,4 +42,5 @@ dirCons = [-1 1]; % -1=left, 1=right
 dirNames = {'left' 'right'};
 
 % for plotting
-colorProb = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+% colorProb = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
