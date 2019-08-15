@@ -26,7 +26,7 @@ try
         info = getInfo(currentBlock);
         runExp(); % baseline: block 0; experiment: block 1
         currentBlock = currentBlock+1;
-        if currentBlock>3
+        if currentBlock>2
             break
         end
     end

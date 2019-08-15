@@ -21,7 +21,7 @@ prm.screen.waitFrames = 1; % for display timing; flip every n frames
 % prm.screen.backgroundColour = []; % background, currently set in openScreen
 
 % probability conditions
-prm.probCons = [50 30 10];
+prm.probCons = [50 90];
 % prm.probCons = [50 70 90];
 % will be randomized and saved for each participant when running the first block
 

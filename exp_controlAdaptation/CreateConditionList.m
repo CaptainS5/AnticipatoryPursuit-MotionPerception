@@ -7,7 +7,7 @@ cohLevelsTest = [0]; % dot coherence level [0...1]; probability of directions al
 cohLevelsStandard = [0.20 0.30]; % probability of directions changes across blocks
 trialsPerCohLevelTest =  [50]; % number of test trials per coherence level per direction
 trialsPerCohLevelStandard = [200 200]; % number of standard trials per coh level, all directions
-rightProbability = 90/100; %probability of rightward movement for standard stimulus
+rightProbability = 50/100; %probability of rightward movement for standard stimulus
 firstTrialN = 50; % the first n trials that should all be standard trials, 50
 varNames = {'coh', 'rdkDir', 'trialType'}; % 1-R, 2-L
 

@@ -19,7 +19,7 @@ try
     cd('data\') 
     prm.resultPath = pwd;
     cd ..
-    cd('exp\')
+    cd('exp_controlAdaptation\')
     prm.expPath = pwd;
     
     while(true)
