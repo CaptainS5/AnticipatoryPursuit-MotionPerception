@@ -21,10 +21,10 @@ sacStart = 10; % from the n_th parameter is saccade
 allLength = 682; % length of all trials in one block
 sLength = 500; % length of standard trials in one block
 pLength = 182; % length of perceptual trials in one block
-trialBin = 50; % window of trial numbers
+trialBin = 30; % window of trial numbers
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
@@ -50,7 +50,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:3%size(checkParas, 2) % automatically loop through the parameters
+    for paraN = 1:2%size(checkParas, 2) % automatically loop through the parameters
         yValuesAll{paraN, subN} = NaN(size(probSub, 2), allLength-trialBin+1);
         yValuesS{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
         yValuesSL{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
@@ -186,28 +186,29 @@ for subN = 1:size(names, 2)
                 title(names{subN})
                 saveas(gca, [pdfNames{paraN}, '_standardTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
                 
-                % all trials
-                if ~strcmp(checkParas{paraN}, 'choice')
-                    figure
-                    for probSubN = 1:size(probSub, 2)
-                        probN = find(probCons==probSub(probSubN));
-                        plot(yValuesAll{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
-                        hold on
-                    end
-                    legend(probNames{probNameI}, 'box', 'off')
-                    xlabel('Trial bin number')
-                    ylabel(yLabels{paraN})
-                    title(names{subN})
-                    saveas(gca, [pdfNames{paraN}, '_allTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
-                end
+%                 % all trials
+%                 if ~strcmp(checkParas{paraN}, 'choice')
+%                     figure
+%                     for probSubN = 1:size(probSub, 2)
+%                         probN = find(probCons==probSub(probSubN));
+%                         plot(yValuesAll{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
+%                         hold on
+%                     end
+%                     legend(probNames{probNameI}, 'box', 'off')
+%                     xlabel('Trial bin number')
+%                     ylabel(yLabels{paraN})
+%                     title(names{subN})
+%                     saveas(gca, [pdfNames{paraN}, '_allTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+%                 end
             end
         end
     end
 end
 
 %% grouped values for sliding window...
+close all
 if averagedPlots==1
-    for paraN = 1:3%sacStart-1%size(checkParas, 2)
+    for paraN = 1:2%sacStart-1%size(checkParas, 2)
         for probNmerged= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probNmerged} = NaN(size(names, 2), pLength-trialBin+1);
@@ -308,18 +309,18 @@ if averagedPlots==1
         
         
 %         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
-%             % standard trials, merged
-%             figure
-%             for probNmerged = 1:3 % merged prob
-%                 plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
-%                 hold on
-%             end
-%             legend({'50' '70' '90'}, 'box', 'off')
-%             title('standard trials')
-%             xlabel('Trial bin number')
-%             ylabel(yLabels{paraN})
-%             saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
-%             %         end
+            % standard trials, merged
+            figure
+            for probNmerged = 1:3 % merged prob
+                plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+                hold on
+            end
+            legend({'50' '70' '90'}, 'box', 'off')
+            title('standard trials')
+            xlabel('Trial bin number')
+            ylabel(yLabels{paraN})
+            saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
+            %         end
             
             % %         % standard trials, not merged
             % %         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')

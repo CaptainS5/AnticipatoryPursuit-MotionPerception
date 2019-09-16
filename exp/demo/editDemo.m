@@ -4,7 +4,7 @@ clc; clear; close all
 % creat movie demo
 % frames{1} = imread('fixation.jpg');
 
-cd('Brownian motion\0.24_0.16_0.08')
+cd('Exp1testTrial')
 files = dir('frame*.jpg');
 for ii = 1:length(files)
     temp = imread(['frame', num2str(ii), '.jpg']);
@@ -17,7 +17,7 @@ end
 % frame5--start of RDK
 
 % create the video writer with 1 fps
-writerObj = VideoWriter('demoTrials_Brownian_24_16_08.avi');
+writerObj = VideoWriter('demoTrials_Exp1.avi');
 writerObj.FrameRate = 85;
 % open the video writer
 open(writerObj);

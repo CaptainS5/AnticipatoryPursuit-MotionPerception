@@ -1,4 +1,3 @@
-
 function setParameters
 % define all paramters used in the exp
 
@@ -21,8 +20,8 @@ prm.screen.waitFrames = 1; % for display timing; flip every n frames
 % prm.screen.backgroundColour = []; % background, currently set in openScreen
 
 % probability conditions
+prm.probCons = [50 10];
 prm.probCons = [50 90];
-% prm.probCons = [50 10];
 % will be randomized and saved for each participant when running the first block
 
 % fixation
@@ -37,7 +36,8 @@ prm.fixation.durationJitter = 0.3;
 prm.gap.duration = 0.3;
 
 % RDK stimulus
-prm.rdk.duration = 0.7; % display duration of the whole RDK
+prm.rdk.durationContext = 0.7; % display duration of the whole RDK
+prm.rdk.durationPerceptual = 0.1; % display duration of the whole RDK
 prm.rdk.dotDensity = 1.5; % dot per dva
 prm.rdk.lifeTime = 0.7; % noise dots change direction every new life time
 prm.rdk.labelUpdateTime = 0.05; % change labels and assign new directions for all
@@ -81,7 +81,7 @@ prm.mask.minLum = 0.3;
 % block conditions
 prm.ITI = 0.05; % inter-trial interval
 prm.reminderTrialN = 50; % progress report every N trials
-% prm.blockN = 6; % total number of blocks
+prm.blockN = 6; % total number of blocks
 
 % key bindings
 prm.stopKey = 'q';

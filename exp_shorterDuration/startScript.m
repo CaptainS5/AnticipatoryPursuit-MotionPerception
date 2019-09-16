@@ -6,7 +6,7 @@ clc; clear all; close all;
 try
     global prm info
     % set default values...
-    currentBlock = 1;
+    currentBlock = 2;
     
     addpath(genpath(pwd))
     AssertOpenGL;
@@ -19,12 +19,12 @@ try
     cd('data\') 
     prm.resultPath = pwd;
     cd ..
-    cd('exp_controlAdaptation\')
+    cd('exp_shorterDuration\')
     prm.expPath = pwd;
     
     while(true)
         info = getInfo(currentBlock);
-        runExp();
+        runExp(); % baseline: block 0; experiment: block 1
         currentBlock = currentBlock+1;
         if currentBlock>2
             break

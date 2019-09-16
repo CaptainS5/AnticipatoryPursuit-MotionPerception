@@ -25,27 +25,22 @@ gapFrames = round(sec2frm(prm.gap.duration));
 resp.gapFrames(trialN, 1) = gapFrames;
 
 % set up RDK
-trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
-resp.trialType(trialN, 1) = trialType;
-coh = list.coh(trialN, 1); % always 100% coherence, just change the moving speed
+coh = list.coh(trialN, 1);
 resp.coh(trialN, 1) = coh;
-dotSpeed = list.speed(trialN, 1); % without direction info, just speed
-if trialType==0 % adjustment of dot speed...
-    dotSpeed = 5*dotSpeed;
-end
-resp.dotSpeed(trialN, 1) = dotSpeed;
 rdkDir = list.rdkDir(trialN, 1); % -1=left, 1=right; used later for movementNextFrame, cannot be 0
-if resp.dotSpeed(trialN, 1)~=0
+if coh~=0
     resp.rdkDir(trialN, 1) = rdkDir;
 else
     resp.rdkDir(trialN, 1) = 0; % mark in the final response file that there is no direction for 0 coherence trials
 end
-rdkFrames = round(sec2frm(prm.rdk.duration));
+trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
+resp.trialType(trialN, 1) = trialType;
+if trialType==1
+    rdkFrames = round(sec2frm(prm.rdk.durationContext));
+elseif trialType==0
+    rdkFrames = round(sec2frm(prm.rdk.durationPerceptual));
+end
 resp.rdkFrames(trialN, 1) = rdkFrames;
-
-% to make sure that no dots will be out of the aperture for perceptual
-% trials (which would be an obvious cue about the motion direction)
-[maxMoveDistanceX, ] = dva2pxl(0.7*resp.dotSpeed(trialN, 1), 0.7*resp.dotSpeed(trialN, 1));
 
 [dots.diameterX, ] = dva2pxl(prm.rdk.dotRadius, prm.rdk.dotRadius);
 dots.diameterX = dots.diameterX*2;
@@ -53,11 +48,7 @@ dots.diameterX = dots.diameterX*2;
 
 % Postion dots in a circular aperture using distanceToCenter and
 % positionTheta
-if trialType==1
-    dots.distanceToCenterX{1} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
-elseif trialType==0
-    dots.distanceToCenterX{1} = (apertureRadiusX-maxMoveDistanceX) * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
-end
+dots.distanceToCenterX{1} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
 % dots.distanceToCenterX{1, trialN}(dots.distanceToCenterX{1, trialN}-dots.diameterX/2>=0, :) = dots.distanceToCenterX{1, trialN}-dots.diameterX/2; % make sure that dots do not overlap outer border
 % previously was dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0);
 % just use the aperture...
@@ -82,7 +73,7 @@ moveTheta(1:targetDotsN, 1) = 0; % assign the signal dots to be coherently movin
 moveTheta = [cos(moveTheta) sin(moveTheta)];
 % to use Brownian motion, dots.label is updated later in each frame
 
-[moveDistance, ] = dva2pxl(resp.dotSpeed(trialN, 1), resp.dotSpeed(trialN, 1));
+[moveDistance, ] = dva2pxl(prm.rdk.speed, prm.rdk.speed);
 moveDistance = repmat(moveDistance, prm.rdk.dotNumber, 1);
 dots.movementNextFrame{1} = rdkDir*moveTheta/prm.screen.refreshRate.*[moveDistance moveDistance*prm.screen.pixelRatioWidthPerHeight];
 
@@ -149,7 +140,7 @@ fixRange = [(prm.screen.center(1)-fixRangeRadiusX) (prm.screen.center(2)-fixRang
 [xSizeM ySizeM]= dva2pxl(prm.motionRange.xLength/2, prm.motionRange.yLength/2);
 motionRange = [(prm.screen.center(1)-xSizeM) (prm.screen.center(2)-ySizeM) (prm.screen.center(1)+xSizeM) (prm.screen.center(2)+ySizeM)];
 
-trialInfo = sprintf('%d %d %d', trialN+(blockN-1)*682, list.speed(trialN,1), list.rdkDir(trialN,1));
+trialInfo = sprintf('%d %d %d', trialN+(blockN-1)*682, list.coh(trialN,1), list.rdkDir(trialN,1));
 %% start display
 % blank screen
 Screen('FillRect', prm.screen.windowPtr, prm.screen.backgroundColour); % fill background
@@ -363,11 +354,6 @@ resp.rdkOffTime(trialN, 1) = rdkOffTime;
 for maskF = 1:maskFrameN
     Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
     Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
-    
-%     %% for pilot, static RDK to see if there is aftereffect...
-%      Screen('DrawDots', prm.screen.windowPtr, transpose(dots.position{1}),...
-%         dots.diameterX, prm.rdk.colour, prm.screen.center, 1);  % change 1 to 0 to draw square dots
-%     Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
     
     if demoN > 0
         imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');

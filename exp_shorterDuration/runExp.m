@@ -26,8 +26,6 @@ try
     elseif info.prob == 0  % practice trials
         load('practiceList.mat')
     elseif info.prob == -1  % test trials
-%         % for pilot
-%         load('test100List.mat')
         load('testList.mat')
     elseif info.prob == -100 % demo trials
         load('demoList.mat')

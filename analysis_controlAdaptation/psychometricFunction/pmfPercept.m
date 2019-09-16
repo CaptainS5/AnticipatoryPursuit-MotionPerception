@@ -2,15 +2,14 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
-% names = {'ct0'};
-averagedPlot = 1;
+names = {'tXW' 'tDC'};
+averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
 probCons = [10; 30; 50; 70; 90];
-probNames{1} = {'Prob 10%' 'Prob 30%' 'Prob 50%'};
-probNames{2} = {'Prob 50%' 'Prob 70%' 'Prob 90%'};
+probNames{1} = {'Prob 10%' 'Prob 50%'};
+probNames{2} = {'Prob 50%' 'Prob 90%'};
 colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 % fitting settings
@@ -34,7 +33,7 @@ dataPercept.probSub = NaN(size(names, 2), 3);
 for subN = 1:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
-    data(data.coh==1, :) = [];
+    data(data.trialType==1, :) = []; % test trials are type 0
     data(data.choice==999, :) = []; % only for the initial pilot...
     
     data.cohFit = data.coh.*data.rdkDir; % left is negative

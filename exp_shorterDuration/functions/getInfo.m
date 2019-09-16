@@ -7,7 +7,7 @@ info.dateTime = clock;
 
 % questions and defaults
 n = 1;
-q{n} = 'subID'; defaults{n} = 'tA0'; n = n+1;
+q{n} = 'subID'; defaults{n} = 'tD0'; n = n+1;
 q{n} = 'Eyetracker(1) or not(0)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Eye condition (0=fixation, 1-pursuit)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Block'; defaults{n} = num2str(currentBlock); n = n+1;
@@ -52,9 +52,6 @@ else
     end
     info.prob = probCons(info.block);
 end
-
-% % for pilot
-% info.prob= -1;
 
 % save info for the current block
 save([prm.fileName.folder, '\Info', num2str(info.block), '_', info.fileNameTime], 'info')

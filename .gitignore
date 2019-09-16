@@ -15,5 +15,6 @@
 *.avi
 *.asc
 *.pptx
+*.csv
 data/*
 results/*
