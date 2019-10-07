@@ -1,15 +1,15 @@
 % function sortRawData
 % to use in R, also to generate the raw data for palamedes
-% Xiuyun Wu, 12/19/2018
+% Xiuyun Wu, 09/16/2019
 clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'tXW' 'tDC' 'p7' 'p5' 'p8' 'p3' 'p6'};
+names = {'tWA'};
 data = table();
 
 %%
-for sub = 6:size(names, 2)
+for sub = 1:size(names, 2)
     % Read all raw data
     % read Experiment data
     cd ..

@@ -1,8 +1,8 @@
 % to calculate and plot psychometric functions
-% Xiuyun Wu, 09/16/2019
+% Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'tA0'};
+names = {'tD0'};
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
@@ -34,8 +34,9 @@ for subN = 1:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.trialType==1, :) = []; % test trials are type 0
+    data(data.choice==999, :) = []; % only for the initial pilot...
     
-    data.cohFit = data.dotSpeed.*data.rdkDir; % left is negative
+    data.cohFit = data.coh.*data.rdkDir; % left is negative
     %     data.cohIdx = zeros(size(data.cohFit));
     %     cohLevels = unique([data.prob, data.cohFit], 'rows');
     %     for ii = 1:length(cohLevels)

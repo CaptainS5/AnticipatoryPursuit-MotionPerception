@@ -28,8 +28,9 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 200;
+accelerationThreshold = 300;
 jerk = jerk(startFrame:endFrame);
+jerkThreshold = 50000;
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
@@ -150,7 +151,7 @@ for i = 1:length(speedOnsets)
     if onsets(i)>=offsets(i)
         onsets(i) = NaN;
         offsets(i) = NaN;
-    elseif max(abs(jerk(onsets(i):offsets(i))))<30000
+    elseif max(abs(jerk(onsets(i):offsets(i))))<jerkThreshold
         onsets(i) = NaN;
         offsets(i) = NaN;
     elseif i>1 && onsets(i)<offsets(i-1)

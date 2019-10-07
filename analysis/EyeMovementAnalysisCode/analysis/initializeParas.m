@@ -2,8 +2,9 @@
 
 clear all; close all; clc
 
-nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
-nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
+% nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'}; % experiment 1
+% nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
+nameSets{1} = {'tXW' 'tDA'};% 'p5' 'p8'};
 setN = 1; % choose which set to analyze
 names = nameSets{setN};
 

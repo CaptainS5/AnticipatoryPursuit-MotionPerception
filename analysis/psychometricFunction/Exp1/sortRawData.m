@@ -5,11 +5,12 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'tXW' 'tDC' 'p7' 'p5' 'p8' 'p3' 'p6'};
+% names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
+names = {'ct0'};
 data = table();
 
 %%
-for sub = 6:size(names, 2)
+for sub = 1:size(names, 2)
     % Read all raw data
     % read Experiment data
     cd ..
