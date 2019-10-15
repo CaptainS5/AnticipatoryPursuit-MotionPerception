@@ -2,15 +2,17 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'tXW' 'tDC' 'p7' 'p5' 'p8' 'p3' 'p6'};
-averagedPlot = 0;
+names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+averagedPlot = 1;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
-probCons = [10; 30; 50; 70; 90];
+% probCons = [10; 30; 50; 70; 90];
+probCons = [10; 50; 90];
 probNames{1} = {'Prob 10%' 'Prob 50%'};
 probNames{2} = {'Prob 50%' 'Prob 90%'};
-colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+colorPlotting = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
+% colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 % fitting settings
 PF = @PAL_Logistic;  %Alternatives: PAL_Gumbel, PAL_Weibull,
@@ -30,7 +32,7 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
-for subN = 6:size(names, 2)
+for subN = 1:size(names, 2)
     load(['dataRaw_', names{subN}])
     data = dataRaw;
     data(data.trialType==1, :) = []; % test trials are type 0
@@ -80,10 +82,10 @@ for subN = 6:size(names, 2)
         
         % saving parameters
         if probSub(1)<50
-            probNmerged = 4-probN;
+            probNmerged = 3-probN;
             paramsValues{subN, probSubN}(1) = -paramsValues{subN, probSubN}(1); % also flip PSE
         else
-            probNmerged = probN-2;
+            probNmerged = probN-1;
         end
         dataPercept.alpha(subN, probNmerged) = paramsValues{subN, probSubN}(1); % threshold, or PSE
         dataPercept.beta(subN, probNmerged) = paramsValues{subN, probSubN}(2); % slope
@@ -117,12 +119,12 @@ if averagedPlot==1
         % merge directions
         for subN = 1:size(dataPercept.alpha, 1)
             if dataPercept.probSub(subN, 1)<50
-                tempNumRight(subN, :) = outOfNum{4-probNmerged}(subN, :)-numRight{4-probNmerged}(subN, :);
+                tempNumRight(subN, :) = outOfNum{3-probNmerged}(subN, :)-numRight{3-probNmerged}(subN, :);
                 tempNumRight(subN, :) = fliplr(tempNumRight(subN, :));
-                tempOutOfNumber(subN, :) = outOfNum{4-probNmerged}(subN, :);
+                tempOutOfNumber(subN, :) = outOfNum{3-probNmerged}(subN, :);
             else
-                tempNumRight(subN, :) = numRight{probNmerged+2}(subN, :);
-                tempOutOfNumber(subN, :) = outOfNum{probNmerged+2}(subN, :);
+                tempNumRight(subN, :) = numRight{probNmerged+1}(subN, :);
+                tempOutOfNumber(subN, :) = outOfNum{probNmerged+1}(subN, :);
             end
         end
         numRightAll{probNmerged} = mean(tempNumRight);
@@ -141,8 +143,8 @@ if averagedPlot==1
         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
         ProportionCorrectModel = PF(paramsValuesAll{probNmerged},StimLevelsFineGrain);
         
-        fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probNmerged+2, :), 'linewidth', 2);
-        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probNmerged+2, :), 'markersize', 30);
+        fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probNmerged+1, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probNmerged+1, :), 'markersize', 30);
     end
     set(gca, 'fontsize',16);
     set(gca, 'Xtick',cohLevels);
@@ -156,20 +158,19 @@ if averagedPlot==1
     % plot average PSE
     errorbar_groups(dataPercept.PSEmean, dataPercept.PSEste,  ...
         'bar_width',0.75,'errorbar_width',0.5, ...
-        'bar_names',{'50','70','90'});
+        'bar_names',{'50', '90'});
     xlabel('Probability of right');
     ylabel('PSE (right is positive)');
     saveas(gcf, ['PSE_all.pdf'])
     
-    save('dataPercept_PSE_all', 'dataPercept');
+    save('dataPercept_all_exp2', 'dataPercept');
     
     % plot average slope
     errorbar_groups(dataPercept.Bmean, dataPercept.Bste,  ...
         'bar_width',0.75,'errorbar_width',0.5, ...
-        'bar_names',{'50','70','90'});
+        'bar_names',{'50', '90'});
     xlabel('Probability of right');
     ylabel('Slope (beta)');
     saveas(gcf, ['Slope_all.pdf'])
     
-    save('dataPercept_slope_all', 'dataPercept');
 end

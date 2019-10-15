@@ -12,12 +12,12 @@ pdfNames = {'APvelX' 'APvelXInterpolated'...
 sacStart = 10; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 0;
-averagedPlots = 1;
+individualPlots = 1;
+averagedPlots = 0;
 scatterPlots = 0;
-paraStart = 5;
-paraEnd = 5; % which parameters to plot
-sortByChoice = 1; % whether sort left/right trials by visual motion or by perception
+paraStart = 1;
+paraEnd = 2; % which parameters to plot
+sortByChoice = 0; % whether sort left/right trials by visual motion or by perception
 yLabels = {'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
     'clp gain (horizontal)' 'clp interpolated gain (horizontal)' 'clp mean horizontal velocity (deg/s)'...
@@ -226,24 +226,24 @@ for subN = 1:size(names, 2)
                     %                                         box off
                     %                                         saveas(gca, [pdfNames{paraN}, '_barplot_visualRperceptualTrials_' , names{subN}, '.pdf'])
                     
-                    % barplot of difference
-                    plotMean = [];
-                    plotSte = [];
-                    for probSubN = 1:size(probSub, 2)
-                        plotMean(1, probSubN) = nanmean(yValues4{paraN, subN}.LL(:, probSubN)-yValues4{paraN, subN}.LR(:, probSubN)); % left
-                        plotMean(2, probSubN) = nanmean(yValues4{paraN, subN}.RR(:, probSubN)-yValues4{paraN, subN}.RL(:, probSubN)); % right
-                        plotSte(1, probSubN) = nanstd(yValues4{paraN, subN}.LL(:, probSubN)-yValues4{paraN, subN}.LR(:, probSubN))/sqrt(size(names, 2)); % left
-                        plotSte(2, probSubN) = nanstd(yValues4{paraN, subN}.RR(:, probSubN)-yValues4{paraN, subN}.RL(:, probSubN))/sqrt(size(names, 2)); % right
-                    end
-                    errorbar_groups(plotMean, plotSte,  ...
-                        'bar_width',0.75,'errorbar_width',0.5, ...
-                        'bar_names',probNames{probNameI});
-                    legend({'visual left trials' 'visual right trials'}, 'Location', 'best')
-                    title('difference between perceived direction trials (same as visual motion-opposite)')
-                    ylabel(yLabels{paraN})
-                    %     ylim([-0.5 5])
-                    box off
-                    saveas(gca, [pdfNames{paraN}, '_diffBarplot_vpMotion_' , names{subN}, '.pdf'])
+%                     % barplot of difference
+%                     plotMean = [];
+%                     plotSte = [];
+%                     for probSubN = 1:size(probSub, 2)
+%                         plotMean(1, probSubN) = nanmean(yValues4{paraN, subN}.LL(:, probSubN)-yValues4{paraN, subN}.LR(:, probSubN)); % left
+%                         plotMean(2, probSubN) = nanmean(yValues4{paraN, subN}.RR(:, probSubN)-yValues4{paraN, subN}.RL(:, probSubN)); % right
+%                         plotSte(1, probSubN) = nanstd(yValues4{paraN, subN}.LL(:, probSubN)-yValues4{paraN, subN}.LR(:, probSubN))/sqrt(size(names, 2)); % left
+%                         plotSte(2, probSubN) = nanstd(yValues4{paraN, subN}.RR(:, probSubN)-yValues4{paraN, subN}.RL(:, probSubN))/sqrt(size(names, 2)); % right
+%                     end
+%                     errorbar_groups(plotMean, plotSte,  ...
+%                         'bar_width',0.75,'errorbar_width',0.5, ...
+%                         'bar_names',probNames{probNameI});
+%                     legend({'visual left trials' 'visual right trials'}, 'Location', 'best')
+%                     title('difference between perceived direction trials (same as visual motion-opposite)')
+%                     ylabel(yLabels{paraN})
+%                     %     ylim([-0.5 5])
+%                     box off
+%                     saveas(gca, [pdfNames{paraN}, '_diffBarplot_vpMotion_' , names{subN}, '.pdf'])
                 end
                 
             end

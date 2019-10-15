@@ -1,8 +1,12 @@
 %% tree plots of the short-term trial history... priming effects
+% not including trials preceded by perceptual trials (n-2 might be
+% perceptual trial)
+% for both eye movements and perception
+% for perception, the "magnitude" is choice minus motion coherence
 initializeParas;
 individualPlots = 1;
 averagedPlots = 0;
-eyeTrialData.choice(eyeTrialData.choice==0) = -1;
+eyeTrialData.choice(eyeTrialData.choice==0) = -1; % left is -1, right is 1
 
 for subN = 1:size(names, 2)
     probSub = unique(eyeTrialData.prob(subN, :));
@@ -11,14 +15,25 @@ for subN = 1:size(names, 2)
     else
         probNameSub = probNames{2};
     end
-    for probN = 1:3
+    for probN = 1:2
         [, dataIdx] = find(eyeTrialData.prob(subN, :)==probSub(probN) & eyeTrialData.errorStatus(subN, :)==0);
         [, perceptualIdx] = find(eyeTrialData.trialType(subN, dataIdx)==0); % locate perceptual trials
+        % make sure that all preceding trials are context trials...
+        deleteI{subN} = [];
+        for pI = 1:length(perceptualIdx)
+            dataIdxT = eyeTrialData.trialIdx(subN, dataIdx);
+            dataTypeT = eyeTrialData.trialType(subN, dataIdx);
+            twoBackI = find(dataIdxT==(dataIdxT(perceptualIdx(pI))-2) );
+            if ~isempty(twoBackI) && dataTypeT(twoBackI)==0
+                deleteI{subN} = [deleteI{subN}; pI];
+            end
+        end
+        perceptualIdx(deleteI{subN}) = [];
         
+        % anticipatory pursuit
         [lastP lastPstd idxOutPL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
-        % 2-back might be another perceptual trial...use perception?
-        [firstP(1:2, :) firstPstd(1:2, :) idxOutPFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{1}, 2); 
-        [firstP(3:4, :) firstPstd(3:4, :) idxOutPFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{2}, 2); 
+        [firstP(1:2, :) firstPstd(1:2, :) idxOutPFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{1}, 2); 
+        [firstP(3:4, :) firstPstd(3:4, :) idxOutPFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{2}, 2); 
         treeNodesP{probN, 1}(subN, 1:4) = firstP(1:4, 1)'; % the first column, four nodes, n-2, diff-diff, same-diff, diff-same, same-same
         treeNodesP{probN, 2}(subN, 1:2) = lastP(1:2, 1)'; % the second column, two nodes, n-1, diff, same
         treeNodesP{probN, 3}(subN, 1) = lastP(1, 2); % the third column, 1 node, mean of all
@@ -31,30 +46,44 @@ for subN = 1:size(names, 2)
             sortForPlot({treeNodesP{probN, 1}(subN, :) treeNodesP{probN, 2}(subN, :) treeNodesP{probN, 3}(subN, :)}, 1, 2);
         [nodesPstdSub{probN, subN}] = ...
             sortForPlot({treeNodesPstd{probN, 1}(subN, :) treeNodesPstd{probN, 2}(subN, :) treeNodesPstd{probN, 3}(subN, :)}, 1, 2);% pursuit
+        
+        % perception
+        [lastPer lastPerstd idxOutPerL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
+        [firstPer(1:2, :) firstPerstd(1:2, :) idxOutPerFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{1}, 2); 
+        [firstPer(3:4, :) firstPerstd(3:4, :) idxOutPerFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{2}, 2); 
+        treeNodesPer{probN, 1}(subN, 1:4) = firstPer(1:4, 1)'; % the first column, four nodes, n-2, diff-diff, same-diff, diff-same, same-same
+        treeNodesPer{probN, 2}(subN, 1:2) = lastPer(1:2, 1)'; % the second column, two nodes, n-1, diff, same
+        treeNodesPer{probN, 3}(subN, 1) = lastPer(1, 2); % the third column, 1 node, mean of all
+        
+        treeNodesPerstd{probN, 1}(subN, 1:4) = firstPerstd(1:4, 1)'; % the first column, four nodes, n-2, diff-diff, same-diff, diff-same, same-same
+        treeNodesPerstd{probN, 2}(subN, 1:2) = lastPerstd(1:2, 1)'; % the second column, two nodes, n-1, diff, same
+        treeNodesPerstd{probN, 3}(subN, 1) = lastPerstd(1, 2); % the third column, 1 node, mean of all
+        
+        [nodesPermeanSub{probN, subN}] = ...
+            sortForPlot({treeNodesPer{probN, 1}(subN, :) treeNodesPer{probN, 2}(subN, :) treeNodesPer{probN, 3}(subN, :)}, 1, 2);
+        [nodesPerstdSub{probN, subN}] = ...
+            sortForPlot({treeNodesPerstd{probN, 1}(subN, :) treeNodesPerstd{probN, 2}(subN, :) treeNodesPerstd{probN, 3}(subN, :)}, 1, 2);% pursuit
     end
     
     %% plots of individual data
     if individualPlots==1
+        cd(perceptFolder)
+        drawPlot(subN, nodesPermeanSub, nodesPerstdSub, 'Trial', 'Choice-coh', probNameSub, 'treePlotPerception_Exp2_', names{subN}, [])
         % pursuit plots
         cd(pursuitFolder)
         % anticipatory pursuit
-        drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlot_Exp1_', names{subN}, [])
+        drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlotPursuit_Exp2_', names{subN}, [])
 %         close all
     end
 end
 
-% % generate the lines for averaged data
-% for probN = 1:size(transDirCons, 2)
-%     [nodesTmean{probN, 1} nodesTste{probN, 1}] = sortForPlot({treeNodesT{probN, 1} treeNodesT{probN, 2} treeNodesT{probN, 3}}, sqrt(size(names, 2)), 2); % torsion
+% generate the lines for averaged data
+% for probN = 1:size(probCons, 2)
+%     [nodesPmean{probN, 1} nodesPste{probN, 1}] = sortForPlot({treeNodesP{probN, 1} treeNodesP{probN, 2} treeNodesP{probN, 3}}, sqrt(size(names, 2)), 2); % torsion
 % end
 
 %% averaged plots
 if averagedPlots==1
-%     % torsion plots
-%     cd(torsionFolder)
-%     % anticipatory torsion
-%     drawPlot(1, nodesTmean, nodesTste, 'Trial', 'Anticipatory torsion velocity (deg/s)', {'CW' 'CCW'}, 'trialHistory_anticipatoryT_', 'Exp3_all', [])
-    
     % pursuit plots
     cd(pursuitFolder)
     % anticipatory pursuit

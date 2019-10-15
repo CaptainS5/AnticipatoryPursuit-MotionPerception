@@ -87,6 +87,7 @@ cd(currentFolder)
 eyeFiles = dir('*.asc');
 nameEndI = strfind(eyeFiles(1, 1).name, 'b');
 currentSubject = eyeFiles(1, 1).name(1:nameEndI-1);
+% currentTrial = 210+682;
 for ascN = 1:size(eyeFiles, 1)
     ascFile = eyeFiles(ascN,1).name;
     rawAsc = load(ascFile);
@@ -96,6 +97,7 @@ for ascN = 1:size(eyeFiles, 1)
         endI = find(rawAsc(:, 1)==(eventLog.rdkOff(currentTrial, 1)+600)); % until mask off
         allData = rawAsc(startI:endI, :);
         save([currentSubject 't' num2str(currentTrial, '%04d') '.mat'], 'allData')
+%         currentTrial = currentTrial+1;
     end
 end
 

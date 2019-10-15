@@ -4,9 +4,12 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
-nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
-subStartI = [1 1];
+% Exp1
+% nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
+% nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
+nameSets{1} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+% this will save you huge trouble...
+subStartI = [1];
 cd ..
 analysisPath = pwd;
 % dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
