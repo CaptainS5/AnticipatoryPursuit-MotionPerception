@@ -101,9 +101,9 @@ for subN = 1:length(names)
             
             % saving parameters
             if probSub(1)<50
-                probNmerged = 4-probN;
+                probNmerged = 3-probN;
             else
-                probNmerged = probN-2;
+                probNmerged = probN-1;
             end
             dataPercept.alpha{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(1); % threshold, or PSE
             dataPercept.beta{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(2); % slope
@@ -125,24 +125,24 @@ end
 save('dataPercept_APbins', 'dataPercept');
 
 %% plot bars of the difference between the two bins in each probability
-% diffMean = mean(dataPercept.alpha{2}-dataPercept.alpha{1});
-% diffSte = std(dataPercept.alpha{2}-dataPercept.alpha{1})/sqrt(length(names));
-% % box plot
-% figure
-% boxplot(dataPercept.alpha{2}-dataPercept.alpha{1}, 'Labels', {'50','70','90'})
-% xlabel('Probability of right');
-% ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
-% cd(perceptFolder)
-% saveas(gcf, ['PSE_APbins_box.pdf'])
-% 
-% % bar plot
-% errorbar_groups(diffMean, diffSte,  ...
-%     'bar_width',0.75,'errorbar_width',0.5, ...
-%     'bar_names',{'50','70','90'})
-% xlabel('Probability of right');
-% ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
-% cd(perceptFolder)
-% saveas(gcf, ['PSE_APbins_bar.pdf'])
+diffMean = mean(dataPercept.alpha{2}-dataPercept.alpha{1});
+diffSte = std(dataPercept.alpha{2}-dataPercept.alpha{1})/sqrt(length(names));
+% box plot
+figure
+boxplot(dataPercept.alpha{2}-dataPercept.alpha{1}, 'Labels', {'50','90'})
+xlabel('Probability of right');
+ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
+cd(perceptFolder)
+saveas(gcf, ['PSE_APbins_box.pdf'])
+
+% bar plot
+errorbar_groups(diffMean, diffSte,  ...
+    'bar_width',0.75,'errorbar_width',0.5, ...
+    'bar_names',{'50','90'})
+xlabel('Probability of right');
+ylabel('Higher AP trials-lower AP trials PSE (right is positive)');
+cd(perceptFolder)
+saveas(gcf, ['PSE_APbins_bar.pdf'])
 
 %% save csv for ANOVA
 cd(analysisFolder)
@@ -153,10 +153,10 @@ cd('R')
 data = table();
 count = 1;
 for subN = 1:length(names)
-    for probNmerged = 1:3
+    for probNmerged = 1:2
         for binN = 1:2
             data.sub(count, 1) = subN;
-            data.prob(count, 1) = probCons(probNmerged+2);
+            data.prob(count, 1) = probCons(probNmerged+1);
             data.relativeMotion(count, 1) = binN;
             data.PSE(count, 1) = dataPercept.alpha{binN}(subN, probNmerged);
             data.slope(count, 1) = dataPercept.beta{binN}(subN, probNmerged);
@@ -170,9 +170,9 @@ writetable(data, 'relativeMotionPSE.csv')
 data = table();
 count = 1;
 for subN = 1:length(names)
-    for probNmerged = 1:3
+    for probNmerged = 1:2
             data.sub(count, 1) = subN;
-            data.prob(count, 1) = probCons(probNmerged+2);
+            data.prob(count, 1) = probCons(probNmerged+1);
 %             data.relativeMotion(count, 1) = binN;
             data.PSEDiff(count, 1) = dataPercept.alpha{2}(subN, probNmerged)-dataPercept.alpha{1}(subN, probNmerged);
 %             data.slope(count, 1) = dataPercept.beta{binN}(subN, probNmerged);

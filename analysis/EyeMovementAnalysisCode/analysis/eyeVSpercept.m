@@ -12,7 +12,7 @@ pdfNames = {'APvelX' ...
 sacStart = 7; % from the n_th parameter is saccade
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'AP horizontal velocity (deg/s)' ...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp horizontal velocity change'...
@@ -20,7 +20,7 @@ yLabels = {'AP horizontal velocity (deg/s)' ...
     'saccade number (horizontal)' 'saccade mean amplitude (horizontal)' 'saccade sum amplitude (horizontal)'};
 
 %% sort trials by perceptual responses, plot pursuit
-for paraN = 5:5%size(checkParas, 2)
+for paraN = 1:1%size(checkParas, 2)
     for subN = 1:size(names, 2)
         probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
         if probSub(1)<50
@@ -69,7 +69,7 @@ for paraN = 5:5%size(checkParas, 2)
 end
 
 %% grouped plots
-for paraN = 5:5%size(checkParas, 2)
+for paraN = 1:1%size(checkParas, 2)
     for subN = 1:size(names, 2)
         probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
         if probSub(1)<50

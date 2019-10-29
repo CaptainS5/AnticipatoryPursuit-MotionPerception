@@ -36,7 +36,7 @@ prm.fixation.durationJitter = 0.3;
 prm.gap.duration = 0.3;
 
 % RDK stimulus
-prm.rdk.durationContext = 5; % display duration of the whole RDK
+prm.rdk.durationContext = 3; % display duration of the whole RDK
 prm.rdk.durationPerceptual = 0.7; % display duration of the whole RDK
 prm.rdk.dotDensity = 1.5; % dot per dva
 prm.rdk.lifeTime = 5; % noise dots change direction every new life time

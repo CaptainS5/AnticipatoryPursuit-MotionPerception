@@ -7,7 +7,7 @@ info.dateTime = clock;
 
 % questions and defaults
 n = 1;
-q{n} = 'subID'; defaults{n} = 'tWA'; n = n+1;
+q{n} = 'subID'; defaults{n} = 'ap1'; n = n+1;
 q{n} = 'Eyetracker(1) or not(0)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Eye condition (0=fixation, 1-pursuit)'; defaults{n} = num2str(1); n = n+1;
 q{n} = 'Block'; defaults{n} = num2str(currentBlock); n = n+1;
@@ -26,11 +26,11 @@ info.trial = str2num(answer{n}); n = n+1;
 % info.prob = str2num(answer{n}); n = n+1;
 
 % creating saving path and filenames
-if info.block==0 % pracrice block, save in the practive folder
-    prm.fileName.folder = [prm.resultPath, '\', info.subID{1}, '\practice'];
-else
+% if info.block==0 % pracrice block, save in the practive folder
+%     prm.fileName.folder = [prm.resultPath, '\', info.subID{1}, '\practice'];
+% else
     prm.fileName.folder = [prm.resultPath, '\', info.subID{1}];
-end
+% end
 mkdir(prm.fileName.folder)
 info.fileNameTime = [info.subID{1}, '_', sprintf('%d-%d-%d_%d%d', info.dateTime(1:5))];
 
@@ -52,7 +52,7 @@ info.fileNameTime = [info.subID{1}, '_', sprintf('%d-%d-%d_%d%d', info.dateTime(
 %     end
 %     info.prob = probCons(info.block);
 % end
-info.prob=-1;
+info.prob=info.block;
 % save info for the current block
 save([prm.fileName.folder, '\Info', num2str(info.block), '_', info.fileNameTime], 'info')
 

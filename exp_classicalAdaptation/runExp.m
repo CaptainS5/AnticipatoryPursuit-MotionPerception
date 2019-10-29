@@ -22,7 +22,7 @@ try
     % load trial info for the current block
     demoN = 0; % default not to record demo images
     if info.prob > 0
-        load(['list', num2str(info.prob), 'prob.mat'])
+        load(['testBlock', num2str(info.prob), '.mat'])
     elseif info.prob == 0  % practice trials
         load('perceptualList.mat')
     elseif info.prob == -1  % test trials

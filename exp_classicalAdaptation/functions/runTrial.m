@@ -35,9 +35,9 @@ else
 end
 trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
 resp.trialType(trialN, 1) = trialType;
-if trialType==1
+if trialType==1 % adapting stimulus
     rdkFrames = round(sec2frm(prm.rdk.durationContext));
-elseif trialType==0
+elseif trialType==0 % test stimulus
     rdkFrames = round(sec2frm(prm.rdk.durationPerceptual));
 end
 resp.rdkFrames(trialN, 1) = rdkFrames;
@@ -291,7 +291,7 @@ end
 % imwrite(imgF, 'fixation.jpg')
 
 %% Gap period
-if trialType==0
+if trialType==0 % test trial, gap between the two RDKs
     if info.eyeTracker==1
         Eyelink('message', 'fixationOff');
     end

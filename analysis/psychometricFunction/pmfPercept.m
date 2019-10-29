@@ -146,6 +146,8 @@ if averagedPlot==1
         fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probNmerged+1, :), 'linewidth', 2);
         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probNmerged+1, :), 'markersize', 30);
     end
+    plot([dataPercept.PSEmean(1) dataPercept.PSEmean(1)], [0 1], '--')
+    plot([dataPercept.PSEmean(2) dataPercept.PSEmean(2)], [0 1], '--')
     set(gca, 'fontsize',16);
     set(gca, 'Xtick',cohLevels);
     axis([min(cohLevels) max(cohLevels) 0 1]);
@@ -155,22 +157,21 @@ if averagedPlot==1
     hold off
     saveas(gcf, ['pf_all.pdf'])
     
-    % plot average PSE
-    errorbar_groups(dataPercept.PSEmean, dataPercept.PSEste,  ...
-        'bar_width',0.75,'errorbar_width',0.5, ...
-        'bar_names',{'50', '90'});
-    xlabel('Probability of right');
-    ylabel('PSE (right is positive)');
-    saveas(gcf, ['PSE_all.pdf'])
-    
-    save('dataPercept_all_exp2', 'dataPercept');
-    
-    % plot average slope
-    errorbar_groups(dataPercept.Bmean, dataPercept.Bste,  ...
-        'bar_width',0.75,'errorbar_width',0.5, ...
-        'bar_names',{'50', '90'});
-    xlabel('Probability of right');
-    ylabel('Slope (beta)');
-    saveas(gcf, ['Slope_all.pdf'])
-    
+%     % plot average PSE
+%     errorbar_groups(dataPercept.PSEmean, dataPercept.PSEste,  ...
+%         'bar_width',0.75,'errorbar_width',0.5, ...
+%         'bar_names',{'50', '90'});
+%     xlabel('Probability of right');
+%     ylabel('PSE (right is positive)');
+%     saveas(gcf, ['PSE_all.pdf'])
+%     
+%     save('dataPercept_all_exp2', 'dataPercept');
+%     
+%     % plot average slope
+%     errorbar_groups(dataPercept.Bmean, dataPercept.Bste,  ...
+%         'bar_width',0.75,'errorbar_width',0.5, ...
+%         'bar_names',{'50', '90'});
+%     xlabel('Probability of right');
+%     ylabel('Slope (beta)');
+%     saveas(gcf, ['Slope_all.pdf'])    
 end

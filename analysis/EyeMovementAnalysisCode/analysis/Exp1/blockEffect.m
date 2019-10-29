@@ -13,10 +13,10 @@ sacStart = 10; % from the n_th parameter is saccade
 
 % some settings
 individualPlots = 0;
-averagedPlots = 1;
-scatterPlots = 0;
+averagedPlots = 0;
+scatterPlots = 1;
 paraStart = 1;
-paraEnd = 2; % which parameters to plot
+paraEnd = 1; % which parameters to plot
 sortByChoice = 0; % whether sort left/right trials by visual motion or by perception
 yLabels = {'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
@@ -262,7 +262,7 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
     subMeanPL{paraN} = NaN(size(names, 2), 3);
     subMeanPR{paraN} = NaN(size(names, 2), 3);
     
-    for probN= 1:2 % here probN is merged, 50 and 90
+    for probN= 1:3 % here probN is merged, 50 and 90
         for subN = 1:size(names, 2)
             
             probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
@@ -272,31 +272,31 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
                         strcmp(checkParas{paraN}, 'pursuit.APvelocityX_interpol') || ...
                         strcmp(checkParas{paraN}, 'initialMeanVelocityX') || ...
                         strcmp(checkParas{paraN}, 'pursuit.initialVelChangeX')
-                    subMeanS{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.standard(:, 3-probN));
-                    subMeanP{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.perceptual(:, 3-probN));
+                    subMeanS{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.standard(:, 4-probN));
+                    subMeanP{paraN}(subN, probN) = nanmean(-yValues{paraN, subN}.perceptual(:, 4-probN));
                     
-                    subMeanSL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.standard(:, 3-probN));
-                    subMeanPL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.perceptual(:, 3-probN));
-                    subMeanSR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.standard(:, 3-probN));
-                    subMeanPR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.perceptual(:, 3-probN));
+                    subMeanSL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.standard(:, 4-probN));
+                    subMeanPL{paraN}(subN, probN) = nanmean(-yValuesR{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.standard(:, 4-probN));
+                    subMeanPR{paraN}(subN, probN) = nanmean(-yValuesL{paraN, subN}.perceptual(:, 4-probN));
                     
-                    subMeanLL{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.RR(:, 3-probN));
-                    subMeanLR{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.RL(:, 3-probN));
-                    subMeanRL{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.LR(:, 3-probN));
-                    subMeanRR{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.LL(:, 3-probN));
+                    subMeanLL{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.RR(:, 4-probN));
+                    subMeanLR{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.RL(:, 4-probN));
+                    subMeanRL{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.LR(:, 4-probN));
+                    subMeanRR{paraN}(subN, probN) = nanmean(-yValues4{paraN, subN}.LL(:, 4-probN));
                 else
-                    subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, 3-probN));
-                    subMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, 3-probN));
+                    subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, 4-probN));
+                    subMeanP{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.perceptual(:, 4-probN));
                     
-                    subMeanSL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, 3-probN));
-                    subMeanPL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, 3-probN));
-                    subMeanSR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, 3-probN));
-                    subMeanPR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, 3-probN));
+                    subMeanSL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.standard(:, 4-probN));
+                    subMeanPL{paraN}(subN, probN) = nanmean(yValuesR{paraN, subN}.perceptual(:, 4-probN));
+                    subMeanSR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.standard(:, 4-probN));
+                    subMeanPR{paraN}(subN, probN) = nanmean(yValuesL{paraN, subN}.perceptual(:, 4-probN));
                     
-                    subMeanLL{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.RR(:, 3-probN));
-                    subMeanLR{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.RL(:, 3-probN));
-                    subMeanRL{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.LR(:, 3-probN));
-                    subMeanRR{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.LL(:, 3-probN));
+                    subMeanLL{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.RR(:, 4-probN));
+                    subMeanLR{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.RL(:, 4-probN));
+                    subMeanRL{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.LR(:, 4-probN));
+                    subMeanRR{paraN}(subN, probN) = nanmean(yValues4{paraN, subN}.LL(:, 4-probN));
                 end
             else
                 subMeanS{paraN}(subN, probN) = nanmean(yValues{paraN, subN}.standard(:, probN));
@@ -449,8 +449,9 @@ end
 cd(analysisFolder)
 cd ..
 cd ..
+cd ..
 cd('psychometricFunction')
-load dataPercept_all_exp2
+load dataPercept_all_exp1
 cd(analysisFolder)
 
 for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
@@ -462,10 +463,30 @@ for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
         %         end
         cd(correlationFolder)
         
+%         % value in each block
+%         figure
+%         for subN = 1:size(names, 2)
+%             hold on
+%             scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
+%         end
+%         %         for probNmerged = 1:3
+%         %             hold on
+%         %             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
+%         %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
+%         %         end
+%         %         legend({'50','70','90'})
+%         title('perceptual trials')
+%         xlabel('PSE')
+%         ylabel(yLabels{paraN})
+%         %     ylim([-0.5 5])
+%         box off
+%         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
+        
+        % difference between each block
         figure
         for subN = 1:size(names, 2)
             hold on
-            scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
+            scatter(dataPercept.alpha(subN, 3)-dataPercept.alpha(subN, 2), subMeanP{paraN}(subN, 3)-subMeanP{paraN}(subN, 2))
         end
         %         for probNmerged = 1:3
         %             hold on
@@ -473,11 +494,11 @@ for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
         %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
         %         end
         %         legend({'50','70','90'})
-        title('perceptual trials')
-        xlabel('PSE')
-        ylabel(yLabels{paraN})
+        title('90-70')
+        xlabel('PSE diff')
+        ylabel({yLabels{paraN} ' diff'})
         %     ylim([-0.5 5])
         box off
-        saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
+        saveas(gca, [pdfNames{paraN}, '_7090_scatterplot_perceptualTrials.pdf'])
     end
 end

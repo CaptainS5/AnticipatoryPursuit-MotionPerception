@@ -35,6 +35,24 @@ saveas(gca, 'perceptBiasExp1vs2.pdf')
 
 save('perceptBias.mat', 'perceptBias')
 
+%% generate csv file for R
+% cd(analysisFolder)
+cd ..
+cd('R')
+
+data = table();
+count = 1;
+for subN = 1:9
+    for expN = 1:2
+        data.sub(count, 1) = subN;
+        data.exp(count, 1) = expN;
+        data.PSEbias(count, 1) = perceptBias(subN, expN);
+        count = count+1;
+    end
+end
+writetable(data, 'comparePSEbias.csv')
+
+%%
 % figure
 % hold on
 % for subN = 1:9

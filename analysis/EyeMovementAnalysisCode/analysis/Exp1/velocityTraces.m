@@ -62,6 +62,8 @@ for probNmerged = 1:3
     meanVel{probNmerged}.vpRR = NaN(length(names), maxFrameLength);
     meanVel{probNmerged}.zeroL = NaN(length(names), maxFrameLength);
     meanVel{probNmerged}.zeroR = NaN(length(names), maxFrameLength);
+    meanVel{probNmerged}.ppL = NaN(length(names), maxFrameLength);
+    meanVel{probNmerged}.ppR = NaN(length(names), maxFrameLength);
 %     stdVel{probN}.leftStandard = NaN(length(names), maxFrameLength);
 %     stdVel{probN}.rightStandard = NaN(length(names), maxFrameLength);
 %     stdVel{probN}.leftPerceptual = NaN(length(names), maxFrameLength);
@@ -94,7 +96,12 @@ for probNmerged = 1:3
         zeroLidx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)==0 ...
             & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0);  
         zeroRidx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)==0 ...
-            & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1); 
+            & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
+        % perceptual trials separated by perception
+        ppLidx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0);  
+        ppRidx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+            & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
         
         % individual mean traces
         meanVel{probNmerged}.leftStandard(subN, tempStartI:end) = nanmean(frames{subN}(leftSIdx, :));
@@ -107,6 +114,8 @@ for probNmerged = 1:3
         meanVel{probNmerged}.vpRR(subN, tempStartI:end) = nanmean(frames{subN}(vpRRidx, :));
         meanVel{probNmerged}.zeroL(subN, tempStartI:end) = nanmean(frames{subN}(zeroLidx, :));
         meanVel{probNmerged}.zeroR(subN, tempStartI:end) = nanmean(frames{subN}(zeroRidx, :));
+        meanVel{probNmerged}.ppL(subN, tempStartI:end) = nanmean(frames{subN}(ppLidx, :));
+        meanVel{probNmerged}.ppR(subN, tempStartI:end) = nanmean(frames{subN}(ppRidx, :));
         %             stdVel{probN}.firstStandard(subN, tempStartI:end) = nanstd(frames{subN, probN}.firstStandard);
         %             stdVel{probN}.lastStandard(subN, tempStartI:end) = nanstd(frames{subN, probN}.lastStandard);
         %             stdVel{probN}.firstPerceptual(subN, tempStartI:end) = nanstd(frames{subN, probN}.firstPerceptual);
@@ -130,6 +139,8 @@ for probNmerged = 1:3
     velMean{probNmerged}.vpRR = nanmean(meanVel{probNmerged}.vpRR(:, (maxFrameLength-minFrameLength+1):end), 1);
     velMean{probNmerged}.zeroL = nanmean(meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end), 1);
     velMean{probNmerged}.zeroR = nanmean(meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end), 1);
+    velMean{probNmerged}.ppL = nanmean(meanVel{probNmerged}.ppL(:, (maxFrameLength-minFrameLength+1):end), 1);
+    velMean{probNmerged}.ppR = nanmean(meanVel{probNmerged}.ppR(:, (maxFrameLength-minFrameLength+1):end), 1);
 end
 
 %% Draw velocity trace plots
@@ -241,7 +252,32 @@ for subN = 1:size(names, 2)
 %     box off
 %     saveas(gca, ['velocity_vpMotion_AllProbs_' names{subN} '.pdf'])
 
-% 0 coherence trials
+% % 0 coherence trials
+% figure
+% for probSubN = 1:size(probSub, 2)
+%     probN = find(probCons==probSub(probSubN));
+%     if probSub(1)<50
+%         probNmerged = 4-probN;
+%     else
+%         probNmerged = probN-2;
+%     end
+%     plot(timePoints, meanVel{probNmerged}.zeroL(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+%     hold on
+%     p{probSubN} = plot(timePoints, meanVel{probNmerged}.zeroR(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+% end
+% % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% % line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% legend([p{1}, p{2}, p{3}], probNames{probNameI}, 'Location', 'NorthWest')
+% title('0 coh trials')
+% xlabel('Time (ms)')
+% ylabel('Horizontal velocity (deg/s)')
+% xlim([-500 700])
+% %     ylim(yPerceptRange)
+% box off
+% saveas(gcf, ['velocity_zeroCoherence_AllProbs_' names{subN} '.pdf'])
+
+% perceptual trials by perception
 figure
 for probSubN = 1:size(probSub, 2)
     probN = find(probCons==probSub(probSubN));
@@ -250,21 +286,21 @@ for probSubN = 1:size(probSub, 2)
     else
         probNmerged = probN-2;
     end
-    plot(timePoints, meanVel{probNmerged}.zeroL(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+    plot(timePoints, meanVel{probNmerged}.ppL(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
     hold on
-    p{probSubN} = plot(timePoints, meanVel{probNmerged}.zeroR(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+    p{probSubN} = plot(timePoints, meanVel{probNmerged}.ppR(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
 end
 % line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
 % line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
 % line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
 legend([p{1}, p{2}, p{3}], probNames{probNameI}, 'Location', 'NorthWest')
-title('0 coh trials')
+title('Perceptual trials by perceived motino')
 xlabel('Time (ms)')
 ylabel('Horizontal velocity (deg/s)')
 xlim([-500 700])
 %     ylim(yPerceptRange)
 box off
-saveas(gcf, ['velocity_zeroCoherence_AllProbs_' names{subN} '.pdf'])
+saveas(gcf, ['velocity_perceptualPerceived_AllProbs_' names{subN} '.pdf'])
 end
 
 %% plot mean traces of all participants in all probabilities 
@@ -383,22 +419,37 @@ for probNmerged = 1:3
 end
 % saveas(gcf, 'velTraceCohLevels_all.pdf')
 
-% zero coherence trials, perceived motion
+% % zero coherence trials, perceived motion
+% figure
+% for probNmerged = 1:3
+%     plot(timePoints, velMean{probNmerged}.zeroL, '--', 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1)
+%     hold on
+%     p{probNmerged} = plot(timePoints, velMean{probNmerged}.zeroR, 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1);
+% end
+% legend([p{1}, p{2}, p{3}], {'50', '70', '90'}, 'Location', 'NorthWest')
+% title('0 coh trials')
+% xlabel('Time (ms)')
+% ylabel('Horizontal velocity (deg/s)')
+% xlim([-500 700])
+% ylim([-4 4])
+% box off
+% saveas(gcf, 'velTraceZeroCoh_all.pdf')
+
+% perceptual trials, perceived motion
 figure
 for probNmerged = 1:3
-    plot(timePoints, velMean{probNmerged}.zeroL, '--', 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1)
+    plot(timePoints, velMean{probNmerged}.ppL, '--', 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1)
     hold on
-    p{probNmerged} = plot(timePoints, velMean{probNmerged}.zeroR, 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1);
+    p{probNmerged} = plot(timePoints, velMean{probNmerged}.ppR, 'color', colorProb(probNmerged+2, :)); %, 'LineWidth', 1);
 end
 legend([p{1}, p{2}, p{3}], {'50', '70', '90'}, 'Location', 'NorthWest')
-title('0 coh trials')
+title('Perceptual trials by perceived motion')
 xlabel('Time (ms)')
 ylabel('Horizontal velocity (deg/s)')
 xlim([-500 700])
 ylim([-4 4])
 box off
-saveas(gcf, 'velTraceZeroCoh_all.pdf')
-
+saveas(gcf, 'velTracePerceptualPerceived_all.pdf')
 %% generate csv files, each file for one probability condition
 % each row is the mean velocity trace of one participant
 % use the min frame length--the lengeth where all participants have
@@ -406,7 +457,8 @@ saveas(gcf, 'velTraceZeroCoh_all.pdf')
 cd(analysisFolder)
 cd ..
 cd ..
-cd('R')
+cd ..
+cd('R\Exp1')
 
 % % standard trials
 % for probNmerged = 1:3
@@ -472,18 +524,34 @@ cd('R')
 %     csvwrite(['velocityTraceVPright_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 
-% zero coherence trials
+% % zero coherence trials
+% for probNmerged = 1:3
+%     velTAverageSub = [];
+%     for binN = 1:2        
+%         if binN==1
+%             dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
+%         else
+%             dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
+%         end
+%         for subN = 1:size(names, 2)
+%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+%         end
+%     end
+%     csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
+% end
+
+% perceptual trials by perception
 for probNmerged = 1:3
     velTAverageSub = [];
     for binN = 1:2        
         if binN==1
-            dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
+            dataTemp = meanVel{probNmerged}.ppL(:, (maxFrameLength-minFrameLength+1):end);
         else
-            dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
+            dataTemp = meanVel{probNmerged}.ppR(:, (maxFrameLength-minFrameLength+1):end);
         end
         for subN = 1:size(names, 2)
             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
         end
     end
-    csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
+    csvwrite(['velocityTracePerceptualPerceived_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 end

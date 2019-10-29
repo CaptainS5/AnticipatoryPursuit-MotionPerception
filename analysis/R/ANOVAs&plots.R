@@ -9,10 +9,10 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/Conferences/Gordon/2019/figures/")
+plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/Conferences/SfN/2019/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataPercept.csv"
-# pdfFileName <- "relativeMotionPSEDiff.pdf"
+dataFileName <- "comparePSEbias.csv"
+pdfFileName <- "PSEbiasExp1vs2.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -24,24 +24,91 @@ data <- read.csv(dataFileName)
 # # exclude bad fitting...
 # data <- subset(data[which(data$sub!=8),])
 
+## comparison between experiments 
+# # ASP gain bias
+# sub <- data["sub"]
+# exp <- data["exp"]
+# aspGainDiff <- data["aspGainDiff"]
+# dataAnova <- data.frame(sub, exp, aspGainDiff)
+# dataAnova$exp <- as.factor(dataAnova$exp)
+# dataAnova$sub <- as.factor(dataAnova$sub)
+
+# p <- ggplot(data, aes(x = exp, y = aspGainDiff)) +
+#         stat_summary(aes(y = aspGainDiff), fun.y = mean, geom = "point", shape = 95, size = 15) +
+#         stat_summary(fun.data = 'mean_sdl',
+#                fun.args = list(mult = 1),
+#                geom = 'errorbar', width = .1) +
+#         # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+#         geom_point(aes(x = exp, y = aspGainDiff), size = dotSize, shape = 1) +
+#         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
+#         scale_y_continuous(name = "ASP gain bias", limits = c(0, 0.3), expand = c(0, 0.05)) +
+#         scale_x_discrete(name = "Experiment", breaks=c("Exp1", "Exp2")) +
+#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
+#         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+#         theme(axis.text=element_text(colour="black"),
+#               axis.ticks=element_line(colour="black", size = axisLineWidth),
+#               panel.grid.major = element_blank(),
+#               panel.grid.minor = element_blank(),
+#               panel.border = element_blank(),
+#               panel.background = element_blank(),
+#               text = element_text(size = textSize, colour = "black"),
+#               legend.background = element_rect(fill="transparent"),
+#               legend.key = element_rect(colour = "transparent", fill = "white"))
+#         # facet_wrap(~prob)
+# print(p)
+# ggsave(paste(plotFolder, pdfFileName, sep = ""))
+
+# PSE bias
+sub <- data["sub"]
+exp <- data["exp"]
+PSEbias <- data["PSEbias"]
+dataAnova <- data.frame(sub, exp, PSEbias)
+dataAnova$exp <- as.factor(dataAnova$exp)
+dataAnova$sub <- as.factor(dataAnova$sub)
+
+p <- ggplot(data, aes(x = exp, y = PSEbias)) +
+        stat_summary(aes(y = PSEbias), fun.y = mean, geom = "point", shape = 95, size = 15) +
+        stat_summary(fun.data = 'mean_sdl',
+               fun.args = list(mult = 1),
+               geom = 'errorbar', width = .1) +
+        # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+        geom_point(aes(x = exp, y = PSEbias), size = dotSize, shape = 1) +
+        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
+        scale_y_continuous(name = "PSE bias", limits = c(0, 0.15), expand = c(0, 0.01)) +
+        scale_x_discrete(name = "Experiment", breaks=c("Exp1", "Exp2")) +
+        # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
+        # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+        theme(axis.text=element_text(colour="black"),
+              axis.ticks=element_line(colour="black", size = axisLineWidth),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank(),
+              panel.background = element_blank(),
+              text = element_text(size = textSize, colour = "black"),
+              legend.background = element_rect(fill="transparent"),
+              legend.key = element_rect(colour = "transparent", fill = "white"))
+        # facet_wrap(~prob)
+print(p)
+ggsave(paste(plotFolder, pdfFileName, sep = ""))
+
 #### perceptual illusion repeated measures ANOVA
 ### 2 way for perception--rotational speed x after-reversal direction
-## Exp1
-sub <- data["sub"]
-prob <- data["prob"]
-# timeBin <- data["timeBin"]
-PSE <- data["PSE"]
-dataAnova <- data.frame(sub, prob, PSE)
-dataAnova$prob <- as.factor(dataAnova$prob)
-dataAnova$sub <- as.factor(dataAnova$sub)
-# dataAnova$timeBin <- as.factor(dataAnova$timeBin)
-colnames(dataAnova)[3] <- "PSE"
-# dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
-    # data = dataTemp, FUN = "mean")
+# ## Exp1
+# sub <- data["sub"]
+# prob <- data["prob"]
+# # timeBin <- data["timeBin"]
+# PSE <- data["PSE"]
+# dataAnova <- data.frame(sub, prob, PSE)
+# dataAnova$prob <- as.factor(dataAnova$prob)
+# dataAnova$sub <- as.factor(dataAnova$sub)
+# # dataAnova$timeBin <- as.factor(dataAnova$timeBin)
+# colnames(dataAnova)[3] <- "PSE"
+# # dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
+#     # data = dataTemp, FUN = "mean")
 
-anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
-    within = .(prob), type = 3)
-print(anovaData)
+# anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
+#     within = .(prob), type = 3)
+# print(anovaData)
 
 # dataTemp <- data.frame(sub, prob, PSE)
 # colnames(dataTemp)[3] <- "PSE"
