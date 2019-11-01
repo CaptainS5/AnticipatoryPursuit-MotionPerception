@@ -21,7 +21,7 @@ try
 
     % load trial info for the current block
     demoN = 0; % default not to record demo images
-    if info.prob > 0
+    if info.prob >= 0
         load(['testBlock', num2str(info.prob), '.mat'])
     elseif info.prob == 0  % practice trials
         load('perceptualList.mat')
@@ -33,6 +33,11 @@ try
     else
         error('ERROR: condition table does not exist')
     end
+    % randominze perceptual trial orders
+    pIdx = find(list.trialType==0);
+    rng('shuffle')
+    newIdx = pIdx(randperm(length(pIdx)));
+    list(pIdx, :) = list(newIdx, :);
 %     prm.trialPerCohLevel = length(find(list.coh==0)); % trial number per condition
     prm.trialPerBlock = size(list, 1);
     

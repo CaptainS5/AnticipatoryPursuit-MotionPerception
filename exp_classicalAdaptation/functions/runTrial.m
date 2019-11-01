@@ -35,7 +35,9 @@ else
 end
 trialType = list.trialType(trialN, 1); % 1 = standard trial, 0 = test trial
 resp.trialType(trialN, 1) = trialType;
-if trialType==1 % adapting stimulus
+if trialN==1 && blockN~=0
+    rdkFrames = round(sec2frm(30));
+elseif trialType==1 % adapting stimulus
     rdkFrames = round(sec2frm(prm.rdk.durationContext));
 elseif trialType==0 % test stimulus
     rdkFrames = round(sec2frm(prm.rdk.durationPerceptual));
@@ -170,7 +172,7 @@ end
 % Check for presence of the eye position signal within the tolerance
 % window and wait for a random interval before the Gap-screen
 StopCommand = 0;
-if trialType==1
+if trialType==0
     frameN = 1;
     initialF = 0;
     vbl = Screen('Flip', prm.screen.windowPtr);
@@ -271,7 +273,7 @@ if trialType==1
             if initialF==0
                 [vbl fixOnTime] = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
                 initialF = 1;
-                resp.fixationOnTime(trialN, 1) = fixOnTime;
+%                 resp.fixationOnTime(trialN, 1) = fixOnTime;
             else
                 vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
             end
@@ -305,8 +307,8 @@ if trialType==0 % test trial, gap between the two RDKs
         
         vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
     end
-%     resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
-%     resp.fixationOffTime(trialN, 1) = fixOffTime;
+    %     resp.fixationDurationTrue(trialN, 1) = fixOffTime-fixOnTime;
+    %     resp.fixationOffTime(trialN, 1) = fixOffTime;
 end
 % if info.eyeTracker==1
 %     Eyelink('command','clear_screen 0'); % clears the box from the Eyelink-operator screen
@@ -347,24 +349,26 @@ resp.rdkOnTime(trialN, 1) = rdkOnTime;
 % prm.screen.waitFrames = 1;
 
 %% Mask
-% % random order of the textures
-% maskIdx = randperm(maskFrameN);
-% if info.eyeTracker==1
-%     Eyelink('message', 'rdkOff');
-% end
+% random order of the textures
+maskIdx = randperm(maskFrameN);
+if info.eyeTracker==1
+    Eyelink('message', 'rdkOff');
+end
 [vbl rdkOffTime] = Screen('Flip', prm.screen.windowPtr);
 resp.rdkOffTime(trialN, 1) = rdkOffTime;
-% for maskF = 1:maskFrameN
-%     Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
-%     Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
-%
-%     if demoN > 0
-%         imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
-%         demoN = demoN + 1;
-%     end
-%     vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
-% end
-% Screen('Flip', prm.screen.windowPtr);
+if trialType==1 % present mask after adapting stimuli
+    for maskF = 1:maskFrameN
+        Screen('DrawTextures', prm.screen.windowPtr, prm.mask.tex{maskIdx(maskF)});
+        Screen('DrawTexture', prm.screen.windowPtr, prm.aperture);
+        
+        if demoN > 0
+            imgDemo{demoN} = Screen('GetImage', prm.screen.windowPtr, [], 'backbuffer');
+            demoN = demoN + 1;
+        end
+        vbl = Screen('Flip', prm.screen.windowPtr, vbl+(prm.screen.waitFrames-0.5)*prm.screen.ifi);
+    end
+    Screen('Flip', prm.screen.windowPtr);
+end
 
 % if trialType==0 % record response in test trials
 %% Response
@@ -412,21 +416,29 @@ end
 resp.rdkDuration(trialN, 1) = rdkOffTime-rdkOnTime;
 
 
-if blockN==0 % practice block, give feedback
-    if (rdkDir<0 && strcmp(key, prm.leftKey)) || (rdkDir>0 && strcmp(key, prm.rightKey))
-        feedbackText = 'corrrect';
-    else
-        feedbackText = 'incorrect';
-    end
-    DrawFormattedText(prm.screen.windowPtr, feedbackText,...
-        'center', 'center', prm.textColour);
-    Screen('Flip', prm.screen.windowPtr);
-    WaitSecs(0.5)
-end
+% if blockN==0 % practice block, give feedback
+%     if (rdkDir<0 && strcmp(key, prm.leftKey)) || (rdkDir>0 && strcmp(key, prm.rightKey))
+%         feedbackText = 'corrrect';
+%     else
+%         feedbackText = 'incorrect';
+%     end
+%     DrawFormattedText(prm.screen.windowPtr, feedbackText,...
+%         'center', 'center', prm.textColour);
+%     Screen('Flip', prm.screen.windowPtr);
+%     WaitSecs(0.5)
+% end
 
 % %%%%%%%%%%%%%%%%% Loop for trials countdown %%%%%%%%%%%%%%%%%%%
-if rem(trialN, prm.reminderTrialN)==0
+if blockN==0 % baseline block
+    remainTrial = rem(trialN, prm.reminderTrialN);
     trialsLeft = prm.trialPerBlock-trialN;
+else
+    remainTrial = rem(trialN/2, prm.reminderTrialN);
+    trialsLeft = (prm.trialPerBlock-trialN)/2;
+end
+
+if remainTrial==0
+    %     trialsLeft = prm.trialPerBlock-trialN;
     text =[num2str(trialsLeft), ' trials remaining'];
     Screen('TextSize', prm.screen.windowPtr, prm.textSize);
     DrawFormattedText(prm.screen.windowPtr, text,...

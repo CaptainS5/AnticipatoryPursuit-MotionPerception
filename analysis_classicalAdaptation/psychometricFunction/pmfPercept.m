@@ -2,13 +2,13 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'tWA'};
+names = {'ap0'};
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
-probCons = [0 -1];
-probNames{1} = {'baseline' 'adaptation'};
+probCons = [0 1 2];%[-1 0]; 
+probNames{1} = {'baseline' 'adaptation low' 'adaptation high'};%
 % probNames{2} = {'Prob 50%' 'Prob 90%'};
 colorPlotting = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
 

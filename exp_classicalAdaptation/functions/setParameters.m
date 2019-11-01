@@ -36,10 +36,10 @@ prm.fixation.durationJitter = 0.3;
 prm.gap.duration = 0.3;
 
 % RDK stimulus
-prm.rdk.durationContext = 3; % display duration of the whole RDK
+prm.rdk.durationContext = 2; % display duration of the whole RDK
 prm.rdk.durationPerceptual = 0.7; % display duration of the whole RDK
 prm.rdk.dotDensity = 1.5; % dot per dva
-prm.rdk.lifeTime = 5; % noise dots change direction every new life time
+prm.rdk.lifeTime = 30; % noise dots change direction every new life time
 prm.rdk.labelUpdateTime = 0.05; % change labels and assign new directions for all
 % for Transparent motion, label update time >= the whole rdk duration;
 % for Brownian motion, label update time = one frame
