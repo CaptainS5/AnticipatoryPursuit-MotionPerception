@@ -2,7 +2,7 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'ap0'};
+names = {'ap0' 'ac1'};
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
@@ -10,7 +10,7 @@ trialN = 26; % number of trials for each coherence level in each direction
 probCons = [0 1 2];%[-1 0]; 
 probNames{1} = {'baseline' 'adaptation low' 'adaptation high'};%
 % probNames{2} = {'Prob 50%' 'Prob 90%'};
-colorPlotting = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
+colorPlotting = [255 182 135; 232 113 240; 113 204 100]/255; % each row is one colour for one probability
 
 % fitting settings
 PF = @PAL_Logistic;  %Alternatives: PAL_Gumbel, PAL_Weibull,

@@ -1,4 +1,4 @@
-%% tree plots of the short-term trial history... priming effects, Exp2
+%% tree plots of the short-term trial history... priming effects, Exp1
 % not including trials preceded by perceptual trials (n-2 might be
 % perceptual trial)
 % for both eye movements and perception
@@ -80,11 +80,11 @@ for subN = 1:size(names, 2)
     %% plots of individual data
     if individualPlots==1
         cd(perceptFolder)
-        drawPlot(subN, nodesPermeanSub, nodesPerstdSub, 'Trial', 'Choice-coh', probNameSub, 'treePlotPerception_Exp2_bootstrap_', names{subN}, [])
+        drawPlot(subN, nodesPermeanSub, nodesPerstdSub, 'Trial', 'Choice-coh', probNameSub, 'treePlotPerception_Exp1_bootstrap_', names{subN}, [])
         % pursuit plots
         cd(pursuitFolder)
         % anticipatory pursuit
-        drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlotPursuit_Exp2_bootstrap_', names{subN}, [])
+        drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlotPursuit_Exp1_bootstrap_', names{subN}, [])
 %         close all
     end
 end
@@ -97,16 +97,16 @@ end
 
 %% averaged plots
 if averagedPlots==1
-    % pursuit plots
+    % perception plots
     cd(perceptFolder)
-    % anticipatory pursuit
-    drawPlot(1, nodesPermean, nodesPerste, 'Trial', 'Choice-coh', probNames{2}, 'treePlotPerception_Exp2_bootstrap_', 'all', [])
+    drawPlot(1, nodesPermean, nodesPerste, 'Trial', 'Choice-coh', probNames{2}, 'treePlotPerception_Exp1_bootstrap_', 'all', [])
     
     % pursuit plots
     cd(pursuitFolder)
     % anticipatory pursuit
-    drawPlot(1, nodesPmean, nodesPste, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNames{2}, 'treePlotPursuit_Exp2_bootstrap_', 'all', [])
+    drawPlot(1, nodesPmean, nodesPste, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNames{2}, 'treePlotPursuit_Exp1_bootstrap_', 'all', [])
 end
+
 
 %% functions used
 function [outputMean outputStd idxOut] = splitNode(trialIdx, x, xCons, y, validI, n)
@@ -171,6 +171,7 @@ for conI = 1:length(xCons)
         outputStd(conI, 1) = NaN;
     end
 end
+
 % % directly compute the mean
 % for conI = 1:length(xCons)
 %     outputMean(conI, 1) = nanmean(tempY{conI});
