@@ -14,7 +14,7 @@ sacStart = 10; % from the n_th parameter is saccade
 % some settings
 individualPlots = 0;
 averagedPlots = 0;
-scatterPlots = 1;
+scatterPlots = 0;
 paraStart = 1;
 paraEnd = 1; % which parameters to plot
 sortByChoice = 0; % whether sort left/right trials by visual motion or by perception
@@ -160,32 +160,32 @@ for subN = 1:size(names, 2)
                 %                 box off
                 %                 saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR_' , names{subN}, '.pdf'])
                 
-                                % left and right seperated, perceptual trials
-                                plotMean = [];
-                                plotSte = [];
-                                for probSubN = 1:size(probSub, 2)
-                                    plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN)); % left
-                                    plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN)); % right
-                                    plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % left
-                                    plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % right
-                                end
-                                errorbar_groups(plotMean, plotSte,  ...
-                                    'bar_width',0.75,'errorbar_width',0.5, ...
-                                    'bar_names',probNames{probNameI});
-                                if sortByChoice==0
-                                    legend({'leftward trials' 'rightward trials'})
-                                elseif sortByChoice==1
-                                    legend({'perceived left trials' 'perceived right trials'})
-                                end
-                                title('perceptual trials')
-                                ylabel(yLabels{paraN})
-                                %     ylim([-0.5 5])
-                                box off
-                                if sortByChoice==0
-                                    saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
-                                elseif sortByChoice==1
-                                    saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice_' , names{subN}, '.pdf'])
-                                end
+%                                 % left and right seperated, perceptual trials
+%                                 plotMean = [];
+%                                 plotSte = [];
+%                                 for probSubN = 1:size(probSub, 2)
+%                                     plotMean(1, probSubN) = nanmean(yValuesL{paraN, subN}.perceptual(:, probSubN)); % left
+%                                     plotMean(2, probSubN) = nanmean(yValuesR{paraN, subN}.perceptual(:, probSubN)); % right
+%                                     plotSte(1, probSubN) = nanstd(yValuesL{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % left
+%                                     plotSte(2, probSubN) = nanstd(yValuesR{paraN, subN}.perceptual(:, probSubN))/sqrt(size(names, 2)); % right
+%                                 end
+%                                 errorbar_groups(plotMean, plotSte,  ...
+%                                     'bar_width',0.75,'errorbar_width',0.5, ...
+%                                     'bar_names',probNames{probNameI});
+%                                 if sortByChoice==0
+%                                     legend({'leftward trials' 'rightward trials'})
+%                                 elseif sortByChoice==1
+%                                     legend({'perceived left trials' 'perceived right trials'})
+%                                 end
+%                                 title('perceptual trials')
+%                                 ylabel(yLabels{paraN})
+%                                 %     ylim([-0.5 5])
+%                                 box off
+%                                 if sortByChoice==0
+%                                     saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_' , names{subN}, '.pdf'])
+%                                 elseif sortByChoice==1
+%                                     saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice_' , names{subN}, '.pdf'])
+%                                 end
                 
                 % visual x perception
                 if sortByChoice==1
@@ -348,6 +348,20 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
         steVPDiff{paraN}(2, probN) = nanstd(subMeanRR{paraN}(:, probN)-subMeanRL{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
     end
     
+    % generate csv file for R
+    cd(analysisFolder)
+    data = table();
+    count = 1;
+    for subN = 1:length(names)
+        for probN = 1:3 % probN is merged already
+            data.sub(count, 1) = subN;
+            data.prob(count, 1) = probCons(probN+2);
+            data.measure(count, 1) = subMeanP{paraN}(subN, probN);
+            count = count+1;
+        end
+    end
+    writetable(data, ['data' pdfNames{paraN} '.csv'])
+    
     if averagedPlots==1
         if paraN<sacStart
             cd(pursuitFolder)
@@ -385,25 +399,25 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
         %         saveas(gca, [pdfNames{paraN}, '_barplot_standardTrialsLR.pdf'])
         %
         
-        % left and right seperated, perceptual trials
-        errorbar_groups(meanYp{paraN}, steYp{paraN},  ...
-            'bar_width',0.75,'errorbar_width',0.5, ...
-            'bar_names',{'50','90'});
-        if sortByChoice==0
-            legend({'leftward trials' 'rightward trials'}, 'Location', 'best')
-        elseif sortByChoice==1
-            legend({'perceived left trials' 'perceived right trials'}, 'Location', 'best')
-        end
-        title('perceptual trials')
-        ylabel(yLabels{paraN})
-        %     ylim([-0.5 5])
-        box off
-        if sortByChoice==0
-            saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR.pdf'])
-        elseif sortByChoice==1
-            saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice.pdf'])
-        end
-        
+%         % left and right seperated, perceptual trials
+%         errorbar_groups(meanYp{paraN}, steYp{paraN},  ...
+%             'bar_width',0.75,'errorbar_width',0.5, ...
+%             'bar_names',{'50','90'});
+%         if sortByChoice==0
+%             legend({'leftward trials' 'rightward trials'}, 'Location', 'best')
+%         elseif sortByChoice==1
+%             legend({'perceived left trials' 'perceived right trials'}, 'Location', 'best')
+%         end
+%         title('perceptual trials')
+%         ylabel(yLabels{paraN})
+%         %     ylim([-0.5 5])
+%         box off
+%         if sortByChoice==0
+%             saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR.pdf'])
+%         elseif sortByChoice==1
+%             saveas(gca, [pdfNames{paraN}, '_barplot_perceptualTrialsLR_sortByChoice.pdf'])
+%         end
+%         
 %         % left and right seperated, visual x perceived directions
 %         if sortByChoice==1
 %             % barplot of true values
@@ -445,29 +459,48 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
 end
 
 %% scatter plot of all participants in all probabilities
-% each dot is one participant in one probability block
-cd(analysisFolder)
-cd ..
-cd ..
-cd ..
-cd('psychometricFunction')
-load dataPercept_all_exp1
-cd(analysisFolder)
-
-for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
-    if scatterPlots==1
-        %         if paraN<sacStart
-        %             cd(pursuitFolder)
-        %         else
-        %             cd(saccadeFolder)
-        %         end
-        cd(correlationFolder)
-        
-%         % value in each block
+% % each dot is one participant in one probability block
+% cd(analysisFolder)
+% cd ..
+% cd ..
+% cd ..
+% cd('psychometricFunction')
+% load dataPercept_all_exp1
+% cd(analysisFolder)
+% 
+% for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
+%     if scatterPlots==1
+%         %         if paraN<sacStart
+%         %             cd(pursuitFolder)
+%         %         else
+%         %             cd(saccadeFolder)
+%         %         end
+%         cd(correlationFolder)
+%         
+% %         % value in each block
+% %         figure
+% %         for subN = 1:size(names, 2)
+% %             hold on
+% %             scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
+% %         end
+% %         %         for probNmerged = 1:3
+% %         %             hold on
+% %         %             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
+% %         %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
+% %         %         end
+% %         %         legend({'50','70','90'})
+% %         title('perceptual trials')
+% %         xlabel('PSE')
+% %         ylabel(yLabels{paraN})
+% %         %     ylim([-0.5 5])
+% %         box off
+% %         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
+%         
+%         % difference between each block
 %         figure
 %         for subN = 1:size(names, 2)
 %             hold on
-%             scatter(dataPercept.alpha(subN, :), subMeanP{paraN}(subN, :))
+%             scatter(dataPercept.alpha(subN, 3)-dataPercept.alpha(subN, 2), subMeanP{paraN}(subN, 3)-subMeanP{paraN}(subN, 2))
 %         end
 %         %         for probNmerged = 1:3
 %         %             hold on
@@ -475,30 +508,11 @@ for paraN = paraStart:paraEnd%sacStart-1%size(checkParas, 2)
 %         %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
 %         %         end
 %         %         legend({'50','70','90'})
-%         title('perceptual trials')
-%         xlabel('PSE')
-%         ylabel(yLabels{paraN})
+%         title('90-70')
+%         xlabel('PSE diff')
+%         ylabel({yLabels{paraN} ' diff'})
 %         %     ylim([-0.5 5])
 %         box off
-%         saveas(gca, [pdfNames{paraN}, '_scatterplot_perceptualTrials.pdf'])
-        
-        % difference between each block
-        figure
-        for subN = 1:size(names, 2)
-            hold on
-            scatter(dataPercept.alpha(subN, 3)-dataPercept.alpha(subN, 2), subMeanP{paraN}(subN, 3)-subMeanP{paraN}(subN, 2))
-        end
-        %         for probNmerged = 1:3
-        %             hold on
-        %             scatter(dataPercept.alpha(:, probNmerged), subMeanP{paraN}(:, probNmerged), ...
-        %                 'MarkerFaceColor', colorProb(probNmerged+2, :), 'MarkerEdgeColor', 'none')
-        %         end
-        %         legend({'50','70','90'})
-        title('90-70')
-        xlabel('PSE diff')
-        ylabel({yLabels{paraN} ' diff'})
-        %     ylim([-0.5 5])
-        box off
-        saveas(gca, [pdfNames{paraN}, '_7090_scatterplot_perceptualTrials.pdf'])
-    end
-end
+%         saveas(gca, [pdfNames{paraN}, '_7090_scatterplot_perceptualTrials.pdf'])
+%     end
+% end

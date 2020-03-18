@@ -16,7 +16,7 @@
 
 function [] = updatePlots(trial)
 % define window for which you want to plot your data
-startFrame = max(1, trial.log.fixationOff-ms2frames(100));
+startFrame = max(1, trial.log.targetOnset-ms2frames(400));
 endFrame = trial.log.trialEnd+ms2frames(100); %length(trial.eyeX_filt); % this is all recorded eye movement data
 % if the interval looking at micro-saccades differs define it here
 % msStart = trial.log.microSaccade.onset; 

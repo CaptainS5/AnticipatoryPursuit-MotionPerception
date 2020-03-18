@@ -5,7 +5,8 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+names = {'fh9'};
+% names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
 % namesFinal = ;
 data = table();
 

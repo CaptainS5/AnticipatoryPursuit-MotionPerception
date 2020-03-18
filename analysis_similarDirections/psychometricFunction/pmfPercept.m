@@ -2,14 +2,14 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'s12'};
+names = {'ca0'};
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
-probCons = [0 1 2];%[-1 0]; 
-probNames{1} = {'baseline' 'adaptation low' 'adaptation high'};%
-% probNames{2} = {'Prob 50%' 'Prob 90%'};
+probCons = [10 50];%[-1 0]; 
+% probNames{1} = {'10% up' '50% up'};%
+% probNames{2} = {'50% up' '90% up'};
 colorPlotting = [255 182 135; 232 113 240; 113 204 100]/255; % each row is one colour for one probability
 
 % fitting settings
@@ -36,7 +36,7 @@ for subN = 1:size(names, 2)
     data(data.trialType==1, :) = []; % test trials are type 0
     data(data.choice==999, :) = []; % only for the initial pilot...
     
-    data.cohFit = data.coh.*data.rdkDir; % left is negative
+    data.cohFit = data.coh.*data.rdkDir; % left and down is negative
     %     data.cohIdx = zeros(size(data.cohFit));
     %     cohLevels = unique([data.prob, data.cohFit], 'rows');
     %     for ii = 1:length(cohLevels)
@@ -44,11 +44,11 @@ for subN = 1:size(names, 2)
     %     end
     
     probSub = unique(data.prob);
-    %     if probSub(1)<50
-    probB = 1;
-    %     else
-    %         probB = 2;
-    %     end
+    if probSub(1)<50
+        probB = 1;
+    else
+        probB = 2;
+    end
     dataPercept.probSub(subN, 1:length(probSub)) = probSub;
     
     figure
@@ -79,13 +79,13 @@ for subN = 1:size(names, 2)
         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probN, :), 'markersize', 30);
         
         % saving parameters
-        probNmerged = probN;
-        %         if probSub(1)<50
-        %             probNmerged = 3-probN;
-        %             paramsValues{subN, probSubN}(1) = -paramsValues{subN, probSubN}(1); % also flip PSE
-        %         else
-        %             probNmerged = probN-1;
-        %         end
+        %         probNmerged = probN;
+        if probSub(1)<50
+            probNmerged = 3-probN;
+            paramsValues{subN, probSubN}(1) = -paramsValues{subN, probSubN}(1); % also flip PSE
+        else
+            probNmerged = probN-1;
+        end
         dataPercept.alpha(subN, probNmerged) = paramsValues{subN, probSubN}(1); % threshold, or PSE
         dataPercept.beta(subN, probNmerged) = paramsValues{subN, probSubN}(2); % slope
         dataPercept.gamma(subN, probNmerged) = paramsValues{subN, probSubN}(3); % guess rate, or baseline
@@ -95,7 +95,7 @@ for subN = 1:size(names, 2)
     set(gca, 'Xtick',cohLevels);
     axis([min(cohLevels) max(cohLevels) 0 1]);
     xlabel('Stimulus Intensity');
-    ylabel('Proportion right');
+    ylabel('Proportion up');
     legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
     
     saveas(gcf, ['pf_', names{subN}, '.pdf'])

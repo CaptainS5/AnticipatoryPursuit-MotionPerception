@@ -21,9 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 77; % 683 for p4
-% Exp1: 441 for p15, 683 for p11 
-% p7 and p11 not finished, but might do later--opposite perception...
+currentTrial = 1; % 1 for fhF 
 % chose trial you want to look at here; default = 1; 
 c = 1; % counter
 % monitor and setup specific parameters
@@ -62,7 +60,7 @@ load eventLog % variable matrix has all the event message frame indice
 cd(analysisPath);
 
 sidx = strfind(currentSubjectPath, 'data\');
-currentSubject = currentSubjectPath(sidx+5:end);
+currentSubject = currentSubjectPath(sidx+5:end); % exp2 +5, exp1+10
 
 errorFilePath = fullfile(analysisPath,'\ErrorFiles\');
 if exist(errorFilePath, 'dir') == 0

@@ -1,4 +1,3 @@
-% Exp 2
 initializeParas;
 
 % % correct for mistakenly pressing the wrong key in standard trials
@@ -25,18 +24,18 @@ pLength = 182; % length of perceptual trials in one block
 trialBin = 50; % window of trial numbers
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
     'clp gain (horizontal)' 'clp interpolated gain (horizontal)' ...
     'saccade number (horizontal)' 'saccade mean amplitude (horizontal)' 'saccade sum amplitude (horizontal)'};
 % for plotting, each parameter has a specific y value range
-minY = [-0.3; 0; ...
+minY = [0; -3; ...
     -10; -15; ...
     0; ...
     0; 0; 0];
-maxY = [0; 3; ...
+maxY = [1; 3; ...
     10; 15; ...
     1.5; ...
     5; 2; 5];
@@ -75,7 +74,7 @@ for subN = 1:size(names, 2)
             
             % standard trials
             idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==1);
+                & abs(eyeTrialData.coh(subN, :))==1);
             for slideI = 1:(length(idxT)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRightNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))>0));
@@ -88,7 +87,7 @@ for subN = 1:size(names, 2)
             %%seperate left and rightward trials
             % left
             idxTL = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==1 & eyeTrialData.rdkDir(subN, :)<0);
+                & abs(eyeTrialData.coh(subN, :))==1 & eyeTrialData.rdkDir(subN, :)<0);
             for slideI = 1:(length(idxTL)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRight = 0;
@@ -99,7 +98,7 @@ for subN = 1:size(names, 2)
             end
             % right
             idxTR = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==1  & eyeTrialData.rdkDir(subN, :)>0);
+                & abs(eyeTrialData.coh(subN, :))==1  & eyeTrialData.rdkDir(subN, :)>0);
             for slideI = 1:(length(idxTR)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRight = 1;
@@ -111,7 +110,7 @@ for subN = 1:size(names, 2)
             
             % perceptual trials
             idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==0);
+                & abs(eyeTrialData.coh(subN, :))~=1);
             for slideI = 1:(length(idxT)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRightNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))>0));
@@ -125,7 +124,7 @@ for subN = 1:size(names, 2)
             %%seperate left and rightward trials
             % left
             idxTL = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0);
+                & abs(eyeTrialData.coh(subN, :))~=1 & eyeTrialData.rdkDir(subN, :)<0);
             for slideI = 1:(length(idxTL)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRight = 0;
@@ -136,7 +135,7 @@ for subN = 1:size(names, 2)
             end
             % right
             idxTR = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-                & eyeTrialData.trialType(subN, :)==0  & eyeTrialData.rdkDir(subN, :)>0);
+                & abs(eyeTrialData.coh(subN, :))~=1  & eyeTrialData.rdkDir(subN, :)>0);
             for slideI = 1:(length(idxTR)-trialBin+1)
                 if strcmp(checkParas{paraN}, 'choice')
                     probRight = 1;
@@ -210,7 +209,7 @@ end
 close all
 if averagedPlots==1
     for paraN = 1:2%sacStart-1%size(checkParas, 2)
-        for probNmerged= 1:2 % here probN is merged, 50 and 90
+        for probNmerged= 1:3 % here probN is merged, 50, 70, and 90
             tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
             tempMeanP{paraN, probNmerged} = NaN(size(names, 2), pLength-trialBin+1);
             for subN = 1:size(names, 2)
@@ -223,21 +222,21 @@ if averagedPlots==1
                             strcmp(checkParas{paraN}, 'initialMeanVelocityX') || ...
                             strcmp(checkParas{paraN}, 'pursuit.initialVelChangeX')
                         % flip direction for AP (these are not absolute values)
-                        tempMeanAll{paraN, probNmerged}(subN, :) = -yValuesAll{paraN, subN}(3-probNmerged, :);
-                        tempMeanS{paraN, probNmerged}(subN, :) = -yValuesS{paraN, subN}(3-probNmerged, :);
-                        tempMeanSL{paraN, probNmerged}(subN, :) = -yValuesSR{paraN, subN}(3-probNmerged, :);
-                        tempMeanSR{paraN, probNmerged}(subN, :) = -yValuesSL{paraN, subN}(3-probNmerged, :);
-                        tempMeanP{paraN, probNmerged}(subN, :) = -yValuesP{paraN, subN}(3-probNmerged, :);
-                        tempMeanPL{paraN, probNmerged}(subN, :) = -yValuesPR{paraN, subN}(3-probNmerged, :);
-                        tempMeanPR{paraN, probNmerged}(subN, :) = -yValuesPL{paraN, subN}(3-probNmerged, :);
+                        tempMeanAll{paraN, probNmerged}(subN, :) = -yValuesAll{paraN, subN}(4-probNmerged, :);
+                        tempMeanS{paraN, probNmerged}(subN, :) = -yValuesS{paraN, subN}(4-probNmerged, :);
+                        tempMeanSL{paraN, probNmerged}(subN, :) = -yValuesSR{paraN, subN}(4-probNmerged, :);
+                        tempMeanSR{paraN, probNmerged}(subN, :) = -yValuesSL{paraN, subN}(4-probNmerged, :);
+                        tempMeanP{paraN, probNmerged}(subN, :) = -yValuesP{paraN, subN}(4-probNmerged, :);
+                        tempMeanPL{paraN, probNmerged}(subN, :) = -yValuesPR{paraN, subN}(4-probNmerged, :);
+                        tempMeanPR{paraN, probNmerged}(subN, :) = -yValuesPL{paraN, subN}(4-probNmerged, :);
                     else
-                        tempMeanAll{paraN, probNmerged}(subN, :) = yValuesAll{paraN, subN}(3-probNmerged, :);
-                        tempMeanS{paraN, probNmerged}(subN, :) = yValuesS{paraN, subN}(3-probNmerged, :);
-                        tempMeanSL{paraN, probNmerged}(subN, :) = yValuesSR{paraN, subN}(3-probNmerged, :);
-                        tempMeanSR{paraN, probNmerged}(subN, :) = yValuesSL{paraN, subN}(3-probNmerged, :);
-                        tempMeanP{paraN, probNmerged}(subN, :) = yValuesP{paraN, subN}(3-probNmerged, :);
-                        tempMeanPL{paraN, probNmerged}(subN, :) = yValuesPR{paraN, subN}(3-probNmerged, :);
-                        tempMeanPR{paraN, probNmerged}(subN, :) = yValuesPL{paraN, subN}(3-probNmerged, :);
+                        tempMeanAll{paraN, probNmerged}(subN, :) = yValuesAll{paraN, subN}(4-probNmerged, :);
+                        tempMeanS{paraN, probNmerged}(subN, :) = yValuesS{paraN, subN}(4-probNmerged, :);
+                        tempMeanSL{paraN, probNmerged}(subN, :) = yValuesSR{paraN, subN}(4-probNmerged, :);
+                        tempMeanSR{paraN, probNmerged}(subN, :) = yValuesSL{paraN, subN}(4-probNmerged, :);
+                        tempMeanP{paraN, probNmerged}(subN, :) = yValuesP{paraN, subN}(4-probNmerged, :);
+                        tempMeanPL{paraN, probNmerged}(subN, :) = yValuesPR{paraN, subN}(4-probNmerged, :);
+                        tempMeanPR{paraN, probNmerged}(subN, :) = yValuesPL{paraN, subN}(4-probNmerged, :);
                     end
                 else
                     tempMeanAll{paraN, probNmerged}(subN, :) = yValuesAll{paraN, subN}(probNmerged, :);
@@ -282,15 +281,14 @@ if averagedPlots==1
         % perceptual trials, merged
         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
             figure
-            for probNmerged = 1:2 % merged prob
-                plot(meanY_p{paraN}(probNmerged, :), 'color', colorProb(probNmerged+1, :))
+            for probNmerged = 1:3 % merged prob
+                plot(meanY_p{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
                 hold on
             end
-            legend({'50' '90'}, 'box', 'off')
+            legend({'50' '70' '90'}, 'box', 'off')
             title('perceptual trials')
             xlabel('Trial bin number')
             ylabel(yLabels{paraN})
-%             ylim([minY(paraN) maxY(paraN)])
             saveas(gca, [pdfNames{paraN}, '_perceptualTrials_all_bin', num2str(trialBin), '.pdf'])
         end
         
@@ -311,17 +309,17 @@ if averagedPlots==1
         
         
 %         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
-%             % standard trials, merged
-%             figure
-%             for probNmerged = 1:2 % merged prob
-%                 plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+1, :))
-%                 hold on
-%             end
-%             legend({'50' '90'}, 'box', 'off')
-%             title('standard trials')
-%             xlabel('Trial bin number')
-%             ylabel(yLabels{paraN})
-%             saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
+            % standard trials, merged
+            figure
+            for probNmerged = 1:3 % merged prob
+                plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+                hold on
+            end
+            legend({'50' '70' '90'}, 'box', 'off')
+            title('standard trials')
+            xlabel('Trial bin number')
+            ylabel(yLabels{paraN})
+            saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
             %         end
             
             % %         % standard trials, not merged
@@ -354,18 +352,18 @@ if averagedPlots==1
 %         end
 
 % generate CSV trials
-for probNmerged = 1:2
+for probNmerged = 1:3
     clear minLengthP
     % find the min length...
     for subN = 1:size(names, 2)
         probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
         if probSub(1)<50
-            probSubN = 3-probNmerged;
+            probSubN = 4-probNmerged;
         else
             probSubN = probNmerged;
         end
         idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-            & eyeTrialData.trialType(subN, :)==0);
+            & abs(eyeTrialData.coh(subN, :))~=1);
         minLengthP(subN, 1) = length(idxT)-trialBin+1;
     end
     maxIdxP = min(minLengthP);
@@ -375,7 +373,7 @@ for probNmerged = 1:2
     cd ..
     cd ..
     cd('R')
-    csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+1)), '_exp2.csv'], slideSub)
+    csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+2)), '.csv'], slideSub)
 end
 
     end

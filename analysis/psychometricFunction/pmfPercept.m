@@ -2,14 +2,16 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
-averagedPlot = 1;
+names = {'fh9'};
+% names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
 % probCons = [10; 30; 50; 70; 90];
 probCons = [10; 50; 90];
 probNames{1} = {'Prob 10%' 'Prob 50%'};
+% probNames{1} = {'Prob 10%' 'Prob 30%' 'Prob 50%'};
 probNames{2} = {'Prob 50%' 'Prob 90%'};
 colorPlotting = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
 % colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
@@ -175,3 +177,20 @@ if averagedPlot==1
 %     ylabel('Slope (beta)');
 %     saveas(gcf, ['Slope_all.pdf'])    
 end
+
+%% save csv for ANOVA
+cd ..
+cd('R')
+
+data = table();
+count = 1;
+for subN = 1:length(names)
+    for probNmerged = 1:2
+        data.sub(count, 1) = subN;
+        data.prob(count, 1) = probCons(probNmerged+1);
+        data.PSE(count, 1) = dataPercept.alpha(subN, probNmerged);
+        data.slope(count, 1) = dataPercept.beta(subN, probNmerged);
+        count = count+1;
+    end
+end
+writetable(data, 'dataPercept_Exp2.csv')

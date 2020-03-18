@@ -35,6 +35,7 @@ end
 xlim([0.18, 0.32])
 xlabel('Coherence of the current trial')
 ylabel('Abs CLP horizontal velocity (deg/s)')
+% saveas(gca, 'coherence_pursuitVel_contextTrials.pdf')
 
 % ASP figure
 figure
@@ -45,3 +46,4 @@ end
 xlim([0.18, 0.32])
 xlabel('Coherence of the previous trial')
 ylabel('ASP horizontal velocity (deg/s)')
+% saveas(gca, 'previousContextTrialCoherence_ASP.pdf')

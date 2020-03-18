@@ -46,7 +46,7 @@ cohLevels = unique(eyeTrialData.coh(1, eyeTrialData.trialType(1, :)==0))';
 % end
 
 %% Perceptual plots
-cd(mausFolder)
+% cd(mausFolder)
 if perceptPlots==1
     for windowSize = 1:wMax
         if aveWinP(windowSize)==1
@@ -220,7 +220,7 @@ end
 
 %% AP plots
 if APplots==1
-    cd(mausFolder)
+%     cd(mausFolder)
     % for plotting velocity traces
     yPerceptRange = [-6 6];
     
@@ -288,7 +288,7 @@ if APplots==1
 %             end
             
             % Draw velocity trace plots
-            cd(mausFolder)
+%             cd(mausFolder)
 %             % plot mean traces in all probabilities for each participant
 %             for subN = 1:size(names, 2)
 %                 probSub = unique(eyeTrialData.prob(subN, :));

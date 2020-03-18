@@ -8,7 +8,7 @@ binMax = 5; % number of bins
 idxT = find(eyeTrialData.rdkDir==0); % 0 coherence coded as 0.5
 eyeTrialData.rdkDir(idxT) = 0.5;
 idxT = find(eyeTrialData.rdkDir==-1); % left coded as 0
-eyeTrialData.rdkDir(idxT) = 0;
+eyeTrialData.rdkDir(idxT) = 0;     
 % idxT = find(eyeTrialData.choice==0); % left coded as -1
 % eyeTrialData.choice(idxT) = -1;
 

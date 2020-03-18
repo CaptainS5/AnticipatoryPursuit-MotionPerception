@@ -7,16 +7,17 @@ rm(list = ls())
 
 #### load data
 # on Inspiron 13
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
-source("pairwise.t.test.with.t.and.df.R")
-plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/Conferences/Gordon/2019/figures/")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
+# source("pairwise.t.test.with.t.and.df.R")
+plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/data/coding challenge/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataPercept.csv"
-# pdfFileName <- "relativeMotionPSEDiff.pdf"
+dataFileName <- "aspVelExp1.csv"
+pdfFileName <- "aspVelExp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
 dotSize <- 3
+subN <- 9
 
 # source("pairwise.t.test.with.t.and.df.R")
 data <- read.csv(dataFileName)
@@ -30,8 +31,8 @@ data <- read.csv(dataFileName)
 sub <- data["sub"]
 prob <- data["prob"]
 # timeBin <- data["timeBin"]
-PSE <- data["PSE"]
-dataAnova <- data.frame(sub, prob, PSE)
+measure <- data["aspGain"]
+dataAnova <- data.frame(sub, prob, measure)
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$timeBin <- as.factor(dataAnova$timeBin)
@@ -39,9 +40,9 @@ colnames(dataAnova)[3] <- "PSE"
 # dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
     # data = dataTemp, FUN = "mean")
 
-anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
-    within = .(prob), type = 3)
-print(anovaData)
+# anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
+#     within = .(prob), type = 3)
+# print(anovaData)
 
 # dataTemp <- data.frame(sub, prob, PSE)
 # colnames(dataTemp)[3] <- "PSE"
@@ -57,55 +58,31 @@ print(anovaData)
 # res[[3]]
 # p.adjust(res[[3]], method = "bonferroni", n = 9) # interaction between timeWindow & afterReversalD
 
-# p <- ggplot(dataAnova, aes(x = prob, y = PSE)) +
-#         stat_summary(aes(y = PSE), fun.y = mean, geom = "point", shape = 95, size = 15) +
-#         stat_summary(fun.data = 'mean_sdl',
-#                fun.args = list(mult = 1),
-#                geom = 'errorbar', width = .1) +
-# # geom = 'smooth', se = 'TRUE') +
-#         # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
-#         geom_point(aes(x = prob, y = PSE), size = dotSize, shape = 1) +
-#         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-#         scale_y_continuous(name = "PSE difference", limits = c(-0.1, 0.15), expand = c(0, 0)) +
-#         scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
-#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
-#         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
-#         theme(axis.text=element_text(colour="black"),
-#               axis.ticks=element_line(colour="black", size = axisLineWidth),
-#               panel.grid.major = element_blank(),
-#               panel.grid.minor = element_blank(),
-#               panel.border = element_blank(),
-#               panel.background = element_blank(),
-#               text = element_text(size = textSize, colour = "black"),
-#               legend.background = element_rect(fill="transparent"),
-#               legend.key = element_rect(colour = "transparent", fill = "white"))
-#         # facet_wrap(~prob)
-# print(p)
-# ggsave(paste(plotFolder, pdfFileName, sep = ""))
+p <- ggplot(dataAnova, aes(x = prob, y = PSE)) +
+        stat_summary(aes(y = PSE), fun.y = mean, geom = "point", shape = 95, size = 15) +
+        stat_summary(fun.data = 'mean_sdl',
+               fun.args = list(mult = 1.96/sqrt(subN)),
+               geom = 'errorbar', width = .1) +
+# geom = 'smooth', se = 'TRUE') +
+        # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+        geom_point(aes(x = prob, y = PSE), size = dotSize, shape = 1) +
+        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
+        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)") + #, limits = c(-4, 6), expand = c(0, 0)) +
+        scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
+        # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
+        # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+        theme(axis.text=element_text(colour="black"),
+              axis.ticks=element_line(colour="black", size = axisLineWidth),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank(),
+              panel.background = element_blank(),
+              text = element_text(size = textSize, colour = "black"),
+              legend.background = element_rect(fill="transparent"),
+              legend.key = element_rect(colour = "transparent", fill = "white"))
+        # facet_wrap(~prob)
+print(p)
+ggsave(paste(plotFolder, pdfFileName, sep = ""))
 
 
-# # PSE Diff
-# p <- ggplot(dataAnova, aes(x = prob, y = PSE)) +
-#         stat_summary(aes(y = PSE), fun.y = mean, geom = "point", shape = 95, size = 15) +
-#         stat_summary(fun.data = 'mean_sdl',
-#                fun.args = list(mult = 1),
-#                geom = 'errorbar', width = .1) +
-#         # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
-#         geom_point(aes(x = prob, y = PSE), size = dotSize, shape = 1) +
-#         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-#         scale_y_continuous(name = "PSE difference", limits = c(-0.1, 0.15), expand = c(0, 0)) +
-#         scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
-#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
-#         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
-#         theme(axis.text=element_text(colour="black"),
-#               axis.ticks=element_line(colour="black", size = axisLineWidth),
-#               panel.grid.major = element_blank(),
-#               panel.grid.minor = element_blank(),
-#               panel.border = element_blank(),
-#               panel.background = element_blank(),
-#               text = element_text(size = textSize, colour = "black"),
-#               legend.background = element_rect(fill="transparent"),
-#               legend.key = element_rect(colour = "transparent", fill = "white"))
-#         # facet_wrap(~prob)
-# print(p)
-# ggsave(paste(plotFolder, pdfFileName, sep = ""))
+# asp gain

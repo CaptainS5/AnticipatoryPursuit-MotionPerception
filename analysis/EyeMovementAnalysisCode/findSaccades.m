@@ -28,9 +28,9 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 300; % 200 for Exp1
+accelerationThreshold = 200; % 200 for Exp1, 300 for exp2
 jerk = jerk(startFrame:endFrame);
-jerkThreshold = 50000; % 30000 for Exp1
+jerkThreshold = 30000; % 30000 for Exp1, 50000 for exp2
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the

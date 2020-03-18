@@ -5,7 +5,7 @@ clear all; close all; clc
 
 %% basic setting
 folder = pwd;
-names = {'s12'};
+names = {'tS0'};
 data = table();
 
 %%

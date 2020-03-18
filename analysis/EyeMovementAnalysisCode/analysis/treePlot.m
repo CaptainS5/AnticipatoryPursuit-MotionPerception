@@ -30,22 +30,22 @@ for subN = 1:size(names, 2)
     for probN = 1:size(probNameSub, 2)
         [, dataIdx] = find(eyeTrialData.prob(subN, :)==probSub(probN) & eyeTrialData.errorStatus(subN, :)==0);
         [, perceptualIdx] = find(eyeTrialData.trialType(subN, dataIdx)==0); % locate perceptual trials
-        % make sure that all preceding trials are context trials...
-        deleteI{subN} = [];
-        for pI = 1:length(perceptualIdx)
-            dataIdxT = eyeTrialData.trialIdx(subN, dataIdx);
-            dataTypeT = eyeTrialData.trialType(subN, dataIdx);
-            twoBackI = find(dataIdxT==(dataIdxT(perceptualIdx(pI))-2) );
-            if ~isempty(twoBackI) && dataTypeT(twoBackI)==0
-                deleteI{subN} = [deleteI{subN}; pI];
-            end
-        end
-        perceptualIdx(deleteI{subN}) = [];
+%         % make sure that all preceding trials are context trials...
+%         deleteI{subN} = [];
+%         for pI = 1:length(perceptualIdx)
+%             dataIdxT = eyeTrialData.trialIdx(subN, dataIdx);
+%             dataTypeT = eyeTrialData.trialType(subN, dataIdx);
+%             twoBackI = find(dataIdxT==(dataIdxT(perceptualIdx(pI))-2) );
+%             if ~isempty(twoBackI) && dataTypeT(twoBackI)==0
+%                 deleteI{subN} = [deleteI{subN}; pI];
+%             end
+%         end
+%         perceptualIdx(deleteI{subN}) = [];
         
         % anticipatory pursuit
-        [lastP lastPstd idxOutPL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
-        [firstP(1:2, :) firstPstd(1:2, :) idxOutPFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{1}, 2); 
-        [firstP(3:4, :) firstPstd(3:4, :) idxOutPFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{2}, 2); 
+        [lastP lastPstd idxOutPL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
+        [firstP(1:2, :) firstPstd(1:2, :) idxOutPFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{1}, 2); 
+        [firstP(3:4, :) firstPstd(3:4, :) idxOutPFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.pursuit.APvelocityX(subN, dataIdx), idxOutPL{probN, subN}{2}, 2); 
         treeNodesP{probN, 1}(subN, 1:4) = firstP(1:4, 1)'; % the first column, four nodes, n-2, diff-diff, same-diff, diff-same, same-same
         treeNodesP{probN, 2}(subN, 1:2) = lastP(1:2, 1)'; % the second column, two nodes, n-1, diff, same
         treeNodesP{probN, 3}(subN, 1) = lastP(1, 2); % the third column, 1 node, mean of all
@@ -60,9 +60,9 @@ for subN = 1:size(names, 2)
             sortForPlot({treeNodesPstd{probN, 1}(subN, :) treeNodesPstd{probN, 2}(subN, :) treeNodesPstd{probN, 3}(subN, :)}, 1, 2);% pursuit
         
         % perception
-        [lastPer lastPerstd idxOutPerL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
-        [firstPer(1:2, :) firstPerstd(1:2, :) idxOutPerFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{1}, 2); 
-        [firstPer(3:4, :) firstPerstd(3:4, :) idxOutPerFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.rdkDir(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{2}, 2); 
+        [lastPer lastPerstd idxOutPerL{probN, subN}] = splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), perceptualIdx, 1); % the last two nodes in the tree plot
+        [firstPer(1:2, :) firstPerstd(1:2, :) idxOutPerFl{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{1}, 2); 
+        [firstPer(3:4, :) firstPerstd(3:4, :) idxOutPerFr{probN, subN}]= splitNode(eyeTrialData.trialIdx(subN, dataIdx), eyeTrialData.choice(subN, dataIdx), [-1 1], eyeTrialData.choice(subN, dataIdx)-eyeTrialData.coh(subN, dataIdx), idxOutPerL{probN, subN}{2}, 2); 
         treeNodesPer{probN, 1}(subN, 1:4) = firstPer(1:4, 1)'; % the first column, four nodes, n-2, diff-diff, same-diff, diff-same, same-same
         treeNodesPer{probN, 2}(subN, 1:2) = lastPer(1:2, 1)'; % the second column, two nodes, n-1, diff, same
         treeNodesPer{probN, 3}(subN, 1) = lastPer(1, 2); % the third column, 1 node, mean of all
@@ -80,11 +80,11 @@ for subN = 1:size(names, 2)
     %% plots of individual data
     if individualPlots==1
         cd(perceptFolder)
-        drawPlot(subN, nodesPermeanSub, nodesPerstdSub, 'Trial', 'Choice-coh', probNameSub, 'treePlotPerception_Exp2_bootstrap_', names{subN}, [])
-        % pursuit plots
-        cd(pursuitFolder)
-        % anticipatory pursuit
-        drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlotPursuit_Exp2_bootstrap_', names{subN}, [])
+        drawPlot(subN, nodesPermeanSub, nodesPerstdSub, 'Trial', 'Choice-coh', probNameSub, 'treePlotPerception_Exp2_', names{subN}, [])
+%         % pursuit plots
+%         cd(pursuitFolder)
+%         % anticipatory pursuit
+%         drawPlot(subN, nodesPmeanSub, nodesPstdSub, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNameSub, 'treePlotPursuit_Exp2_', names{subN}, [])
 %         close all
     end
 end
@@ -100,12 +100,12 @@ if averagedPlots==1
     % pursuit plots
     cd(perceptFolder)
     % anticipatory pursuit
-    drawPlot(1, nodesPermean, nodesPerste, 'Trial', 'Choice-coh', probNames{2}, 'treePlotPerception_Exp2_bootstrap_', 'all', [])
+    drawPlot(1, nodesPermean, nodesPerste, 'Trial', 'Choice-coh', probNames{2}, 'treePlotPerception_Exp2_', 'all', [])
     
-    % pursuit plots
-    cd(pursuitFolder)
-    % anticipatory pursuit
-    drawPlot(1, nodesPmean, nodesPste, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNames{2}, 'treePlotPursuit_Exp2_bootstrap_', 'all', [])
+%     % pursuit plots
+%     cd(pursuitFolder)
+%     % anticipatory pursuit
+%     drawPlot(1, nodesPmean, nodesPste, 'Trial', 'Anticipatory pursuit velocity (deg/s)', probNames{2}, 'treePlotPursuit_Exp2_', 'all', [])
 end
 
 %% functions used
@@ -125,18 +125,18 @@ function [outputMean outputStd idxOut] = splitNode(trialIdx, x, xCons, y, validI
 %       the second column is the mean of all trials (should be identical numbers)
 %   idxOut-each cell contains the idx of each split condition
 
-% also bootstrap the first one
-lastY = y(validI); % the original vector
-sampleSize = length(lastY);
-resampleIdx = randi(sampleSize, [sampleSize, 1000]);
-newSamples = lastY(resampleIdx);
-bsMeanAll = nanmean(newSamples);
-outputMean(:, 2) = repmat(nanmean(bsMeanAll), length(xCons), 1);
-outputStd(:, 2) = repmat(nanstd(bsMeanAll), length(xCons), 1);
+% % also bootstrap the first one
+% lastY = y(validI); % the original vector
+% sampleSize = length(lastY);
+% resampleIdx = randi(sampleSize, [sampleSize, 1000]);
+% newSamples = lastY(resampleIdx);
+% bsMeanAll = nanmean(newSamples);
+% outputMean(:, 2) = repmat(nanmean(bsMeanAll), length(xCons), 1);
+% outputStd(:, 2) = repmat(nanstd(bsMeanAll), length(xCons), 1);
 
-% % directly compute
-% outputMean(:, 2) = repmat(nanmean(y(validI)), length(xCons), 1);
-% outputStd(:, 2) = repmat(nanstd(y(validI)), length(xCons), 1);
+% directly compute
+outputMean(:, 2) = repmat(nanmean(y(validI)), length(xCons), 1);
+outputStd(:, 2) = repmat(nanstd(y(validI)), length(xCons), 1);
 
 tempY = cell(1, length(xCons));
 idxOut = cell(1, length(xCons));
@@ -151,31 +151,31 @@ for idxT = 1:length(validI) % loop through all trials
     end    
 end
 
-% bootstrapping! do 1000 times
-for conI = 1:length(xCons)
-    if ~isempty(tempY{conI})
-        sampleSize = length(tempY{conI});
-        resampleIdx = randi(sampleSize, [sampleSize, 1000]);
-        newSamples = tempY{conI}(resampleIdx);
-        bsMeanAll = nanmean(newSamples);
-        %     % plot the distribution, show the calculated mean
-        %     figure
-        %     histogram(bsMeanAll)
-        %     title(['mean=', num2str(nanmean(bsMeanAll)), ' median=', num2str(nanmedian(bsMeanAll))])
-        %     pause
-        %     close
-        outputMean(conI, 1) = nanmean(bsMeanAll);
-        outputStd(conI, 1) = nanstd(bsMeanAll);
-    else
-        outputMean(conI, 1) = NaN;
-        outputStd(conI, 1) = NaN;
-    end
-end
-% % directly compute the mean
+% % bootstrapping! do 1000 times
 % for conI = 1:length(xCons)
-%     outputMean(conI, 1) = nanmean(tempY{conI});
-%     outputStd(conI, 1) = nanstd(tempY{conI});
+%     if ~isempty(tempY{conI})
+%         sampleSize = length(tempY{conI});
+%         resampleIdx = randi(sampleSize, [sampleSize, 1000]);
+%         newSamples = tempY{conI}(resampleIdx);
+%         bsMeanAll = nanmean(newSamples);
+%         %     % plot the distribution, show the calculated mean
+%         %     figure
+%         %     histogram(bsMeanAll)
+%         %     title(['mean=', num2str(nanmean(bsMeanAll)), ' median=', num2str(nanmedian(bsMeanAll))])
+%         %     pause
+%         %     close
+%         outputMean(conI, 1) = nanmean(bsMeanAll);
+%         outputStd(conI, 1) = nanstd(bsMeanAll);
+%     else
+%         outputMean(conI, 1) = NaN;
+%         outputStd(conI, 1) = NaN;
+%     end
 % end
+% directly compute the mean
+for conI = 1:length(xCons)
+    outputMean(conI, 1) = nanmean(tempY{conI});
+    outputStd(conI, 1) = nanstd(tempY{conI});
+end
 end
 
 function [nodesMean nodesSte] = sortForPlot(treeNodes, sqrtN, n) % mainly for average plot
