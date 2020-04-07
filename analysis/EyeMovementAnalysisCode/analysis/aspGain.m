@@ -1,13 +1,13 @@
-% to calculate the ASP gain in both experiments and compare them
+% to calculate the ASP gain in experiments 1&3 and compare them
 clear all; close all; clc
 
 d{1} = load('eyeTrialData_all_set1_exp1.mat');
-d{2} = load('eyeTrialData_all_set1_exp2.mat');
-probCons = [50 70 90]; % to compare between the experiments
+d{2} = load('eyeTrialData_all_set1_exp3.mat');
+probCons = [50 90]; % to compare between the experiments
 
 %% calculate ASP gain for each participant in prob 90 block
 % asp for each trial is velocity-mean ASP velocity in the prob 50 block
-for expN = 1:1
+for expN = 1:2
     aspGainTrial{expN, 1} = NaN(182, 9);
     aspTrial{expN, 1} = NaN(182, 9);
     aspGainTrial{expN, 2} = NaN(182, 9);
@@ -46,7 +46,7 @@ for expN = 1:1
                 aspGainTrial{expN, probN}(perceptN, subN) = aspTrial{expN, probN}(perceptN, subN)/meanCLPvelX{expN, probN}(perceptN, subN); % each column is one participant
             end
 %             aspGainSub(subN, (expN-1)*2+probN) = nanmean(aspGainTrial{expN, probN}(:, subN)); % exp1-50, exp1-90, exp2-50, exp2-90
-            aspGainSub(subN, (expN-1)*2+probN) = nanmean(aspTrial{expN, probN}(:, subN)); % velocity, not gain; exp1-50, exp1-90, exp2-50, exp2-90
+            aspVelSub(subN, (expN-1)*2+probN) = nanmean(aspTrial{expN, probN}(:, subN)); % velocity, not gain; exp1-50, exp1-90, exp2-50, exp2-90
         end
     end
 end
@@ -76,29 +76,41 @@ cd('R')
 
 data = table();
 count = 1;
+for ii = 1:2
+    if ii==1
+        expN = 1;
+    else
+        expN = 2;
+    end
+    for subN = 1:9
+        for probN = 1:2
+            data.sub(count, 1) = subN;
+            data.exp(count, 1) = expN;
+            data.prob(count, 1) = probCons(probN);
+            data.aspVel(count, 1) = aspVelSub(subN, (ii-1)*2+probN);
+            count = count+1;
+        end
+    end
+end
+writetable(data, 'aspVel_exp1vs3.csv')
+
+% asp gain difference
+data = table();
+count = 1;
 for subN = 1:9
-    for probN = 1:3
+    for ii = 1:2
+        if ii==1
+            expN = 1;
+        else
+            expN = 3;
+        end
         data.sub(count, 1) = subN;
-        data.exp(count, 1) = 2;
-        data.prob(count, 1) = probCons(probN);
-        data.aspGain(count, 1) = aspGainSub(subN, probN);
+        data.exp(count, 1) = expN;
+        data.aspVelDiff(count, 1) = aspVelSub(subN, ii*2)-aspVelSub(subN, ii*2-1);
         count = count+1;
     end
 end
-writetable(data, 'aspVelExp1.csv')
-
-% % asp gain difference
-% data = table();
-% count = 1;
-% for subN = 1:9
-%     for expN = 1:2
-%         data.sub(count, 1) = subN;
-%         data.exp(count, 1) = expN;
-%         data.aspGainDiff(count, 1) = aspGainSub(subN, expN*2)-aspGainSub(subN, expN*2-1);
-%         count = count+1;
-%     end
-% end
-% writetable(data, 'aspGainCompare.csv')
+writetable(data, 'aspVelDiff_exp1vs3.csv')
 
 %% check correlation... no you only have 9 points = =
 % load('perceptBias')

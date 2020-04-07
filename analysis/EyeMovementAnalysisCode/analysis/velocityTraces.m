@@ -1,8 +1,10 @@
 % plot velocity traces, generate csv file for plotting in R
 initializeParas;
-eyeTrialData = expAll{3}.eyeTrialData;
-individualPlots = 1;
-averagedPlots = 1;
+eyeTrialData = expCleanedUp{2}.eyeTrialData;
+% eyeTrialData = expAll{2}.eyeTrialData;
+names = names2;
+individualPlots = 0;
+averagedPlots = 0;
 
 % for plotting
 yStandardRange = [-12 12];
@@ -465,10 +467,10 @@ end
 % each row is the mean velocity trace of one participant
 % use the min frame length--the lengeth where all participants have
 % valid data points
-% cd(analysisFolder)
-% cd ..
-% cd ..
-% cd('R')
+cd(analysisFolder)
+cd ..
+cd ..
+cd('R\Exp2')
 
 % % perceptual trials by perceived motion
 % for probNmerged = 1:2
@@ -502,21 +504,21 @@ end
 %     csvwrite(['velocityTraceStandard_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 %
-% % perceptual trials by visual motion
-% for probNmerged = 1:2
-%     velTAverageSub = [];
-%     for binN = 1:2
-%         if binN==1
-%             dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-%         else
-%             dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-%         end
-%         for subN = 1:size(names, 2)
-%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-%         end
-%     end
-%     csvwrite(['velocityTracePerceptual_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
-% end
+% perceptual trials by visual motion
+for probNmerged = 1:2
+    velTAverageSub = [];
+    for binN = 1:2
+        if binN==1
+            dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+        else
+            dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+        end
+        for subN = 1:size(names, 2)
+            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+        end
+    end
+    csvwrite(['velocityTracePerceptual_cleaned140_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
+end
 %
 % % perceptual visual left trials
 % for probNmerged = 1:3

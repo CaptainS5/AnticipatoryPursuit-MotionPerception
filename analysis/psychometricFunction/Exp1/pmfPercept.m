@@ -2,8 +2,9 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14'};
+names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'};
 averagedPlot = 1;
+perceptFolder = pwd;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorProb = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
@@ -31,13 +32,31 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
+try
+    cd ..
+    cd ..
+    cd('EyeMovementAnalysisCode\analysis\')
+    load('eyeTrialData_all_set1_exp1.mat')
+    loadRaw = 0;
+catch
+    loadRaw = 1;
+end
+
 for subN = 1:size(names, 2)
-    load(['dataRaw_', names{subN}])
-    data = dataRaw;
-    data(data.coh==1, :) = [];
-    data(data.choice==999, :) = []; % only for the initial pilot...
+    if loadRaw==1
+        load(['dataRaw_', names{subN}])
+        data = dataRaw;
+        data(data.coh==1, :) = [];
+        data(data.choice==999, :) = []; % only for the initial pilot...
+        data.cohFit = data.coh.*data.rdkDir; % left is negative
+    else
+        data = table();
+        idx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0);
+        data.choice = eyeTrialData.choice(subN, idx)';
+        data.cohFit = eyeTrialData.coh(subN, idx)';
+        data.prob = eyeTrialData.prob(subN, idx)';
+    end
     
-    data.cohFit = data.coh.*data.rdkDir; % left is negative
     %     data.cohIdx = zeros(size(data.cohFit));
     %     cohLevels = unique([data.prob, data.cohFit], 'rows');
     %     for ii = 1:length(cohLevels)
@@ -98,14 +117,16 @@ for subN = 1:size(names, 2)
 %     ylabel('Proportion right');
 %     legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
 %     
+% cd (perceptFolder)
 %     saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end
 
 %% draw averaged PSE plot
+cd (perceptFolder)
 if averagedPlot==1
     % plot averaged pf
-%     figure
-%     hold on
+    figure
+    hold on
     for probNmerged = 1:size(dataPercept.alpha, 2) % merged left&right probabilities
         % average PSE
         dataPercept.PSEmean(1, probNmerged) = mean(dataPercept.alpha(:, probNmerged));
@@ -142,17 +163,17 @@ if averagedPlot==1
         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
         ProportionCorrectModel = PF(paramsValuesAll{probNmerged},StimLevelsFineGrain);
         
-%         fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probNmerged+2, :), 'linewidth', 2);
-%         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probNmerged+2, :), 'markersize', 30);
+        fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probNmerged+2, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probNmerged+2, :), 'markersize', 30);
     end
-%     set(gca, 'fontsize',16);
-%     set(gca, 'Xtick',cohLevels);
-%     axis([min(cohLevels) max(cohLevels) 0 1]);
-%     xlabel('Stimulus Intensity');
-%     ylabel('Proportion right');
-%     legend([fAll{:}], probNames{2}, 'box', 'off', 'location', 'northwest')
-%     hold off
-%     saveas(gcf, ['pf_all.pdf'])
+    set(gca, 'fontsize',16);
+    set(gca, 'Xtick',cohLevels);
+    axis([min(cohLevels) max(cohLevels) 0 1]);
+    xlabel('Stimulus Intensity');
+    ylabel('Proportion right');
+    legend([fAll{:}], probNames{2}, 'box', 'off', 'location', 'northwest')
+    hold off
+    saveas(gcf, ['pf_all.pdf'])
 %     
 %     % plot average PSE
 %     errorbar_groups(dataPercept.PSEmean, dataPercept.PSEste,  ...
@@ -176,7 +197,8 @@ end
 save('dataPercept_all', 'dataPercept');
 %% save csv for ANOVA
 cd ..
-cd('R')
+cd ..
+cd('R/Exp1')
 
 data = table();
 count = 1;

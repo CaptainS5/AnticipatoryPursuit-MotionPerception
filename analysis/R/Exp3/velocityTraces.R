@@ -7,11 +7,11 @@ rm(list = ls())
 
 #### load data
 # on Inspiron 13
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp2")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "velocityTracePerceptual_"
-pdfFileName <- "velocityTracePerceptual_all_Exp1.pdf"
+dataFileName <- "velocityTracePerceptual_notCleaned_"
+pdfFileName <- "velocityTracePerceptual_all_notCleaned_Exp2.pdf"
 # for plotting
 vtPlotWidth <- 16 # width for the pdf file
 textSize <- 25
@@ -31,19 +31,19 @@ ytickHigh <- 4
 ## load and process data
 # mean velocity traces in different conditions
 # first get mean for each condition and the confidence intervals
-probName <-c("50", "70", "90")
-n <- 9
+probName <-c("50", "90")
+n <- 8
 timePoints <- seq(from = -500, to = 700, by = 1)
 velTrace <- list()
 
-for (probI in 1:3) {
+for (probI in 1:2) {
     fileName = paste(dataFileName,probName[probI],".csv", sep = "")
     velData <- read.csv(fileName, header = FALSE, sep=",")
     velData <- as.matrix(velData)
 
     for (conI in 1:2) {
-      idxStart <- (conI-1)*9+1
-      idxEnd <- conI*9
+      idxStart <- (conI-1)*n+1
+      idxEnd <- conI*n
 
       velDataT <- velData[idxStart:idxEnd, 700:1900] # -500 to 700 ms
       tempM <- colMeans(velDataT, na.rm=TRUE)
@@ -66,21 +66,17 @@ p <- ggplot(velTrace[[1]], aes(x = timePoints, y = velMean)) +
         # geom_ribbon(aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
         geom_line(data = velTrace[[2]], aes(x = timePoints, y = velMean, colour = "50%"), size = 1, linetype = "twodash") + 
         # geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
-        geom_line(data = velTrace[[3]], aes(x = timePoints, y = velMean, colour = "70%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
-        geom_line(data = velTrace[[4]], aes(x = timePoints, y = velMean, colour = "70%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[4]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
-        geom_line(data = velTrace[[5]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[5]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
-        geom_line(data = velTrace[[6]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[6]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
+        geom_line(data = velTrace[[3]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "twodash") + 
+        # geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
+        geom_line(data = velTrace[[4]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "twodash") + 
+        # geom_ribbon(data = velTrace[[4]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-500, -550), xend = c(700, -550), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
         scale_y_continuous(name = "Horinzontal eye velocity (°/s)",limits = c(ylimLow, ylimHigh), breaks=seq(ytickLow, ytickHigh, 2), expand = c(0, 0)) +
         scale_x_continuous(name = "Time (ms)", limits = c(-550, 700), breaks=seq(-500, 700, 100), expand = c(0, 0)) +
         # coord_cartesian(ylim=c(-4, 4)) +
         scale_colour_manual("Probability of rightward motion",
-                            breaks = c("50%", "70%", "90%"),
-                            values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
+                            breaks = c("50%", "90%"),
+                            values = c("50%" = colourCode[1], "90%" = colourCode[3])) +
         # scale_fill_manual("Probability of rightward motion",
         #                     breaks = c("50%", "70%", "90%"),
         #                     values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
@@ -100,12 +96,12 @@ ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 # # sliding window analysis
 # # mean velocity traces in different conditions
 # # first get mean for each condition and the confidence intervals
-# probName <-c("50", "70", "90")
+# probName <-c("50", "90")
 # n <- 9
 # velTrace <- list()
 
-# for (probI in 1:3) {
-#     fileName = paste(dataFileName,probName[probI],".csv", sep = "")
+# for (probI in 1:2) {
+#     fileName = paste(dataFileName,probName[probI],"_exp2.csv", sep = "")
 #     velData <- read.csv(fileName, header = FALSE, sep=",")
 #     velData <- as.matrix(velData)
 #     lengthD <- dim(velData)[2]
@@ -129,18 +125,18 @@ ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 # # pdf(paste(folder1, "velocityTraces.pdf", sep = ""))
 # p <- ggplot(velTrace[[1]], aes(x = timePoints, y = velMean)) +
 #         geom_line(aes(colour = "50%"), size = 1, linetype = "solid") + geom_ribbon(aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
-#         geom_line(data = velTrace[[2]], aes(x = timePoints, y = velMean, colour = "70%"), size = 1, linetype = "solid") + geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
-#         geom_line(data = velTrace[[3]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "solid") + geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
+#         geom_line(data = velTrace[[2]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "solid") + geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
 #         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-500, -550), xend = c(700, -550), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
-#         scale_y_continuous(name = "P(perceiving right)-P(motion right) (°/s)", limits = c(-.1, 2), breaks=seq(0, 2, 0.5), expand = c(0, 0)) +
+#         # scale_y_continuous(name = "Horizontal AP velocity (°/s)", limits = c(-.1, 2), breaks=seq(0, 2, 0.5), expand = c(0, 0)) + 
+#         scale_y_continuous(name = "P(perceiving right)-P(motion right)", limits = c(-.25, .15), breaks=seq(-.2, .1, 0.05), expand = c(0, 0)) + # (-.1, 2) for ASP, (-0.3, 0.2) for perception
 #         scale_x_continuous(name = "Perceptual trial number", limits = c(-0, 130), breaks=seq(0, 130, 40), expand = c(0, 0)) +
 #         # coord_cartesian(ylim=c(-4, 4)) +
 #         scale_colour_manual("Probability of rightward motion",
-#                             breaks = c("50%", "70%", "90%"),
-#                             values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
+#                             breaks = c("50%", "90%"),
+#                             values = c("50%" = colourCode[1], "90%" = colourCode[3])) +
 #         scale_fill_manual("Probability of rightward motion",
-#                             breaks = c("50%", "70%", "90%"),
-#                             values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
+#                             breaks = c("50%", "90%"),
+#                             values = c("50%" = colourCode[1], "90%" = colourCode[3])) +
 #         theme(axis.text=element_text(colour="black"),
 #               axis.ticks=element_line(colour="black", size = axisLineWidth),
 #               panel.grid.major = element_blank(),

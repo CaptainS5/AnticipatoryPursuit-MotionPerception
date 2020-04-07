@@ -9,10 +9,10 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 # source("pairwise.t.test.with.t.and.df.R")
-plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/data/coding challenge/")
+plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "aspVelExp1.csv"
-pdfFileName <- "aspVelExp1.pdf"
+dataFileName <- "dataPercept.csv"
+pdfFileName <- "pmfExp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -31,18 +31,18 @@ data <- read.csv(dataFileName)
 sub <- data["sub"]
 prob <- data["prob"]
 # timeBin <- data["timeBin"]
-measure <- data["aspGain"]
+measure <- data["PSE"]
 dataAnova <- data.frame(sub, prob, measure)
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$timeBin <- as.factor(dataAnova$timeBin)
 colnames(dataAnova)[3] <- "PSE"
 # dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
-    # data = dataTemp, FUN = "mean")
+#     data = dataTemp, FUN = "mean")
 
-# anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
-#     within = .(prob), type = 3)
-# print(anovaData)
+anovaData <- ezANOVA(dataAnova, dv = .(PSE), wid = .(sub),
+    within = .(prob), type = 3)
+print(anovaData)
 
 # dataTemp <- data.frame(sub, prob, PSE)
 # colnames(dataTemp)[3] <- "PSE"
@@ -66,8 +66,9 @@ p <- ggplot(dataAnova, aes(x = prob, y = PSE)) +
 # geom = 'smooth', se = 'TRUE') +
         # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
         geom_point(aes(x = prob, y = PSE), size = dotSize, shape = 1) +
-        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)") + #, limits = c(-4, 6), expand = c(0, 0)) +
+        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(0), xend = c(0), y = c(-1), yend = c(5)), size = axisLineWidth) +
+        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(1, 0), xend = c(3, 0), y = c(-1.25, -1), yend = c(-1.25, 5)), size = axisLineWidth) +
+        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)", breaks = seq(-1, 5, 1), limits = c(-1, 5), expand = c(0, 0.6)) +
         scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +

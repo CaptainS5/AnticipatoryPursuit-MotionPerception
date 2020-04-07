@@ -1,4 +1,7 @@
 initializeParas;
+eyeTrialData = expAll{2}.eyeTrialData;
+names = names2;
+rFolder = 'R/Exp2';
 
 % different parameters to look at
 checkParas = {'pursuit.APvelocityX' 'pursuit.APvelocityX_interpol' ...
@@ -13,10 +16,10 @@ sacStart = 10; % from the n_th parameter is saccade
 
 % some settings
 individualPlots = 0;
-averagedPlots = 1;
+averagedPlots = 0;
 scatterPlots = 0;
 paraStart = 1;
-paraEnd = 2; % which parameters to plot
+paraEnd = 1; % which parameters to plot
 sortByChoice = 0; % whether sort left/right trials by visual motion or by perception
 yLabels = {'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
@@ -347,6 +350,23 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
         steVPDiff{paraN}(1, probN) = nanstd(subMeanLL{paraN}(:, probN)-subMeanLR{paraN}(:, probN))/sqrt(size(names, 2)); % left trials
         steVPDiff{paraN}(2, probN) = nanstd(subMeanRR{paraN}(:, probN)-subMeanRL{paraN}(:, probN))/sqrt(size(names, 2)); % right trials
     end
+    
+    % generate csv file for R
+    cd(analysisFolder)
+    cd ..
+    cd ..
+    cd(rFolder)
+    data = table();
+    count = 1;
+    for subN = 1:length(names)
+        for probN = 1:2 % probN is merged already
+            data.sub(count, 1) = subN;
+            data.prob(count, 1) = probCons(probN+1);
+            data.measure(count, 1) = subMeanP{paraN}(subN, probN);
+            count = count+1;
+        end
+    end
+    writetable(data, ['data' pdfNames{paraN} '.csv'])
     
     if averagedPlots==1
         if paraN<sacStart

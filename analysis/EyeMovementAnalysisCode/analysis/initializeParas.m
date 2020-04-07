@@ -4,11 +4,11 @@ clear all; close all; clc
 
 nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'}; % experiment 1
 % nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
-nameSets{2} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5' 'nan'};
-nameSets{3} = {'tFW' 'fh2' 'nan' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'nan' 'p15'};
+nameSets{3} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'};
+nameSets{2} = {'tFW' 'fh2' 'nan' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'nan' 'p15'};
 setN = 1; % choose which set to analyze
-% names = nameSets{3};
-names = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
+% names = nameSets{1};
+names2 = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
 
 sampleRate = 1000;
 
@@ -38,6 +38,8 @@ cd(analysisFolder)
 expAll{1} = load(['eyeTrialData_all_set1_exp1.mat']);
 expAll{2} = load(['eyeTrialData_all_set1_exp2.mat']);
 expAll{3} = load(['eyeTrialData_all_set1_exp3.mat']);
+expCleanedUp{1} = load(['eyeTrialData_all_cleaned_exp1.mat']);
+expCleanedUp{2} = load(['eyeTrialData_all_cleaned_exp2.mat']);
 % load(['eyeTrialData_all_set' num2str(setN) '_exp2.mat']);
 
 % for Exp1
@@ -48,14 +50,14 @@ expAll{3} = load(['eyeTrialData_all_set1_exp3.mat']);
 probCons = [10 50 90];
 probNames{1} = {'10', '50'};
 probNames{2} = {'50', '90'};
-probNames13{1} = {'exp1-50', 'exp1-10', 'exp3-50', 'exp3-10'};
-probNames13{2} = {'exp1-50', 'exp1-90', 'exp3-50', 'exp3-90'};
+probNames12{1} = {'exp1-50', 'exp1-10', 'exp3-50', 'exp3-10'};
+probNames12{2} = {'exp1-50', 'exp1-90', 'exp3-50', 'exp3-90'};
 
 dirCons = [-1 1]; % -1=left, 1=right
 dirNames = {'left' 'right'};
 
 % for plotting
-for t = 1:size(names, 2) % individual color for scatter plots, can do 10 people
+for t = 1:size(nameSets{1}, 2) % individual color for scatter plots, can do 10 people
     if t<=2
         markerC(t, :) = (t+2)/4*[77 255 202]/255;
     elseif t<=4

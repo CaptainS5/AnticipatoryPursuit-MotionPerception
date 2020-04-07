@@ -2,19 +2,22 @@
 % Xiuyun Wu, 04/28/2018
 clear all; close all; clc
 
-names = {'fh9'};
-% names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
-averagedPlot = 0;
+perceptFolder = pwd;
+% names = {'fh9'};
+% names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % Exp3 in the same order as Exp1
+names = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'}; % Exp2
+averagedPlot = 1;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
-% colorPlotting = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
+% colorProb = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
 % probCons = [10; 30; 50; 70; 90];
 probCons = [10; 50; 90];
 probNames{1} = {'Prob 10%' 'Prob 50%'};
 % probNames{1} = {'Prob 10%' 'Prob 30%' 'Prob 50%'};
 probNames{2} = {'Prob 50%' 'Prob 90%'};
-colorPlotting = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
-% colorPlotting = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
+colorProb = [8,48,107;198,219,239;8,48,107]/255; % all blue hues
+% colorProb = [232 113 240; 255 182 135; 113 204 100]/255; % each row is one colour for one probability
+% colorProb = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255; % each row is one colour for one probability
 
 % fitting settings
 PF = @PAL_Logistic;  %Alternatives: PAL_Gumbel, PAL_Weibull,
@@ -34,18 +37,32 @@ searchGrid.lambda = 0:0.001:0.05;  %ditto
 
 %% fitting data
 dataPercept.probSub = NaN(size(names, 2), 3);
+try
+    cd ..
+    cd('EyeMovementAnalysisCode\analysis\')
+    load('eyeTrialData_all_set1_exp2.mat')
+    loadRaw = 0;
+    cd(perceptFolder)
+catch
+    loadRaw = 1;
+    cd(perceptFolder)
+    cd('Exp2')
+end
+
 for subN = 1:size(names, 2)
-    load(['dataRaw_', names{subN}])
-    data = dataRaw;
-    data(data.trialType==1, :) = []; % test trials are type 0
-    data(data.choice==999, :) = []; % only for the initial pilot...
-    
-    data.cohFit = data.coh.*data.rdkDir; % left is negative
-    %     data.cohIdx = zeros(size(data.cohFit));
-    %     cohLevels = unique([data.prob, data.cohFit], 'rows');
-    %     for ii = 1:length(cohLevels)
-    %         data.cohIdx(all([data.prob, data.cohFit]==repmat(cohLevels(ii, :), size(data, 1), 1), 2)) = ii;
-    %     end
+    if loadRaw==1
+        load(['dataRaw_', names{subN}])
+        data = dataRaw;
+        data(data.coh==1, :) = [];
+        data(data.choice==999, :) = []; % only for the initial pilot...
+        data.cohFit = data.coh.*data.rdkDir; % left is negative
+    else
+        data = table();
+        idx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0);
+        data.choice = eyeTrialData.choice(subN, idx)';
+        data.cohFit = eyeTrialData.coh(subN, idx)';
+        data.prob = eyeTrialData.prob(subN, idx)';
+    end
     
     probSub = unique(data.prob);
     if probSub(1)<50
@@ -55,8 +72,8 @@ for subN = 1:size(names, 2)
     end
     dataPercept.probSub(subN, 1:length(probSub)) = probSub;
     
-    figure
-    hold on
+%     figure
+%     hold on
     %% fitting for each coherence level
     for probSubN = 1:length(probSub)
         probN = find(probCons==probSub(probSubN));
@@ -74,13 +91,13 @@ for subN = 1:size(names, 2)
         [paramsValues{subN, probSubN} LL{subN, probSubN} exitflag{subN, probSubN}] = PAL_PFML_Fit(cohLevels, numRight{probN}(subN, :)', ...
             outOfNum{probN}(subN, :)', searchGrid, paramsFree, PF);
         
-        % plotting
-        ProportionCorrectObserved=numRight{probN}(subN, :)./outOfNum{probN}(subN, :);
-        StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
-        ProportionCorrectModel = PF(paramsValues{subN, probSubN},StimLevelsFineGrain);
-        
-        f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probN, :), 'linewidth', 2);
-        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probN, :), 'markersize', 30);
+%         % plotting
+%         ProportionCorrectObserved=numRight{probN}(subN, :)./outOfNum{probN}(subN, :);
+%         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+%         ProportionCorrectModel = PF(paramsValues{subN, probSubN},StimLevelsFineGrain);
+%         
+%         f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
+%         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
         
         % saving parameters
         if probSub(1)<50
@@ -94,14 +111,14 @@ for subN = 1:size(names, 2)
         dataPercept.gamma(subN, probNmerged) = paramsValues{subN, probSubN}(3); % guess rate, or baseline
         dataPercept.lambda(subN, probNmerged) = paramsValues{subN, probSubN}(4); % lapse rate
     end
-    set(gca, 'fontsize',16);
-    set(gca, 'Xtick',cohLevels);
-    axis([min(cohLevels) max(cohLevels) 0 1]);
-    xlabel('Stimulus Intensity');
-    ylabel('Proportion right');
-    legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
-    
-    saveas(gcf, ['pf_', names{subN}, '.pdf'])
+%     set(gca, 'fontsize',16);
+%     set(gca, 'Xtick',cohLevels);
+%     axis([min(cohLevels) max(cohLevels) 0 1]);
+%     xlabel('Stimulus Intensity');
+%     ylabel('Proportion right');
+%     legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
+%     
+%     saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end
 
 %% draw averaged PSE plot
@@ -145,8 +162,8 @@ if averagedPlot==1
         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
         ProportionCorrectModel = PF(paramsValuesAll{probNmerged},StimLevelsFineGrain);
         
-        fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorPlotting(probNmerged+1, :), 'linewidth', 2);
-        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorPlotting(probNmerged+1, :), 'markersize', 30);
+        fAll{probNmerged} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probNmerged+1, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probNmerged+1, :), 'markersize', 30);
     end
     plot([dataPercept.PSEmean(1) dataPercept.PSEmean(1)], [0 1], '--')
     plot([dataPercept.PSEmean(2) dataPercept.PSEmean(2)], [0 1], '--')
@@ -157,7 +174,7 @@ if averagedPlot==1
     ylabel('Proportion right');
     legend([fAll{:}], probNames{2}, 'box', 'off', 'location', 'northwest')
     hold off
-    saveas(gcf, ['pf_all.pdf'])
+    saveas(gcf, ['pf_all_exp2.pdf'])
     
 %     % plot average PSE
 %     errorbar_groups(dataPercept.PSEmean, dataPercept.PSEste,  ...
@@ -167,7 +184,7 @@ if averagedPlot==1
 %     ylabel('PSE (right is positive)');
 %     saveas(gcf, ['PSE_all.pdf'])
 %     
-%     save('dataPercept_all_exp2', 'dataPercept');
+    save('dataPercept_all_exp2', 'dataPercept');
 %     
 %     % plot average slope
 %     errorbar_groups(dataPercept.Bmean, dataPercept.Bste,  ...
@@ -179,8 +196,9 @@ if averagedPlot==1
 end
 
 %% save csv for ANOVA
+cd(perceptFolder)
 cd ..
-cd('R')
+cd('R\Exp2')
 
 data = table();
 count = 1;

@@ -350,6 +350,10 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
     
     % generate csv file for R
     cd(analysisFolder)
+    cd ..
+    cd ..
+    cd ..
+    cd('R\Exp1')
     data = table();
     count = 1;
     for subN = 1:length(names)

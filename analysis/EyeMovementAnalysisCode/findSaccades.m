@@ -28,9 +28,9 @@ lowerThreshold = stimulusSpeed - threshold;
 speed = speed(startFrame:endFrame);
 endSpeedF = length(speed);
 acceleration = acceleration(startFrame:endFrame);
-accelerationThreshold = 200; % 200 for Exp1, 300 for exp2
+accelerationThreshold = 200; % 200 for all exp2; 300 for exp3 (the old exp2)
 jerk = jerk(startFrame:endFrame);
-jerkThreshold = 30000; % 30000 for Exp1, 50000 for exp2
+jerkThreshold = 30000; % 30000 for all exps; 50000 for exp3 (the old exp2)
 
 % check eye velocity against threshold to find when the eye is much faster 
 % than the moving stimulus (or just compared to 0) and read out the
@@ -69,7 +69,7 @@ speedOffsets = find(speedOffsets);
 middle = acceleration/1000;
 predecessor = [middle(2:end); 0];
 signSwitches = find((middle .* predecessor) <= 0)+1; % either sign switch, or rapid change of speed
-% only count if consecutive 15 frames acceleration are all below the
+% only count if consecutive 25 frames acceleration are all below the
 % threshold; to ensure that the tails of saccades do not survive...
 accelerationAbs = abs(acceleration)<accelerationThreshold;
 accDiff = diff(accelerationAbs);

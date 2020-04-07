@@ -7,16 +7,16 @@ clear all; close all; clc
 % Exp1
 % nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'};
 % nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
-% Exp2
-% nameSets{1} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+% Exp2, now named as Exp3
+nameSets{1} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
 % this will save you huge trouble...
 % Exp3
-nameSets{1} = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
+% nameSets{1} = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
 subStartI = [1];
 cd ..
 analysisPath = pwd;
 % dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data'; % dell laptop
+dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data\Exp3'; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
@@ -53,7 +53,7 @@ for setN = 1:length(subStartI)
         load('parametersAll')
         load eventLog
         cd(analysisPath)
-        errors = load(['Errorfiles\Sub_' currentSubject '_errorFile.mat']);
+        errors = load(['Errorfiles\Exp3\Sub_' currentSubject '_errorFile.mat']);
         clear eyeTrialDataSub
         
         for currentTrial = 1:size(parameters, 1)
