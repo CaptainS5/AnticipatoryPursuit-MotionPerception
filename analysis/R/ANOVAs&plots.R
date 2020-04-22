@@ -13,10 +13,10 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "PSE_exp1vs3.csv"
-dataDFileName <- "PSEdiff_exp1vs3.csv"
-pdfFileName <- "PSE_Exp1vs3.pdf"
-pdfFileNameD <- "PSEdiff_Exp1vs3.pdf"
+dataFileName <- "aspVel_exp1vs2_cleaned126.csv"
+dataDFileName <- "aspVelDiff_exp1vs2_cleaned126.csv"
+pdfFileName <- "aspVel_exp1vs2_cleaned126.pdf"
+pdfFileNameD <- "aspVelDiff_exp1vs2_cleaned126.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -34,7 +34,7 @@ sub <- data["sub"]
 exp <- data["exp"]
 prob <- data["prob"]
 # timeBin <- data["timeBin"]
-measure <- data["PSE"]
+measure <- data["aspVel"]
 dataAnova <- data.frame(sub, prob, exp, measure)
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
@@ -58,8 +58,8 @@ p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
         geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-        # scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)") + #, limits = c(-0.1, 0.55), expand = c(0, 0)) +
-        scale_y_continuous(name = "PSE") + 
+        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)") + #, limits = c(-0.1, 0.55), expand = c(0, 0)) +
+        # scale_y_continuous(name = "PSE") + 
         scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
@@ -79,7 +79,7 @@ ggsave(paste(plotFolder, pdfFileName, sep = ""))
 ## t-test of the difference
 sub <- dataD["sub"]
 exp <- dataD["exp"]
-measure <- dataD["PSEdiff"]
+measure <- dataD["aspVelDiff"]
 dataDtemp <- data.frame(sub, exp, measure)
 dataDtemp$sub <- as.factor(dataDtemp$sub)
 dataDtemp$exp <- as.factor(dataDtemp$exp)
@@ -91,7 +91,7 @@ show(res) # [[3]] = p value table, un adjusted
 res[[5]] # t-value
 res[[6]] # dfs
 res[[3]]
-p.adjust(res[[3]], method = "bonferroni", n = 9) 
+p.adjust(res[[3]], method = "bonferroni", n = 3) 
 
 p <- ggplot(dataDtemp, aes(x = exp, y = measure)) +
         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
@@ -101,8 +101,9 @@ p <- ggplot(dataDtemp, aes(x = exp, y = measure)) +
         # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
         geom_point(aes(x = exp, y = measure), size = dotSize, shape = 1) +
         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-        scale_y_continuous(name = "PSE bias", limits = c(0, 0.15), expand = c(0, 0.01)) +
-        scale_x_discrete(name = "Experiment", breaks=c("Exp1", "Exp3")) +
+        # 
+        scale_y_continuous(name = "Anticipatory pursuit velocity bias (deg/s)") + #, limits = c(0, 0.15), expand = c(0, 0.01)) +
+        scale_x_discrete(name = "Experiment", breaks=c("Exp1", "Exp2")) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
         theme(axis.text=element_text(colour="black"),

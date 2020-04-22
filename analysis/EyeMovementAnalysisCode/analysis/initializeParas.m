@@ -38,8 +38,8 @@ cd(analysisFolder)
 expAll{1} = load(['eyeTrialData_all_set1_exp1.mat']);
 expAll{2} = load(['eyeTrialData_all_set1_exp2.mat']);
 expAll{3} = load(['eyeTrialData_all_set1_exp3.mat']);
-expCleanedUp{1} = load(['eyeTrialData_all_cleaned_exp1.mat']);
-expCleanedUp{2} = load(['eyeTrialData_all_cleaned_exp2.mat']);
+% expCleanedUp{1} = load(['eyeTrialData_all_cleaned_exp1.mat']);
+% expCleanedUp{2} = load(['eyeTrialData_all_cleaned_exp2.mat']);
 % load(['eyeTrialData_all_set' num2str(setN) '_exp2.mat']);
 
 % for Exp1

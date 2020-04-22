@@ -64,9 +64,9 @@ end
 %% take trials with the lowest and highest asp to see if they are evenly distributed, and have reasonable numbers...
 % would be hard since we didn't random trial orders
 % close all
-% % for saving the cleaned data... excluded perceptual trials marked as 3
-% trialTypeCleaned{1} = expAll{1}.eyeTrialData.trialType;
-% trialTypeCleaned{2} = expAll{2}.eyeTrialData.trialType;
+% for saving the cleaned data... excluded perceptual trials marked as 3
+trialTypeCleaned{1} = expAll{1}.eyeTrialData.trialType;
+trialTypeCleaned{2} = expAll{2}.eyeTrialData.trialType;
 
 for subN = 1:subNexp(2)
     if probSubAll(subN, 1)<50
@@ -162,10 +162,10 @@ end
 cd(analysisFolder)
 eyeTrialData = expAll{1}.eyeTrialData;
 eyeTrialData.trialType = trialTypeCleaned{1};
-save('eyeTrialData_all_cleaned_exp1.mat', 'eyeTrialData')
+save(['eyeTrialData_all_cleaned', num2str(chooseTrialN), '_exp1.mat'], 'eyeTrialData')
 eyeTrialData = expAll{2}.eyeTrialData;
 eyeTrialData.trialType = trialTypeCleaned{2};
-save('eyeTrialData_all_cleaned_exp2.mat', 'eyeTrialData')
+save(['eyeTrialData_all_cleaned', num2str(chooseTrialN), '_exp2.mat'], 'eyeTrialData')
 
 %% if all look good, go ahead to psychometric curve fitting
 % for subN = 1:subNexp(3)
