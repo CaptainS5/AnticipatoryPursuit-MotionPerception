@@ -3,7 +3,7 @@
 clear all; close all; clc
 
 names = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'};
-averagedPlot = 1;
+averagedPlot = 0;
 perceptFolder = pwd;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
@@ -71,8 +71,8 @@ for subN = 1:size(names, 2)
     end
     dataPercept.probSub(subN, 1:length(probSub)) = probSub;
     
-%     figure
-%     hold on
+    figure
+    hold on
     %% fitting for each coherence level
     for probSubN = 1:length(probSub)
         probN = find(probCons==probSub(probSubN));
@@ -95,8 +95,8 @@ for subN = 1:size(names, 2)
         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
         ProportionCorrectModel = PF(paramsValues{subN, probSubN},StimLevelsFineGrain);
         
-%         f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
-%         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
+        f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
         
         % saving parameters
         if probSub(1)<50
@@ -110,15 +110,15 @@ for subN = 1:size(names, 2)
         dataPercept.gamma(subN, probNmerged) = paramsValues{subN, probSubN}(3); % guess rate, or baseline
         dataPercept.lambda(subN, probNmerged) = paramsValues{subN, probSubN}(4); % lapse rate
     end
-%     set(gca, 'fontsize',16);
-%     set(gca, 'Xtick',cohLevels);
-%     axis([min(cohLevels) max(cohLevels) 0 1]);
-%     xlabel('Stimulus Intensity');
-%     ylabel('Proportion right');
-%     legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
-%     
-% cd (perceptFolder)
-%     saveas(gcf, ['pf_', names{subN}, '.pdf'])
+    set(gca, 'fontsize',16);
+    set(gca, 'Xtick',cohLevels);
+    axis([min(cohLevels) max(cohLevels) 0 1]);
+    xlabel('Stimulus Intensity');
+    ylabel('Proportion right');
+    legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
+    
+cd (perceptFolder)
+    saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end
 
 %% draw averaged PSE plot

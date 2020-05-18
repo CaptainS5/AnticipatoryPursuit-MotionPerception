@@ -372,7 +372,8 @@ for probNmerged = 1:3
     cd(analysisFolder)
     cd ..
     cd ..
-    cd('R')
+    cd ..
+    cd('R\Exp1')
     csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+2)), '.csv'], slideSub)
 end
 

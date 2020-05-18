@@ -6,7 +6,7 @@ perceptFolder = pwd;
 % names = {'fh9'};
 % names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % Exp3 in the same order as Exp1
 names = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'}; % Exp2
-averagedPlot = 1;
+averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
 % colorProb = [217 217 217; 189 189 189; 150 150 150; 99 99 99; 37 37 37]/255;
@@ -72,8 +72,8 @@ for subN = 1:size(names, 2)
     end
     dataPercept.probSub(subN, 1:length(probSub)) = probSub;
     
-%     figure
-%     hold on
+    figure
+    hold on
     %% fitting for each coherence level
     for probSubN = 1:length(probSub)
         probN = find(probCons==probSub(probSubN));
@@ -91,13 +91,13 @@ for subN = 1:size(names, 2)
         [paramsValues{subN, probSubN} LL{subN, probSubN} exitflag{subN, probSubN}] = PAL_PFML_Fit(cohLevels, numRight{probN}(subN, :)', ...
             outOfNum{probN}(subN, :)', searchGrid, paramsFree, PF);
         
-%         % plotting
-%         ProportionCorrectObserved=numRight{probN}(subN, :)./outOfNum{probN}(subN, :);
-%         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
-%         ProportionCorrectModel = PF(paramsValues{subN, probSubN},StimLevelsFineGrain);
-%         
-%         f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
-%         plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
+        % plotting
+        ProportionCorrectObserved=numRight{probN}(subN, :)./outOfNum{probN}(subN, :);
+        StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+        ProportionCorrectModel = PF(paramsValues{subN, probSubN},StimLevelsFineGrain);
+        
+        f{probSubN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-','color', colorProb(probN, :), 'linewidth', 2);
+        plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
         
         % saving parameters
         if probSub(1)<50
@@ -111,14 +111,14 @@ for subN = 1:size(names, 2)
         dataPercept.gamma(subN, probNmerged) = paramsValues{subN, probSubN}(3); % guess rate, or baseline
         dataPercept.lambda(subN, probNmerged) = paramsValues{subN, probSubN}(4); % lapse rate
     end
-%     set(gca, 'fontsize',16);
-%     set(gca, 'Xtick',cohLevels);
-%     axis([min(cohLevels) max(cohLevels) 0 1]);
-%     xlabel('Stimulus Intensity');
-%     ylabel('Proportion right');
-%     legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
-%     
-%     saveas(gcf, ['pf_', names{subN}, '.pdf'])
+    set(gca, 'fontsize',16);
+    set(gca, 'Xtick',cohLevels);
+    axis([min(cohLevels) max(cohLevels) 0 1]);
+    xlabel('Stimulus Intensity');
+    ylabel('Proportion right');
+    legend([f{:}], probNames{probB}, 'box', 'off', 'location', 'northwest')
+    
+    saveas(gcf, ['pf_', names{subN}, '.pdf'])
 end
 
 %% draw averaged PSE plot
@@ -196,19 +196,19 @@ if averagedPlot==1
 end
 
 %% save csv for ANOVA
-cd(perceptFolder)
-cd ..
-cd('R\Exp2')
-
-data = table();
-count = 1;
-for subN = 1:length(names)
-    for probNmerged = 1:2
-        data.sub(count, 1) = subN;
-        data.prob(count, 1) = probCons(probNmerged+1);
-        data.PSE(count, 1) = dataPercept.alpha(subN, probNmerged);
-        data.slope(count, 1) = dataPercept.beta(subN, probNmerged);
-        count = count+1;
-    end
-end
-writetable(data, 'dataPercept_Exp2.csv')
+% cd(perceptFolder)
+% cd ..
+% cd('R\Exp2')
+% 
+% data = table();
+% count = 1;
+% for subN = 1:length(names)
+%     for probNmerged = 1:2
+%         data.sub(count, 1) = subN;
+%         data.prob(count, 1) = probCons(probNmerged+1);
+%         data.PSE(count, 1) = dataPercept.alpha(subN, probNmerged);
+%         data.slope(count, 1) = dataPercept.beta(subN, probNmerged);
+%         count = count+1;
+%     end
+% end
+% writetable(data, 'dataPercept_Exp2.csv')

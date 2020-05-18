@@ -484,21 +484,21 @@ cd('R\Exp1')
 %     csvwrite(['velocityTraceStandard_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 % 
-% perceptual trials
-for probNmerged = 1:3
-    velTAverageSub = [];
-    for binN = 1:2        
-        if binN==1
-            dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-        else
-            dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-        end
-        for subN = 1:size(names, 2)
-            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-        end
-    end
-    csvwrite(['velocityTracePerceptual_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
-end
+% % perceptual trials
+% for probNmerged = 1:3
+%     velTAverageSub = [];
+%     for binN = 1:2        
+%         if binN==1
+%             dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+%         else
+%             dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+%         end
+%         for subN = 1:size(names, 2)
+%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+%         end
+%     end
+%     csvwrite(['velocityTracePerceptual_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
+% end
 % 
 % % perceptual visual left trials
 % for probNmerged = 1:3
@@ -532,21 +532,21 @@ end
 %     csvwrite(['velocityTraceVPright_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 
-% % zero coherence trials
-% for probNmerged = 1:3
-%     velTAverageSub = [];
-%     for binN = 1:2        
-%         if binN==1
-%             dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
-%         else
-%             dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
-%         end
-%         for subN = 1:size(names, 2)
-%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-%         end
-%     end
-%     csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
-% end
+% zero coherence trials
+for probNmerged = 1:3
+    velTAverageSub = [];
+    for binN = 1:2        
+        if binN==1
+            dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
+        else
+            dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
+        end
+        for subN = 1:size(names, 2)
+            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+        end
+    end
+    csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
+end
 
 % % perceptual trials by perception
 % for probNmerged = 1:3

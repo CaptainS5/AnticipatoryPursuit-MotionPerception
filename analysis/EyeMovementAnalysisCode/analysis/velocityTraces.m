@@ -1,8 +1,10 @@
 % plot velocity traces, generate csv file for plotting in R
 initializeParas;
-eyeTrialData = expCleanedUp{2}.eyeTrialData;
+eyeTrialData = expAll{3}.eyeTrialData;
 % eyeTrialData = expAll{2}.eyeTrialData;
-names = names2;
+names = nameSets{3};
+RsaveFolder = [RFolder '\Exp3'];
+
 individualPlots = 0;
 averagedPlots = 0;
 
@@ -353,42 +355,42 @@ if averagedPlots
     % box off
     % saveas(gca, ['velocityAllProbs_all_set' num2str(setN) '.pdf'])
     
-%     perceptual trials, visual x perceived motion
-    figure
-    subplot(2, 1, 1)
-    for probNmerged = 1:2
-        plot(timePoints, velMean{probNmerged}.vpLL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
-        hold on
-        p{probNmerged} = plot(timePoints, velMean{probNmerged}.vpLR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
-    end
-%     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
-%     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-%     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-    legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
-    title('perceptual trials, visual left, dashed perceived left')
-    xlabel('Time (ms)')
-    ylabel('Horizontal velocity (deg/s)')
-    xlim([-500 700])
-    ylim([-4 4])
-    box off
-    
-    subplot(2, 1, 2)
-    for probNmerged = 1:2
-        plot(timePoints, velMean{probNmerged}.vpRL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
-        hold on
-        p{probNmerged} = plot(timePoints, velMean{probNmerged}.vpRR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
-    end
-%     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
-%     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-%     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
-    legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
-    title('perceptual trials, visual right, dashed perceived left')
-    xlabel('Time (ms)')
-    ylabel('Horizontal velocity (deg/s)')
-    xlim([-500 700])
-    ylim([-4 4])
-    box off
-    saveas(gca, ['velocity_vpMotion_AllProbs_all_exp3.pdf'])
+% %     perceptual trials, visual x perceived motion
+%     figure
+%     subplot(2, 1, 1)
+%     for probNmerged = 1:2
+%         plot(timePoints, velMean{probNmerged}.vpLL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
+%         hold on
+%         p{probNmerged} = plot(timePoints, velMean{probNmerged}.vpLR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
+%     end
+% %     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% %     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% %     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+%     legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
+%     title('perceptual trials, visual left, dashed perceived left')
+%     xlabel('Time (ms)')
+%     ylabel('Horizontal velocity (deg/s)')
+%     xlim([-500 700])
+%     ylim([-4 4])
+%     box off
+%     
+%     subplot(2, 1, 2)
+%     for probNmerged = 1:2
+%         plot(timePoints, velMean{probNmerged}.vpRL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
+%         hold on
+%         p{probNmerged} = plot(timePoints, velMean{probNmerged}.vpRR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
+%     end
+% %     line([-300 -300], [minVel(dirN) maxVel(dirN)],'Color','m','LineStyle','--')
+% %     line([-50 -50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+% %     line([50 50], [minVel(dirN) maxVel(dirN)],'Color','k','LineStyle','--')
+%     legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
+%     title('perceptual trials, visual right, dashed perceived left')
+%     xlabel('Time (ms)')
+%     ylabel('Horizontal velocity (deg/s)')
+%     xlim([-500 700])
+%     ylim([-4 4])
+%     box off
+%     saveas(gca, ['velocity_vpMotion_AllProbs_all_exp3.pdf'])
     
     % % perceptual trials, different coherence levels
     % cohVelSub = cell(2, length(cohLevels));
@@ -431,21 +433,21 @@ if averagedPlots
     % end
     % % saveas(gcf, 'velTraceCohLevels_all.pdf')
     
-    % zero coherence trials, perceived motion
-    figure
-    for probNmerged = 1:2
-        plot(timePoints, velMean{probNmerged}.zeroL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
-        hold on
-        p{probNmerged} = plot(timePoints, velMean{probNmerged}.zeroR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
-    end
-    legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
-    title('0 coh trials')
-    xlabel('Time (ms)')
-    ylabel('Horizontal velocity (deg/s)')
-    xlim([-500 700])
-    ylim([-4 4])
-    box off
-    saveas(gcf, 'velTraceZeroCoh_all_exp3.pdf')
+%     % zero coherence trials, perceived motion
+%     figure
+%     for probNmerged = 1:2
+%         plot(timePoints, velMean{probNmerged}.zeroL, '--', 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1)
+%         hold on
+%         p{probNmerged} = plot(timePoints, velMean{probNmerged}.zeroR, 'color', colorProb(probNmerged+1, :)); %, 'LineWidth', 1);
+%     end
+%     legend([p{1}, p{2}], {'50', '90'}, 'Location', 'NorthWest')
+%     title('0 coh trials')
+%     xlabel('Time (ms)')
+%     ylabel('Horizontal velocity (deg/s)')
+%     xlim([-500 700])
+%     ylim([-4 4])
+%     box off
+%     saveas(gcf, 'velTraceZeroCoh_all_exp3.pdf')
     
 %     % perceptual trials, perceived motion
 %     figure
@@ -467,26 +469,23 @@ end
 % each row is the mean velocity trace of one participant
 % use the min frame length--the lengeth where all participants have
 % valid data points
-cd(analysisFolder)
-cd ..
-cd ..
-cd('R\Exp2')
+cd(RsaveFolder)
 
-% % perceptual trials by perceived motion
-% for probNmerged = 1:2
-%     velTAverageSub = [];
-%     for binN = 1:2
-%         if binN==1
-%             dataTemp = meanVel{probNmerged}.ppL(:, (maxFrameLength-minFrameLength+1):end);
-%         else
-%             dataTemp = meanVel{probNmerged}.ppR(:, (maxFrameLength-minFrameLength+1):end);
-%         end
-%         for subN = 1:size(names, 2)
-%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-%         end
-%     end
-%     csvwrite(['velocityTracePerceptualPerceived_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
-% end
+% perceptual trials by perceived motion
+for probNmerged = 1:2
+    velTAverageSub = [];
+    for binN = 1:2
+        if binN==1
+            dataTemp = meanVel{probNmerged}.ppL(:, (maxFrameLength-minFrameLength+1):end);
+        else
+            dataTemp = meanVel{probNmerged}.ppR(:, (maxFrameLength-minFrameLength+1):end);
+        end
+        for subN = 1:size(names, 2)
+            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+        end
+    end
+    csvwrite(['velocityTracePerceptualPerceived_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
+end
 
 % % standard trials
 % for probNmerged = 1:3
@@ -504,21 +503,21 @@ cd('R\Exp2')
 %     csvwrite(['velocityTraceStandard_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 %
-% perceptual trials by visual motion
-for probNmerged = 1:2
-    velTAverageSub = [];
-    for binN = 1:2
-        if binN==1
-            dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-        else
-            dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
-        end
-        for subN = 1:size(names, 2)
-            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-        end
-    end
-    csvwrite(['velocityTracePerceptual_cleaned140_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
-end
+% % perceptual trials by visual motion
+% for probNmerged = 1:2
+%     velTAverageSub = [];
+%     for binN = 1:2
+%         if binN==1
+%             dataTemp = meanVel{probNmerged}.leftPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+%         else
+%             dataTemp = meanVel{probNmerged}.rightPerceptual(:, (maxFrameLength-minFrameLength+1):end);
+%         end
+%         for subN = 1:size(names, 2)
+%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+%         end
+%     end
+%     csvwrite(['velocityTracePerceptual_cleaned140_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
+% end
 %
 % % perceptual visual left trials
 % for probNmerged = 1:3
@@ -552,18 +551,18 @@ end
 %     csvwrite(['velocityTraceVPright_', num2str(probCons(probNmerged+2)), '.csv'], velTAverageSub)
 % end
 
-% % zero coherence trials
-% for probNmerged = 1:2
-%     velTAverageSub = [];
-%     for binN = 1:2
-%         if binN==1
-%             dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
-%         else
-%             dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
-%         end
-%         for subN = 1:size(names, 2)
-%             velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-%         end
-%     end
-%     csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
-% end
+% zero coherence trials
+for probNmerged = 1:2
+    velTAverageSub = [];
+    for binN = 1:2
+        if binN==1
+            dataTemp = meanVel{probNmerged}.zeroL(:, (maxFrameLength-minFrameLength+1):end);
+        else
+            dataTemp = meanVel{probNmerged}.zeroR(:, (maxFrameLength-minFrameLength+1):end);
+        end
+        for subN = 1:size(names, 2)
+            velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+        end
+    end
+    csvwrite(['velocityTraceZeroCoh_', num2str(probCons(probNmerged+1)), '.csv'], velTAverageSub)
+end

@@ -13,15 +13,24 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "aspVel_exp1vs2_cleaned126.csv"
-dataDFileName <- "aspVelDiff_exp1vs2_cleaned126.csv"
-pdfFileName <- "aspVel_exp1vs2_cleaned126.pdf"
-pdfFileNameD <- "aspVelDiff_exp1vs2_cleaned126.pdf"
+dataFileName <- "aspVel_exp1vs3.csv"
+dataDFileName <- "PSEdiff_exp1vs3.csv"
+pdfFileName <- "aspVel_exp1vs3.pdf"
+pdfFileNameD <- "slopeDiff_exp1vs3.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
 dotSize <- 3
 subN <- 9 # for calculating standard errors
+# slope
+ylimLow <- 10
+ylimHigh <- 50
+# PSE
+ylimLow <- -0.1
+ylimHigh <- 0.15
+# ASP
+ylimLow <- -1
+ylimHigh <- 5
 
 data <- read.csv(dataFileName)
 dataD <- read.csv(dataDFileName)
@@ -29,6 +38,7 @@ dataD <- read.csv(dataDFileName)
 # # exclude bad fitting...
 # data <- subset(data[which(data$sub!=8),])
 
+## compare two experiments
 # PSE anova
 sub <- data["sub"]
 exp <- data["exp"]
@@ -76,45 +86,55 @@ p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
 print(p)
 ggsave(paste(plotFolder, pdfFileName, sep = ""))
 
-## t-test of the difference
-sub <- dataD["sub"]
-exp <- dataD["exp"]
-measure <- dataD["aspVelDiff"]
-dataDtemp <- data.frame(sub, exp, measure)
-dataDtemp$sub <- as.factor(dataDtemp$sub)
-dataDtemp$exp <- as.factor(dataDtemp$exp)
-colnames(dataDtemp)[3] <- "measure"
-# dataDttest <- aggregate(measure ~ exp, data = dataDtemp, FUN = "mean")
+# ## t-test of the difference
+# sub <- dataD["sub"]
+# exp <- dataD["exp"]
+# measure <- dataD["slopeDiff"]
+# dataDtemp <- data.frame(sub, exp, measure)
+# dataDtemp$sub <- as.factor(dataDtemp$sub)
+# dataDtemp$exp <- as.factor(dataDtemp$exp)
+# colnames(dataDtemp)[3] <- "measure"
+# # dataDttest <- aggregate(measure ~ exp, data = dataDtemp, FUN = "mean")
 
-res <- pairwise.t.test.with.t.and.df(x = dataDtemp$measure, g = dataDtemp$exp, paired = TRUE, p.adj="none")
-show(res) # [[3]] = p value table, un adjusted
-res[[5]] # t-value
-res[[6]] # dfs
-res[[3]]
-p.adjust(res[[3]], method = "bonferroni", n = 3) 
+# # res <- pairwise.t.test.with.t.and.df(x = dataDtemp$measure, g = dataDtemp$exp, paired = TRUE, p.adj="none")
+# # show(res) # [[3]] = p value table, un adjusted
+# # res[[5]] # t-value
+# # res[[6]] # dfs
+# # res[[3]]
+# # p.adjust(res[[3]], method = "bonferroni", n = 3) 
 
-p <- ggplot(dataDtemp, aes(x = exp, y = measure)) +
-        stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
-        stat_summary(fun.data = 'mean_sdl',
-               fun.args = list(mult = 1.96/sqrt(subN)),
-               geom = 'errorbar', width = .1) +
-        # stat_summary(aes(y = PSE), fun.data = mean_se, geom = "errorbar", width = 0.1) +
-        geom_point(aes(x = exp, y = measure), size = dotSize, shape = 1) +
-        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-        # 
-        scale_y_continuous(name = "Anticipatory pursuit velocity bias (deg/s)") + #, limits = c(0, 0.15), expand = c(0, 0.01)) +
-        scale_x_discrete(name = "Experiment", breaks=c("Exp1", "Exp2")) +
-        # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
-        # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
-        theme(axis.text=element_text(colour="black"),
-              axis.ticks=element_line(colour="black", size = axisLineWidth),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              panel.border = element_blank(),
-              panel.background = element_blank(),
-              text = element_text(size = textSize, colour = "black"),
-              legend.background = element_rect(fill="transparent"),
-              legend.key = element_rect(colour = "transparent", fill = "white"))
-        # facet_wrap(~prob)
-print(p)
-ggsave(paste(plotFolder, pdfFileNameD, sep = ""))
+# # # bias in PSE
+# # ylimLow <- -0.05
+# # ylimHigh <- 0.2
+# # # bias in ASP
+# # ylimLow <- 0
+# # ylimHigh <- 3
+# # bias in slope
+# ylimLow <- -40
+# ylimHigh <- 30
+
+# p <- ggplot(dataDtemp, aes(x = exp, y = measure)) +
+#         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
+#         stat_summary(fun.data = 'mean_sdl',
+#                fun.args = list(mult = 1.96/sqrt(subN)),
+#                geom = 'linerange', size = 1) +
+#         geom_line(aes(x = exp, y = measure, group = sub), size = 0.5, linetype = "dashed") +
+#         geom_point(aes(x = exp, y = measure), size = dotSize, shape = 1) +
+#         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(0), y = c(ylimLow), xend = c(0), yend = c(ylimHigh)), size = axisLineWidth) +
+#         # scale_y_continuous(name = "Bias of PSE") + #, limits = c(0, 0.15), expand = c(0, 0.01)) +
+#         scale_y_continuous(name = "Bias of slope") + #, limits = c(0, 0.15), expand = c(0, 0.01)) +
+#         # scale_y_continuous(name = "Bias of anticipatory pursuit velocity(deg/s)") + #, limits = c(0, 0.15), expand = c(0, 0.01)) +
+#         scale_x_discrete(name = "Experiment", limits = c("1", "3"), labels = c("1" = "Exp1", "3" = "Exp3")) +
+#         # scale_x_discrete(name = "Experiment", limits = c("1", "2"), labels = c("1" = "Exp1", "2" = "Exp2")) +
+#         theme(axis.text=element_text(colour="black"),
+#               axis.ticks=element_line(colour="black", size = axisLineWidth),
+#               panel.grid.major = element_blank(),
+#               panel.grid.minor = element_blank(),
+#               panel.border = element_blank(),
+#               panel.background = element_blank(),
+#               text = element_text(size = textSize, colour = "black"),
+#               legend.background = element_rect(fill="transparent"),
+#               legend.key = element_rect(colour = "transparent", fill = "white"))
+#         # facet_wrap(~prob)
+# print(p)
+# ggsave(paste(plotFolder, pdfFileNameD, sep = ""))

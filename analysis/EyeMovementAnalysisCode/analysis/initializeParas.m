@@ -4,7 +4,7 @@ clear all; close all; clc
 
 nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'}; % experiment 1
 % nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
-nameSets{3} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'};
+nameSets{3} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order corresponding to exp1
 nameSets{2} = {'tFW' 'fh2' 'nan' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'nan' 'p15'};
 setN = 1; % choose which set to analyze
 % names = nameSets{1};
@@ -34,6 +34,10 @@ mausFolder = pwd;
 cd ..
 cd('slidingWindows')
 slidingWFolder = pwd;
+cd ..
+cd ..
+cd('R')
+RFolder = pwd;
 cd(analysisFolder)
 expAll{1} = load(['eyeTrialData_all_set1_exp1.mat']);
 expAll{2} = load(['eyeTrialData_all_set1_exp2.mat']);

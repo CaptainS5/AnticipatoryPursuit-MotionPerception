@@ -1,5 +1,15 @@
-% Exp 2
+% Exp 2 & 3
 initializeParas;
+% 
+% names = names2; % Exp2, 8 people, fixation control
+% slidingWFolder = [slidingWFolder '\Exp2'];
+% eyeTrialData = expAll{2}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp2']
+
+names = nameSets{3}; % Exp3, 9 people, low-coh context trials
+slidingWFolder = [slidingWFolder '\Exp3'];
+eyeTrialData = expAll{3}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp3'];
 
 % % correct for mistakenly pressing the wrong key in standard trials
 % idxT = find(eyeTrialData.trialType==1); % standard trials, same perceptual choice as visual
@@ -25,7 +35,7 @@ pLength = 182; % length of perceptual trials in one block
 trialBin = 50; % window of trial numbers
 
 % some settings
-individualPlots = 0;
+individualPlots = 1;
 averagedPlots = 1;
 yLabels = {'Probability of perceiving right-probability of right' 'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
     'olp mean horizontal velocity (deg/s)' 'olp peak horizontal velocity (deg/s)' 'olp mean acceleration (deg/s2)' 'olp horizontal velocity change'...
@@ -371,11 +381,8 @@ for probNmerged = 1:2
     maxIdxP = min(minLengthP);
     
     slideSub = tempMeanP{paraN, probNmerged}(:, 1:maxIdxP);    
-    cd(analysisFolder)
-    cd ..
-    cd ..
-    cd('R')
-    csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+1)), '_exp2.csv'], slideSub)
+    cd(RsaveFolder)
+    csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+1)), '.csv'], slideSub)
 end
 
     end
