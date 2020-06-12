@@ -1,36 +1,41 @@
 library(ggplot2)
 library(ez)
 library(Hmisc)
+library(lsr)
 
 #### clear environment
 rm(list = ls())
 
 #### load data
 # on Inspiron 13
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
-# source("pairwise.t.test.with.t.and.df.R")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
+source("pairwise.t.test.with.t.and.df.R")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp3")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataAPvelX.csv"
-pdfFileName <- "aspExp1.pdf"
+dataFileName <- "precededPerceptionASP_exp3.csv"
+pdfFileName <- "precededPerceptionASP_exp3.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
 dotSize <- 4
-subN <- 10
 # slope
 ylimLow <- 10
 ylimHigh <- 50
-# PSE
+# PSE 
 ylimLow <- -0.1
 ylimHigh <- 0.15
+# PSE by preceding perception
+ylimLow <- -0.2
+ylimHigh <- 0.1
 # ASP
 ylimLow <- -1
-ylimHigh <- 5
+ylimHigh <- 3 # 5 for all probability blocks
 
 # source("pairwise.t.test.with.t.and.df.R")
 data <- read.csv(dataFileName)
-
+subs <- unique(data$sub)
+subN <- length(subs)
 # # exclude bad fitting...
 # data <- subset(data[which(data$sub!=8),])
 
@@ -38,10 +43,12 @@ data <- read.csv(dataFileName)
 ### 2 way for perception--rotational speed x after-reversal direction
 ## Exp1
 sub <- data["sub"]
-prob <- data["prob"]
+# prob <- data["prob"]
+preDir <- data["precededPerception"]
 # timeBin <- data["timeBin"]
-measure <- data["slope"]
-dataAnova <- data.frame(sub, prob, measure)
+measure <- data["aspVelX"]
+dataAnova <- data.frame(sub, preDir, measure)
+# dataAnova <- data.frame(sub, prob, measure)
 # dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$timeBin <- as.factor(dataAnova$timeBin)
@@ -67,25 +74,36 @@ colnames(dataAnova)[3] <- "measure"
 # res[[3]]
 # p.adjust(res[[3]], method = "bonferroni", n = 9) # interaction between timeWindow & afterReversalD
 
+# t-test to compare PSE for different preceding perception
+res <- pairwise.t.test.with.t.and.df(x = dataAnova$measure, g = dataAnova$precededPerception, paired = TRUE, p.adj="none")
+# show(res) # [[3]] = p value table, un adjusted
+res[[5]] # t-value
+res[[6]] # dfs
+res[[3]]
+# p.adjust(res[[3]], method = "bonferroni", n = 9) # interaction between timeWindow & afterReversalD
+cohensd <- cohensD(subset(dataAnova, precededPerception==0)$measure, subset(dataAnova, precededPerception==1)$measure, method = 'paired')
+show(cohensd)
+
 # to do the plot, do not turn prob into factor, check the values and data type!
 # show(dataAnova$prob)
 # is.numeric(dataAnova$prob)
+# data=subset(dataAnova, prob!=70)
 
-p <- ggplot(dataAnova, aes(x = prob, y = measure)) +
+p <- ggplot(data=dataAnova, aes(x = precededPerception, y = measure)) +
         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 17.5) +
         stat_summary(fun.data = 'mean_sdl',
                fun.args = list(mult = 1.96/sqrt(subN)),
                geom = 'linerange', size = 1) +
-        geom_line(aes(x = prob, y = measure, group = sub), size = 0.5, linetype = "dashed") +
-        geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
+        geom_line(aes(x = precededPerception, y = measure, group = sub), size = 0.5, linetype = "dashed") +
+        geom_point(aes(x = precededPerception, y = measure), size = dotSize, shape = 1) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth) +
-        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)", breaks = seq(-1, 5, 1), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
-        # scale_y_continuous(name = "Point of  Subjective Equality", breaks = c(ylimLow, 0, ylimHigh), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
+        scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(-1, 5, 1), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
+        # scale_y_continuous(name = "PSE", breaks = c(ylimLow, 0, ylimHigh), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
         # scale_y_continuous(name = "Slope", breaks = seq(ylimLow, ylimHigh， 10), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
+        scale_x_continuous(name = "Preceded perceived direction", breaks=c(0, 1), limits = c(-0.5, 1.5), expand = c(0, 0)) + # preceded perception
         # scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp2&3
-        scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp1
+        # scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp1
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
-        # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
         theme(axis.text=element_text(colour="black"),
               axis.ticks=element_line(colour="black", size = axisLineWidth),
@@ -98,4 +116,4 @@ p <- ggplot(dataAnova, aes(x = prob, y = measure)) +
               legend.key = element_rect(colour = "transparent", fill = "white"))
         # facet_wrap(~prob)
 print(p)
-# ggsave(paste(plotFolder, pdfFileName, sep = ""))
+ggsave(paste(plotFolder, pdfFileName, sep = ""))

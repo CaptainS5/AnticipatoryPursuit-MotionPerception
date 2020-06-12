@@ -54,6 +54,8 @@ expAll{3} = load(['eyeTrialData_all_set1_exp3.mat']);
 probCons = [10 50 90];
 probNames{1} = {'10', '50'};
 probNames{2} = {'50', '90'};
+% probNames{1} = {'10', '30', '50'};
+% probNames{2} = {'50', '70', '90'};
 probNames12{1} = {'exp1-50', 'exp1-10', 'exp3-50', 'exp3-10'};
 probNames12{2} = {'exp1-50', 'exp1-90', 'exp3-50', 'exp3-90'};
 

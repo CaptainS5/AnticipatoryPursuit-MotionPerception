@@ -3,6 +3,7 @@ library(ez)
 library(Hmisc)
 library(reshape2)
 library(psychReport)
+library(lsr)
 
 #### clear environment
 rm(list = ls())
@@ -11,17 +12,17 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
+plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/raw plots")
 ### modify these parameters to plot different conditions
 dataFileName <- "aspVel_exp1vs3.csv"
-dataDFileName <- "PSEdiff_exp1vs3.csv"
+# dataDFileName <- "PSEdiff_exp1vs2_notCleaned.csv"
 pdfFileName <- "aspVel_exp1vs3.pdf"
-pdfFileNameD <- "slopeDiff_exp1vs3.pdf"
+pdfInteractionFileName <- "aspVel_exp1vs3_interaction2.pdf"
+# pdfFileNameD <- "slopeDiff_exp1vs3.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
 dotSize <- 3
-subN <- 9 # for calculating standard errors
 # slope
 ylimLow <- 10
 ylimHigh <- 50
@@ -33,7 +34,9 @@ ylimLow <- -1
 ylimHigh <- 5
 
 data <- read.csv(dataFileName)
-dataD <- read.csv(dataDFileName)
+subs <- unique(data$sub)
+subN <- length(subs)
+# dataD <- read.csv(dataDFileName)
 # data <- data[data.exp==3]
 # # exclude bad fitting...
 # data <- subset(data[which(data$sub!=8),])
@@ -59,19 +62,70 @@ anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
 # print(anovaData)
 aovEffectSize(anovaData, 'pes')
 
-p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
-        stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
-        stat_summary(fun.data = 'mean_sdl',
-               fun.args = list(mult = 1.96/sqrt(subN)),
-               geom = 'errorbar', width = .1) +
-# geom = 'smooth', se = 'TRUE') +
+# p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
+#         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
+#         stat_summary(fun.data = 'mean_sdl',
+#                fun.args = list(mult = 1.96/sqrt(subN)),
+#                geom = 'errorbar', width = .1) +
+# # geom = 'smooth', se = 'TRUE') +
+#         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+#         geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
+#         # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
+#         scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)") + #, limits = c(-0.1, 0.55), expand = c(0, 0)) +
+#         # scale_y_continuous(name = "PSE") + 
+#         scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
+#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
+#         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+#         theme(axis.text=element_text(colour="black"),
+#                       axis.ticks=element_line(colour="black", size = axisLineWidth),
+#                       panel.grid.major = element_blank(),
+#                       panel.grid.minor = element_blank(),
+#                       panel.border = element_blank(),
+#                       panel.background = element_blank(),
+#                       text = element_text(size = textSize, colour = "black"),
+#                       legend.background = element_rect(fill="transparent"),
+#                       legend.key = element_rect(colour = "transparent", fill = "white"))
+#         # facet_wrap(~exp)
+# print(p)
+# ggsave(paste(plotFolder, pdfFileName, sep = ""))
+
+## t-test of the simple main effect of probability in the control experiment
+dataD <- dataAnova[dataAnova$exp==2,]
+# show(dataD)
+res <- pairwise.t.test.with.t.and.df(x = dataD$measure, g = dataD$prob, paired = TRUE, p.adj="none")
+show(res) # [[3]] = p value table, un adjusted
+res[[5]] # t-value
+res[[6]] # dfs
+res[[3]]
+p.adjust(res[[3]], method = "bonferroni", n = 4) 
+cohensd <- cohensD(subset(dataD, prob==50)$measure, subset(dataD, prob==90)$measure, method = 'paired')
+show(cohensd)
+
+## interaction plot
+dataPlot <- data.frame(sub, prob, exp, measure)
+colnames(dataPlot)[4] <- "measure"
+dataPlot$sub <- as.factor(dataPlot$sub)
+dataPlot$exp <- as.factor(dataPlot$exp)
+# dataPlot <- aggregate(measure ~ exp+prob, data = dataPlot, FUN = "mean")
+# show(dataPlot)
+# PSE
+ylimLow <- -0.1
+ylimHigh <- 0.15
+# ASP
+ylimLow <- -1
+ylimHigh <- 3
+p <- ggplot(dataPlot, aes(x = prob, y = measure, color = exp)) +
+        stat_summary(fun.y = mean, geom = "point", shape = 95, size = 17.5) +
+        stat_summary(fun.y = mean, geom = "line", width = 1) +
+        stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1) +
         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
-        geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
-        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(-0.1, -0.1), yend = c(-0.1, 0.15)), size = axisLineWidth) +
-        scale_y_continuous(name = "Anticipatory pursuit velocity (deg/s)") + #, limits = c(-0.1, 0.55), expand = c(0, 0)) +
-        # scale_y_continuous(name = "PSE") + 
-        scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
-        # scale_x_discrete(name = "Probability of rightward motion", breaks=c(50, 70, 90)) +
+        # geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
+        # geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth) +
+        scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
+        coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
+        # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
+        scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) +
+        # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
         theme(axis.text=element_text(colour="black"),
                       axis.ticks=element_line(colour="black", size = axisLineWidth),
@@ -84,7 +138,7 @@ p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
                       legend.key = element_rect(colour = "transparent", fill = "white"))
         # facet_wrap(~exp)
 print(p)
-ggsave(paste(plotFolder, pdfFileName, sep = ""))
+ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
 
 # ## t-test of the difference
 # sub <- dataD["sub"]
