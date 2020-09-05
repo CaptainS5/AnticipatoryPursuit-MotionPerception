@@ -4,19 +4,24 @@
 % run this after getting the errorfiles
 
 clear all; close all; clc
-% Exp1
+% % Exp1
 % nameSets{1} = {'XW0' 'p2' 'p4' 'p5' 'p6' 'p8' 'p9' 'p10' 'p14' '015'};
-% nameSets{2} = {'p3' 'p7' 'p12'};% 'p15'};
-% Exp2, now named as Exp3
-nameSets{1} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
-% this will save you huge trouble...
-% Exp3
-% nameSets{1} = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
+% expN = 1;
+
+% % Exp3--low coherence in context trials (the previous exp2)
+% nameSets{1} = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % in the same order as Exp1
+% expN = 3;
+% % this will save you huge trouble...
+
+% Exp2--fixation until RDK onset
+nameSets{1} = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'};
+expN = 2;
+
 subStartI = [1];
 cd ..
 analysisPath = pwd;
 % dataPath = 'C:\Users\vision\Documents\Xiuyun\AnticipatoryPursuit-MotionPerception\data'; % saccade pc
-dataPath = 'C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data\Exp3'; % dell laptop
+dataPath = ['C:\Users\wuxiu\Documents\PhD@UBC\Lab\2ndYear\AnticipatoryPursuit\AnticipatoryPursuitMotionPerception\data\exp' num2str(expN)]; % dell laptop
 % dataPath = 'E:\XiuyunWu\AnticipatoryPursuit-MotionPerception\data'; % ASUS laptop
 trialPerCon = 26; % for each coherence level in each direction
 % parameters
@@ -31,14 +36,13 @@ distance = 55; % 57.29 for tW
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 5;
-microSaccadeThreshold = 5;
+saccadeThreshold = 400; % acceleration
 
 %% All trials
 for setN = 1:length(subStartI)
     if subStartI(setN)>1 % load eyeTrialDataAll
         cd([analysisPath '\analysis'])
-        load(['eyeTrialData_all_set' num2str(setN) '.mat'])
+        load(['eyeTrialData_all_exp' num2str(expN) '.mat'])
     else
         clear eyeTrialData
     end
@@ -53,7 +57,7 @@ for setN = 1:length(subStartI)
         load('parametersAll')
         load eventLog
         cd(analysisPath)
-        errors = load(['Errorfiles\Exp3\Sub_' currentSubject '_errorFile.mat']);
+        errors = load(['Errorfiles\Exp' num2str(expN) '\Sub_' currentSubject '_errorFile.mat']);
         clear eyeTrialDataSub
         
         for currentTrial = 1:size(parameters, 1)
@@ -191,7 +195,7 @@ for setN = 1:length(subStartI)
             end
         end
         cd([analysisPath '\analysis'])
-        save(['eyeTrialDataSub_' names{subN} '.mat'], 'eyeTrialDataSub');
+        save(['eyeTrialDataExp' num2str(expN) '_Sub_' names{subN} '.mat'], 'eyeTrialDataSub');
     end
-    save(['eyeTrialData_all_set' num2str(setN) '_exp3.mat'], 'eyeTrialData');
+    save(['eyeTrialData_all_exp' num2str(expN) '.mat'], 'eyeTrialData');
 end

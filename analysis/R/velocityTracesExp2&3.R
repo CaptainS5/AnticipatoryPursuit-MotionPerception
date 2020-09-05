@@ -7,14 +7,14 @@ rm(list = ls())
 
 #### load data
 # on Inspiron 13
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp3")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp2")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
 ### modify these parameters to plot different conditions
-dataFileName <- "velocityTrace_wrongPerceptualPerceived_exp3_prob"
-pdfFileName <- "velocityTrace_wrongPerceptualPerceived_all_Exp3.pdf"
-# dataFileName <- "slidingW_perceptionRatio_"
-# pdfFileName <- "slidingW_perceptionRatio_STE_all_Exp2.pdf"
-n <- 9 # number of participants
+dataFileName <- "velocityTrace_perceptualVisual_exp2_prob"
+pdfFileName <- "velocityTrace_perceptualVisual_all_Exp2.pdf"
+# dataFileName <- "slidingW_perception_"
+# pdfFileName <- "slidingW_perception_STE_all_Exp3.pdf"
+n <- 8 # number of participants
 # for plotting
 vtPlotWidth <- 16 # width for the pdf file
 textSize <- 25
@@ -31,11 +31,11 @@ ytickHigh <- 4
 # ytickLow <- -10 # range of y axis line
 # ytickHigh <- 10
 
-## load and process data
+# load and process data
 # mean velocity traces in different conditions
 # first get mean for each condition and the confidence intervals
 probName <-c("50", "90")
-timePoints <- seq(from = -500, to = 700, by = 1)
+timePoints <- seq(from = -200, to = 700, by = 1)
 velTrace <- list()
 
 for (probI in 1:2) {
@@ -47,7 +47,7 @@ for (probI in 1:2) {
       idxStart <- (conI-1)*n+1
       idxEnd <- conI*n
 
-      velDataT <- velData[idxStart:idxEnd, 700:1900] # -500 to 700 ms
+      velDataT <- velData[idxStart:idxEnd, 1000:1900] # -200 to 700 ms
       tempM <- colMeans(velDataT, na.rm=TRUE)
       velMean <- as.matrix(tempM)
       velStd <- colSds(velDataT, na.rm=TRUE)
@@ -57,8 +57,8 @@ for (probI in 1:2) {
       velTrace[[(probI-1)*2+conI]] <- data.frame(timePoints, velMean, velLower, velUpper)
     }
 }
-# colourCode <- c("#ffb687", "#897eff", "#71cc64") # different hues
-colourCode <- c("#c6dbef", "#4292c6", "#08306b") # all blue
+colourCode <- c("#dad9d9", "#737474", "#000000") # different shades of grey
+# colourCode <- c("#c6dbef", "#4292c6", "#08306b") # all blue
 ###
 
 ## plot velocity traces with 95% CI
@@ -72,9 +72,9 @@ p <- ggplot(velTrace[[1]], aes(x = timePoints, y = velMean)) +
         # geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
         geom_line(data = velTrace[[4]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "solid") + 
         # geom_ribbon(data = velTrace[[4]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
-        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-500, -550), xend = c(700, -550), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
+        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-200, -250), xend = c(700, -250), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
         scale_y_continuous(name = "Horinzontal eye velocity (°/s)",limits = c(ylimLow, ylimHigh), breaks=seq(ytickLow, ytickHigh, 2), expand = c(0, 0)) +
-        scale_x_continuous(name = "Time (ms)", limits = c(-550, 700), breaks=seq(-500, 700, 100), expand = c(0, 0)) +
+        scale_x_continuous(name = "Time (ms)", limits = c(-250, 700), breaks=seq(-200, 700, 100), expand = c(0, 0)) +
         # coord_cartesian(ylim=c(-4, 4)) +
         scale_colour_manual("Probability of rightward motion",
                             breaks = c("50%", "90%"),
@@ -95,9 +95,9 @@ print(p)
 # dev.off()
 ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 
-# # sliding window analysis
-# # mean velocity traces in different conditions
-# # first get mean for each condition and the confidence intervals
+# sliding window analysis
+# mean velocity traces in different conditions
+# first get mean for each condition and the confidence intervals
 
 # # perceptual trials, sliding windows, adjust according to needs
 # # for perception
@@ -106,12 +106,11 @@ ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 # ytickLow <- -0.3 # range of y axis line
 # ytickHigh <- 0.3
 
-# # for perception ratio
-# ylimLow <- -0.25 # range for x axis line
-# ylimHigh <- 1.25
-# ytickLow <-  -0.25 # range of y axis line
-# ytickHigh <- 1.25
-
+# # # for perception ratio
+# # ylimLow <- -0.25 # range for x axis line
+# # ylimHigh <- 1.25
+# # ytickLow <-  -0.25 # range of y axis line
+# # ytickHigh <- 1.25
 
 # # # for APvelX
 # # ylimLow <- -0.5 # range for x axis line
@@ -150,7 +149,7 @@ ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 #         geom_line(data = velTrace[[2]], aes(x = timePoints, y = velMean, colour = "90%"), size = 1, linetype = "solid") + geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
 #         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(0, 0), xend = c(130, 0), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
 #         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", limits = c(ylimLow, ylimHigh), breaks=c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
-#         scale_y_continuous(name = "P(perceiving right)/P(motion right)", limits = c(ylimLow, ylimHigh), breaks=c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
+#         scale_y_continuous(name = "P(perceiving right)-P(motion right)", limits = c(ylimLow, ylimHigh), breaks=c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
 #         scale_x_continuous(name = "Perceptual trial number", limits = c(-0, 130), breaks=c(0, 50, 100, 130), expand = c(0, 0)) +
 #         scale_colour_manual("Probability of rightward motion",
 #                             breaks = c("50%", "90%"),

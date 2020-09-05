@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 1; % 1 for fhF 
+currentTrial = 368; % 1 for fhF 
 % chose trial you want to look at here; default = 1; 
 c = 1; % counter
 % monitor and setup specific parameters
@@ -36,8 +36,7 @@ distance = 55;
 % note that this threshold is hard-coded! If you want to test different
 % values this will not update while clicking through and you will have to
 % declare the variable eagain in the command window
-saccadeThreshold = 5; % ~10^2--jerk; ~15-velocity
-microSaccadeThreshold = 5;
+saccadeThreshold = 400; % acceleration
 % this is a csv files that will contain information about discarded trials
 % errors = load('errors.csv'); ???
 
@@ -46,7 +45,7 @@ analysisPath = pwd;
 % enter your data path here
 cd ..
 cd ..
-dataPath = fullfile(pwd,'data\');
+dataPath = fullfile(pwd,'data\exp1');
 cd(analysisPath);
 currentSubjectPath = selectSubject(dataPath);
 
@@ -60,7 +59,7 @@ load eventLog % variable matrix has all the event message frame indice
 cd(analysisPath);
 
 sidx = strfind(currentSubjectPath, 'data\');
-currentSubject = currentSubjectPath(sidx+5:end); % exp2 +5, exp1+10
+currentSubject = currentSubjectPath(sidx+10:end); % exp2 +5, exp1/3+10
 
 errorFilePath = fullfile(analysisPath,'\ErrorFiles\');
 if exist(errorFilePath, 'dir') == 0

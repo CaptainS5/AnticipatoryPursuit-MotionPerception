@@ -4,17 +4,17 @@ initializeParas;
 initializePSE;
 
 % only uncomment the experiment you want to look at
-% Exp1, 10 people, main experiment
-expN = 1;
-names = nameSets{1}; 
-slidingWFolder = [slidingWFolder '\Exp1'];
-eyeTrialData = expAll{1}.eyeTrialData;
-RsaveFolder = [RFolder '\Exp1'];
-probTotalN = 3;
-colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
-probNames{1} = {'10', '30', '50'};
-probNames{2} = {'50', '70', '90'};
-probCons = [10 30 50 70 90];
+% % Exp1, 10 people, main experiment
+% expN = 1;
+% names = nameSets{1}; 
+% slidingWFolder = [slidingWFolder '\Exp1'];
+% eyeTrialData = expAll{1}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp1'];
+% probTotalN = 3;
+% colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+% probNames{1} = {'10', '30', '50'};
+% probNames{2} = {'50', '70', '90'};
+% probCons = [10 30 50 70 90];
 
 % % Exp2, 8 people, fixation control
 % expN = 2;
@@ -24,13 +24,13 @@ probCons = [10 30 50 70 90];
 % RsaveFolder = [RFolder '\Exp2'];
 % probTotalN = 2;
 
-% % Exp3, 9 people, low-coh context trials
-% expN = 3;
-% names = nameSets{3}; 
-% slidingWFolder = [slidingWFolder '\Exp3'];
-% eyeTrialData = expAll{3}.eyeTrialData;
-% RsaveFolder = [RFolder '\Exp3'];
-% probTotalN = 2;
+% Exp3, 9 people, low-coh context trials
+expN = 3;
+names = nameSets{3}; 
+slidingWFolder = [slidingWFolder '\Exp3'];
+eyeTrialData = expAll{3}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp3'];
+probTotalN = 2;
 
 % flip every direction... to collapse left and right probability
 % blocks
@@ -63,76 +63,76 @@ for subN = 1:length(names)
     idxT{2} = rightChoiceTrialIdx(tempI)+1;% preceded by rightward trials
     
 %     % calculate and draw individual psychometric curves
-%     figure
-%     hold on    
+    figure
+    hold on    
     for binN = 1:2
         % calculate the mean ASP
         dataASP{binN}(subN, 1) = nanmean(eyeTrialData.pursuit.APvelocityX(subN, idxT{binN}));
         
-%         % fit the psychometric curves for each bin
-%         data.cohFit = eyeTrialData.coh(subN, idxT{binN})';
-%         data.choice = eyeTrialData.choice(subN, idxT{binN})';
-%                 
-%         % sort data to prepare for fitting--when there's no need to
-%         % calculate the weighted probabilities...
-%         data.cohIdx = zeros(size(data.cohFit));
-%         for cohN = 1:length(cohLevels)
-%             data.cohIdx(data.cohFit==cohLevels(cohN), 1) = cohN;
-%         end
-%         numRight{binN}(subN, :) = accumarray(data.cohIdx, data.choice, [], @sum); % choice 1=right, 0=left
-%         outOfNum{binN}(subN, :) = accumarray(data.cohIdx, data.choice, [], @numel); % total trial numbers
-%         
-%         %Perform fit
-%         [paramsValues{subN, binN} LL{subN, binN} exitflag{subN, binN}] = PAL_PFML_Fit(cohLevels, numRight{binN}(subN, :)', ...
-%             outOfNum{binN}(subN, :)', searchGrid, paramsFree, PF);
+        % fit the psychometric curves for each bin
+        data.cohFit = eyeTrialData.coh(subN, idxT{binN})';
+        data.choice = eyeTrialData.choice(subN, idxT{binN})';
+                
+        % sort data to prepare for fitting--when there's no need to
+        % calculate the weighted probabilities...
+        data.cohIdx = zeros(size(data.cohFit));
+        for cohN = 1:length(cohLevels)
+            data.cohIdx(data.cohFit==cohLevels(cohN), 1) = cohN;
+        end
+        numRight{binN}(subN, :) = accumarray(data.cohIdx, data.choice, [], @sum); % choice 1=right, 0=left
+        outOfNum{binN}(subN, :) = accumarray(data.cohIdx, data.choice, [], @numel); % total trial numbers
         
-%         % plotting
-%         ProportionCorrectObserved=numRight{binN}(subN, :)./outOfNum{binN}(subN, :);
-%         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
-%         ProportionCorrectModel = PF(paramsValues{subN, binN},StimLevelsFineGrain);
-%         if binN==1
-%             f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-k', 'linewidth', 2);
-%             plot(cohLevels, ProportionCorrectObserved,'.k', 'markersize', 30);
-%         else
-%             f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-b', 'linewidth', 2);
-%             plot(cohLevels, ProportionCorrectObserved,'.b', 'markersize', 30);
-%         end
-%         
-%         % saving parameters
-%         dataPercept.alpha{binN}(subN, 1) = paramsValues{subN, binN}(1); % threshold, or PSE
-%         dataPercept.beta{binN}(subN, 1) = paramsValues{subN, binN}(2); % slope
-%         dataPercept.gamma{binN}(subN, 1) = paramsValues{subN, binN}(3); % guess rate, or baseline
-%         dataPercept.lambda{binN}(subN, 1) = paramsValues{subN, binN}(4); % lapse rate
+        %Perform fit
+        [paramsValues{subN, binN} LL{subN, binN} exitflag{subN, binN}] = PAL_PFML_Fit(cohLevels, numRight{binN}(subN, :)', ...
+            outOfNum{binN}(subN, :)', searchGrid, paramsFree, PF, 'lapseLimits',[0 0.1]);
+        
+        % plotting
+        ProportionCorrectObserved=numRight{binN}(subN, :)./outOfNum{binN}(subN, :);
+        StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+        ProportionCorrectModel = PF(paramsValues{subN, binN},StimLevelsFineGrain);
+        if binN==1
+            f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-k', 'linewidth', 2);
+            plot(cohLevels, ProportionCorrectObserved,'.k', 'markersize', 30);
+        else
+            f{binN} = plot(StimLevelsFineGrain, ProportionCorrectModel,'-b', 'linewidth', 2);
+            plot(cohLevels, ProportionCorrectObserved,'.b', 'markersize', 30);
+        end
+        
+        % saving parameters
+        dataPercept.alpha{binN}(subN, 1) = paramsValues{subN, binN}(1); % threshold, or PSE
+        dataPercept.beta{binN}(subN, 1) = paramsValues{subN, binN}(2); % slope
+        dataPercept.gamma{binN}(subN, 1) = paramsValues{subN, binN}(3); % guess rate, or baseline
+        dataPercept.lambda{binN}(subN, 1) = paramsValues{subN, binN}(4); % lapse rate
     end
-%     set(gca, 'fontsize', 16);
-%     set(gca, 'Xtick',cohLevels);
-%     axis([min(cohLevels) max(cohLevels) 0 1]);
-%     xlabel('Stimulus Intensity');
-%     ylabel('Proportion right');
-%     legend([f{:}], {'preceded by left', 'preceded by right'}, 'box', 'off', 'location', 'northwest')
+    set(gca, 'fontsize', 16);
+    set(gca, 'Xtick',cohLevels);
+    axis([min(cohLevels) max(cohLevels) 0 1]);
+    xlabel('Stimulus Intensity');
+    ylabel('Proportion right');
+    legend([f{:}], {'preceded by left', 'preceded by right'}, 'box', 'off', 'location', 'northwest')
 %     
-%     cd(perceptFolder)
-%     saveas(gcf, ['pf_precededPerception_exp' num2str(expN) '_' names{subN} '.pdf'])
+    cd(perceptFolder)
+    saveas(gcf, ['pf_precededPerception_exp' num2str(expN) '_' names{subN} '.pdf'])
 end
-% save(['dataPercept_precededPerception_exp' num2str(expN)], 'dataPercept');
+save(['dataPercept_precededPerception_exp' num2str(expN)], 'dataPercept');
 save(['dataASP_precededPerception_exp' num2str(expN)], 'dataASP');
 
 %% save csv for ANOVA
 cd(RsaveFolder)
-% % perceptual data
-% data = table();
-% count = 1;
-% for subN = 1:length(names)
-%     for binN = 1:2
-%         data.sub(count, 1) = subN;
-%         data.prob(count, 1) = 50;
-%         data.precededPerception(count, 1) = binN-1; % 0=left, 1-right
-%         data.PSE(count, 1) = dataPercept.alpha{binN}(subN, 1);
-%         data.slope(count, 1) = dataPercept.beta{binN}(subN, 1);
-%         count = count+1;
-%     end
-% end
-% writetable(data, ['precededPerceptionPSE_exp' num2str(expN) '.csv'])
+% perceptual data
+data = table();
+count = 1;
+for subN = 1:length(names)
+    for binN = 1:2
+        data.sub(count, 1) = subN;
+        data.prob(count, 1) = 50;
+        data.precededPerception(count, 1) = binN-1; % 0=left, 1-right
+        data.PSE(count, 1) = dataPercept.alpha{binN}(subN, 1);
+        data.slope(count, 1) = dataPercept.beta{binN}(subN, 1);
+        count = count+1;
+    end
+end
+writetable(data, ['precededPerceptionPSE_exp' num2str(expN) '.csv'])
 
 % asp data
 data = table();

@@ -4,8 +4,8 @@ clear all; close all; clc
 
 perceptFolder = pwd;
 % names = {'fh9'};
-% names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % Exp3 in the same order as Exp1
-names = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'}; % Exp2
+names = {'tXW' 'tDC' 'p7' 'p3' 'p9' 'p8' 'p6' 'p4' 'p5'}; % Exp3 in the same order as Exp1
+% names = {'tFW' 'fh2' 'fh5' 'fh6' 'fh8' 'fh9' 'fht' 'p15'}; % Exp2
 averagedPlot = 0;
 trialN = 26; % number of trials for each coherence level in each direction
 % just flip the leftward probability participants? maybe later...
@@ -67,6 +67,9 @@ for subN = 1:size(names, 2)
     probSub = unique(data.prob);
     if probSub(1)<50
         probB = 1;
+        % to merge conditions, flip...
+        data.choice = 1-data.choice;
+        data.cohFit = -data.cohFit;
     else
         probB = 2;
     end
@@ -89,7 +92,7 @@ for subN = 1:size(names, 2)
         
         %Perform fit
         [paramsValues{subN, probSubN} LL{subN, probSubN} exitflag{subN, probSubN}] = PAL_PFML_Fit(cohLevels, numRight{probN}(subN, :)', ...
-            outOfNum{probN}(subN, :)', searchGrid, paramsFree, PF);
+            outOfNum{probN}(subN, :)', searchGrid, paramsFree, PF, 'lapseLimits',[0 0.1]);
         
         % plotting
         ProportionCorrectObserved=numRight{probN}(subN, :)./outOfNum{probN}(subN, :);
@@ -151,7 +154,7 @@ if averagedPlot==1
         
         % fitting averaged psychometric function
         [paramsValuesAll{probNmerged} LLAll{probNmerged} exitflagAll{probNmerged}] = PAL_PFML_Fit(cohLevels, numRightAll{probNmerged}', ...
-            outOfNumAll{probNmerged}', searchGrid, paramsFree, PF);
+            outOfNumAll{probNmerged}', searchGrid, paramsFree, PF, 'lapseLimits',[0 0.1]);
         dataPercept.alpha_all(probNmerged) = paramsValuesAll{probNmerged}(1);
         dataPercept.beta_all(probNmerged) = paramsValuesAll{probNmerged}(2);
         dataPercept.gamma_all(probNmerged) = paramsValuesAll{probNmerged}(3);
@@ -196,19 +199,19 @@ if averagedPlot==1
 end
 
 %% save csv for ANOVA
-% cd(perceptFolder)
-% cd ..
-% cd('R\Exp2')
-% 
-% data = table();
-% count = 1;
-% for subN = 1:length(names)
-%     for probNmerged = 1:2
-%         data.sub(count, 1) = subN;
-%         data.prob(count, 1) = probCons(probNmerged+1);
-%         data.PSE(count, 1) = dataPercept.alpha(subN, probNmerged);
-%         data.slope(count, 1) = dataPercept.beta(subN, probNmerged);
-%         count = count+1;
-%     end
-% end
-% writetable(data, 'dataPercept_Exp2.csv')
+cd(perceptFolder)
+cd ..
+cd('R\Exp2')
+
+data = table();
+count = 1;
+for subN = 1:length(names)
+    for probNmerged = 1:2
+        data.sub(count, 1) = subN;
+        data.prob(count, 1) = probCons(probNmerged+1);
+        data.PSE(count, 1) = dataPercept.alpha(subN, probNmerged);
+        data.slope(count, 1) = dataPercept.beta(subN, probNmerged);
+        count = count+1;
+    end
+end
+writetable(data, 'dataPercept_Exp2.csv')

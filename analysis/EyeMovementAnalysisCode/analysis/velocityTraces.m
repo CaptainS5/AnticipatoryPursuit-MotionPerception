@@ -3,48 +3,41 @@
 initializeParas;
 
 % only uncomment the experiment you want to look at
-% % Exp1, 10 people, main experiment
-% expN = 1;
-% names = nameSets{1}; 
-% slidingWFolder = [slidingWFolder '\Exp1'];
-% eyeTrialData = expAll{1}.eyeTrialData;
-% RsaveFolder = [RFolder '\Exp1'];
-% probTotalN = 3;
-% colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
-% probNames{1} = {'10', '30', '50'};
-% probNames{2} = {'50', '70', '90'};
-% probCons = [10 30 50 70 90];
+% Exp1, 10 people, main experiment
+expN = 1;
+names = nameSets{1}; 
+eyeTrialData = expAll{1}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp1'];
+probTotalN = 3;
+colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+probNames{1} = {'10', '30', '50'};
+probNames{2} = {'50', '70', '90'};
+probCons = [10 30 50 70 90];
 
 % % Exp2, 8 people, fixation control
 % expN = 2;
 % names = names2; 
-% slidingWFolder = [slidingWFolder '\Exp2'];
 % eyeTrialData = expAll{2}.eyeTrialData;
 % RsaveFolder = [RFolder '\Exp2'];
 % probTotalN = 2;
 
-% Exp3, 9 people, low-coh context trials
-expN = 3;
-names = nameSets{3}; 
-slidingWFolder = [slidingWFolder '\Exp3'];
-eyeTrialData = expAll{3}.eyeTrialData;
-RsaveFolder = [RFolder '\Exp3'];
-probTotalN = 2;
+% % Exp3, 9 people, low-coh context trials
+% expN = 3;
+% names = nameSets{3}; 
+% eyeTrialData = expAll{3}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp3'];
+% probTotalN = 2;
 
 % choose the grouping you want to achieve
-groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLpercepved', 'perceptualVisualRperceived', 'zeroPerceived', 'perceptualPerceived', 'wrongPerceptualPerceived'};
+groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLperceived', 'perceptualVisualRperceived', 'zeroPerceived', 'perceptualPerceived', 'wrongPerceptualPerceived'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = 7; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [5]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will plot each group rule in one figure
 
 % choose which plot to look at now
-individualPlots = 1;
+individualPlots = 0;
 averagedPlots = 1;
-
-% for plotting, choose one and set as 'yRange'
-% yRange = [-12 12]; % individual standard trials
-% yRange = [-7 7]; % individual pereptual trials
-yRange = [-4 4]; % averaged perceptual trials
+textFontSize = 8;
 
 % flip every direction... to collapse left and right probability blocks
 for subN = 1:length(names)
@@ -55,13 +48,12 @@ for subN = 1:length(names)
         eyeTrialData.rdkDir(subN, :) = -eyeTrialData.rdkDir(subN, :);
     end
 end
-cohLevels = unique(eyeTrialData.coh(1, eyeTrialData.trialType(1, :)==0))';
 
 %% align rdk offset, frame data for all trials
 for subN = 1:size(names, 2)
     cd(analysisFolder)
-    load(['eyeTrialDataSubExp' num2str(expN) '_' names{subN} '.mat']);
-    frameLength(subN) = min(max(eyeTrialData.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate);
+    load(['eyeTrialDataExp' num2str(expN) '_Sub_' names{subN} '.mat']);
+    frameLength(subN) = min(max(eyeTrialData.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate); % only plot until 600ms
     lengthT = size(eyeTrialDataSub.trial, 2);
     frames{subN} = NaN(lengthT, frameLength(subN));
     
@@ -96,14 +88,31 @@ timePoints = [(1:minFrameLength)-minFrameLength+0.7*sampleRate]*framePerSec*1000
 
 %% calculate mean traces
 for ii = 1:length(groupN)
-    [indiMean{ii}, allMean{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
+    [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
 end
 
 %% Draw velocity trace plots
-cd(velTraceFolder)
 for ii = 1:length(groupN)
     % plot mean traces in all probabilities for each participant
     if individualPlots
+        cd([velTraceFolder, '\Exp', num2str(expN)])
+        switch groupN(ii)
+            case 1
+                yRange = [-12 12]; % individual standard trials
+            case 2
+                yRange = [-7 7]; % individual pereptual trials
+            case 3
+                yRange = [-7 7];
+            case 4
+                yRange = [-7 7];
+            case 5
+                yRange = [-4 4]; 
+            case 6
+                yRange = [-7 7];
+            case 7
+                yRange = [-7 7];
+        end
+
         for subN = 1:size(names, 2)
             probSub = unique(eyeTrialData.prob(subN, :));
             if probSub(1)<50
@@ -121,8 +130,10 @@ for ii = 1:length(groupN)
                     probNmerged = probN-(probTotalN-1);
                 end
                 plot(timePoints, indiMean{ii}{probNmerged}.left(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+                text(timePoints(end), indiMean{ii}{probNmerged}.left(subN, end), num2str(trialNumber{ii}{probNmerged}.left(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
                 hold on
                 p{probSubN} = plot(timePoints, indiMean{ii}{probNmerged}.right(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+                text(timePoints(end), indiMean{ii}{probNmerged}.right(subN, end), num2str(trialNumber{ii}{probNmerged}.right(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
             end
             line([-300 -300], [min(yRange) max(yRange)],'Color','k','LineStyle','--')
             line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
@@ -140,6 +151,24 @@ for ii = 1:length(groupN)
     
     % plot mean traces of all participants in all probabilities
     if averagedPlots
+        cd(velTraceFolder)
+        switch groupN(ii)
+            case 1
+                yRange = [-10 10]; % average standard trials
+            case 2
+                yRange = [-4 4]; % average pereptual trials
+            case 3
+                yRange = [-4 4];
+            case 4
+                yRange = [-4 4];
+            case 5
+                yRange = [-4 4];
+            case 6
+                yRange = [-4 4];
+            case 7
+                yRange = [-4 4];
+        end
+
         figure
         for probNmerged = 1:probTotalN
             plot(timePoints, allMean{ii}{probNmerged}.left, '--', 'color', colorProb(probNmerged+probTotalN-1, :)); %, 'LineWidth', 1)
@@ -149,7 +178,7 @@ for ii = 1:length(groupN)
         line([-300 -300], [min(yRange) max(yRange)],'Color','k','LineStyle','--')
         line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
         line([50 50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
-        legend([p{:}], probNames{probNameI}, 'Location', 'NorthWest')
+        legend([p{:}], probNames{2}, 'Location', 'NorthWest')
         title(groupName{groupN(ii)})
         xlabel('Time (ms)')
         ylabel('Horizontal eye velocity (deg/s)')
@@ -166,6 +195,7 @@ end
 % use the min frame length--the lengeth where all participants have
 % valid data points
 cd(RsaveFolder)
+% averaged traces
 for ii = 1:length(groupN)
     for probNmerged = 1:probTotalN
         velTAverageSub = [];
@@ -184,10 +214,11 @@ for ii = 1:length(groupN)
 end
 
 %%
-function [indiMean, allMean] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN)
+function [indiMean, allMean, trialNumber] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN)
 % calculate mean traces
 % indiMean: each row is one participant
 % allMean: averaged across participants
+% trialNumber: corresponds to indiMean, the trial number for each element
 
 maxFrameLength = max(frameLength);
 minFrameLength = min(frameLength);
@@ -243,8 +274,11 @@ for probNmerged = 1:probTotalN
         end
         
         % individual mean traces
-        indiMean{probNmerged}.left(subN, tempStartI:end) = nanmean(frames{subN}(leftIdx, :));
-        indiMean{probNmerged}.right(subN, tempStartI:end) = nanmean(frames{subN}(rightIdx, :));
+        indiMean{probNmerged}.left(subN, tempStartI:end) = nanmean(frames{subN}(leftIdx, :), 1);
+        indiMean{probNmerged}.right(subN, tempStartI:end) = nanmean(frames{subN}(rightIdx, :), 1);
+        
+        trialNumber{probNmerged}.left(subN, 1) = length(leftIdx);
+        trialNumber{probNmerged}.right(subN, 1) = length(rightIdx);
     end
     
     % collapsed all participants

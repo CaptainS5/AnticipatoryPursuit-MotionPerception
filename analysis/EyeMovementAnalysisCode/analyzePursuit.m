@@ -25,6 +25,9 @@ pursuit.APvelocityX_interpol = nanmean(trial.DX_interpolSac((trial.stim_onset+ne
 openLoopLength = trial.timeWindow.openLoopDuration;
 pursuitOff = trial.stim_offset-trial.timeWindow.excludeEndDuration; % may want to adjust if target has already disappeard 
 
+% just manually define...
+pursuit.onset = nan;
+pursuit.onsetSteadyState = trial.stim_onset+ms2frames(200); % 200ms after RDK onset
 %%calculated open-loop duration
 if ~isnan(pursuit.onset) && ~isnan(pursuit.onsetSteadyState)
     openLoopDuration = pursuit.onsetSteadyState - pursuit.onset;

@@ -2,10 +2,10 @@ initializeParas;
 
 % only uncomment the experiment you want to look at
 % Exp1, 10 people, main experiment
-names = nameSets{1}; 
+names = nameSets{1};
 slidingWFolder = [slidingWFolder '\Exp1'];
 eyeTrialData = expAll{1}.eyeTrialData;
-RsaveFolder = [RFolder '\Exp1']
+RsaveFolder = [RFolder '\Exp1'];
 probTotalN = 3;
 colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
 probNames{1} = {'10', '30', '50'};
@@ -14,15 +14,15 @@ probCons = [10 30 50 70 90];
 
 % % Exp2, 8 people, fixation control
 % expN = 2;
-% names = names2; 
+% names = names2;
 % slidingWFolder = [slidingWFolder '\Exp2'];
 % eyeTrialData = expAll{2}.eyeTrialData;
-% RsaveFolder = [RFolder '\Exp2']
+% RsaveFolder = [RFolder '\Exp2'];
 % probTotalN = 2;
 
 % % Exp3, 9 people, low-coh context trials
 % expN = 3;
-% names = nameSets{3}; 
+% names = nameSets{3};
 % slidingWFolder = [slidingWFolder '\Exp3'];
 % eyeTrialData = expAll{3}.eyeTrialData;
 % RsaveFolder = [RFolder '\Exp3'];
@@ -78,7 +78,7 @@ for subN = 1:size(names, 2)
         probNameI = 2;
     end
     
-    for paraN = 1:1%size(checkParas, 2) % automatically loop through the parameters
+    for paraN = 2:2%size(checkParas, 2) % automatically loop through the parameters
         yValuesAll{paraN, subN} = NaN(size(probSub, 2), allLength-trialBin+1);
         yValuesS{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
         yValuesSL{paraN, subN} = NaN(size(probSub, 2), sLength-trialBin+1);
@@ -155,7 +155,7 @@ for subN = 1:size(names, 2)
                     probRightNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))>0));
                     zeroNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))==0));
                     probRight = (probRightNum+zeroNum/2)/trialBin;
-                    yValuesP{paraN, subN}(probSubN, slideI) = length(find(eyeTrialData.choice(subN, idxT(slideI:(slideI+trialBin-1)))==1))/trialBin/probRight;
+                    yValuesP{paraN, subN}(probSubN, slideI) = length(find(eyeTrialData.choice(subN, idxT(slideI:(slideI+trialBin-1)))==1))/trialBin-probRight;
                 elseif strcmp(checkParas{paraN}, 'choiceRatio')
                     probRightNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))>0));
                     zeroNum = length(find(eyeTrialData.rdkDir(subN, idxT(slideI:(slideI+trialBin-1)))==0));
@@ -196,13 +196,13 @@ for subN = 1:size(names, 2)
         end
         
         if individualPlots==1
-%             if paraN==1
-%                 cd([perceptFolder '\individuals'])
-%             elseif paraN<sacStart
-%                 cd([pursuitFolder '\individuals'])
-%             else
-                cd([slidingWFolder '\individuals'])
-%             end
+            %             if paraN==1
+            %                 cd([perceptFolder '\individuals'])
+            %             elseif paraN<sacStart
+            %                 cd([pursuitFolder '\individuals'])
+            %             else
+            cd([slidingWFolder '\individuals'])
+            %             end
             
             % individual plot
             % perceptual trials
@@ -234,20 +234,20 @@ for subN = 1:size(names, 2)
                 title(names{subN})
                 saveas(gca, [pdfNames{paraN}, '_standardTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
                 
-%                 % all trials
-%                 if ~strcmp(checkParas{paraN}, 'choice')
-%                     figure
-%                     for probSubN = 1:size(probSub, 2)
-%                         probN = find(probCons==probSub(probSubN));
-%                         plot(yValuesAll{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
-%                         hold on
-%                     end
-%                     legend(probNames{probNameI}, 'box', 'off')
-%                     xlabel('Trial bin number')
-%                     ylabel(yLabels{paraN})
-%                     title(names{subN})
-%                     saveas(gca, [pdfNames{paraN}, '_allTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
-%                 end
+                %                 % all trials
+                %                 if ~strcmp(checkParas{paraN}, 'choice')
+                %                     figure
+                %                     for probSubN = 1:size(probSub, 2)
+                %                         probN = find(probCons==probSub(probSubN));
+                %                         plot(yValuesAll{paraN, subN}(probSubN, :), 'color', colorProb(probN, :))
+                %                         hold on
+                %                     end
+                %                     legend(probNames{probNameI}, 'box', 'off')
+                %                     xlabel('Trial bin number')
+                %                     ylabel(yLabels{paraN})
+                %                     title(names{subN})
+                %                     saveas(gca, [pdfNames{paraN}, '_allTrials_', names{subN}, '_bin', num2str(trialBin), '.pdf'])
+                %                 end
             end
         end
     end
@@ -256,7 +256,7 @@ end
 %% grouped values for sliding window...
 close all
 if averagedPlots==1
-    for paraN = 1:1%sacStart-1%size(checkParas, 2)
+    for paraN = 2:2%sacStart-1%size(checkParas, 2)
         
         for probNmerged= 1:probTotalN % here probN is merged, 50 and 90
             tempMeanAll{paraN, probNmerged} = NaN(size(names, 2), allLength-trialBin+1); % standard trials
@@ -327,13 +327,13 @@ if averagedPlots==1
         end
         
         % plot
-%         if paraN==1
-%             cd(perceptFolder)
-%         elseif paraN<sacStart
-%             cd(pursuitFolder)
-%         else
-            cd(slidingWFolder)
-%         end
+        %         if paraN==1
+        %             cd(perceptFolder)
+        %         elseif paraN<sacStart
+        %             cd(pursuitFolder)
+        %         else
+        cd(slidingWFolder)
+        %         end
         
         % perceptual trials, merged
         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
@@ -346,7 +346,7 @@ if averagedPlots==1
             title('perceptual trials')
             xlabel('Trial bin number')
             ylabel(yLabels{paraN})
-%             ylim([minY(paraN) maxY(paraN)])
+            %             ylim([minY(paraN) maxY(paraN)])
             saveas(gca, [pdfNames{paraN}, '_perceptualTrials_all_bin', num2str(trialBin), '.pdf'])
         end
         
@@ -366,70 +366,70 @@ if averagedPlots==1
         %         end
         
         
-%         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
-%             % standard trials, merged
-%             figure
-%             for probNmerged = 1:probTotalN % merged prob
-%                 plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+1, :))
-%                 hold on
-%             end
-%             legend({'50' '90'}, 'box', 'off')
-%             title('standard trials')
-%             xlabel('Trial bin number')
-%             ylabel(yLabels{paraN})
-%             saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
-            %         end
+        %         if ~strcmp(checkParas{paraN}, 'choice') %|| strcmp(checkParas{paraN}, 'pursuit.gainX')
+        %             % standard trials, merged
+        %             figure
+        %             for probNmerged = 1:probTotalN % merged prob
+        %                 plot(meanY_s{paraN}(probNmerged, :), 'color', colorProb(probNmerged+1, :))
+        %                 hold on
+        %             end
+        %             legend({'50' '90'}, 'box', 'off')
+        %             title('standard trials')
+        %             xlabel('Trial bin number')
+        %             ylabel(yLabels{paraN})
+        %             saveas(gca, [pdfNames{paraN}, '_standardTrials_all_bin', num2str(trialBin), '.pdf'])
+        %         end
+        
+        % %         % standard trials, not merged
+        % %         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
+        % %             figure
+        % %             for probNmerged = 1:3 % merged prob
+        % %                 plot(meanY_sL{paraN}(probNmerged, :), '--', 'color', colorProb(probNmerged+2, :))
+        % %                 hold on
+        % %                 plot(meanY_sR{paraN}(probNmerged, :), '-', 'color', colorProb(probNmerged+2, :))
+        % %             end
+        % %             legend({'50-left' '50-right' '70-left' '70-right' '90-left' '90-right'}, 'box', 'off')
+        % %             title('standard trials')
+        % %             xlabel('Trial bin number')
+        % %             ylabel(yLabels{paraN})
+        % %             saveas(gca, [pdfNames{paraN}, '_standardTrials_LR_bin', num2str(trialBin), '.pdf'])
+        % %         end
+        
+        %             % all trials
+        %             %         if ~strcmp(checkParas{paraN}, 'choice')
+        %             figure
+        %             for probNmerged = 1:3 % merged prob
+        %                 plot(meanY_all{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
+        %                 hold on
+        %             end
+        %             legend({'50' '70' '90'}, 'box', 'off')
+        %             title('all trials')
+        %             xlabel('Trial bin number')
+        %             ylabel(yLabels{paraN})
+        %             saveas(gca, [pdfNames{paraN}, '_allTrials_all_bin', num2str(trialBin), '.pdf'])
+        %         end
+        
+        % generate CSV trials
+        for probNmerged = 1:probTotalN
+            clear minLengthP
+            % find the min length...
+            for subN = 1:size(names, 2)
+                probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
+                if probSub(1)<50
+                    probSubN = probTotalN+1-probNmerged;
+                else
+                    probSubN = probNmerged;
+                end
+                idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
+                    & eyeTrialData.trialType(subN, :)==0);
+                minLengthP(subN, 1) = length(idxT)-trialBin+1;
+            end
+            maxIdxP = min(minLengthP);
             
-            % %         % standard trials, not merged
-            % %         if paraN<sacStart %strcmp(checkParas{paraN}, 'choice') || strcmp(checkParas{paraN}, 'pursuit.gainX')
-            % %             figure
-            % %             for probNmerged = 1:3 % merged prob
-            % %                 plot(meanY_sL{paraN}(probNmerged, :), '--', 'color', colorProb(probNmerged+2, :))
-            % %                 hold on
-            % %                 plot(meanY_sR{paraN}(probNmerged, :), '-', 'color', colorProb(probNmerged+2, :))
-            % %             end
-            % %             legend({'50-left' '50-right' '70-left' '70-right' '90-left' '90-right'}, 'box', 'off')
-            % %             title('standard trials')
-            % %             xlabel('Trial bin number')
-            % %             ylabel(yLabels{paraN})
-            % %             saveas(gca, [pdfNames{paraN}, '_standardTrials_LR_bin', num2str(trialBin), '.pdf'])
-            % %         end
-            
-%             % all trials
-%             %         if ~strcmp(checkParas{paraN}, 'choice')
-%             figure
-%             for probNmerged = 1:3 % merged prob
-%                 plot(meanY_all{paraN}(probNmerged, :), 'color', colorProb(probNmerged+2, :))
-%                 hold on
-%             end
-%             legend({'50' '70' '90'}, 'box', 'off')
-%             title('all trials')
-%             xlabel('Trial bin number')
-%             ylabel(yLabels{paraN})
-%             saveas(gca, [pdfNames{paraN}, '_allTrials_all_bin', num2str(trialBin), '.pdf'])
-%         end
-
-% generate CSV trials
-for probNmerged = 1:probTotalN
-    clear minLengthP
-    % find the min length...
-    for subN = 1:size(names, 2)
-        probSub = unique(eyeTrialData.prob(subN, eyeTrialData.errorStatus(subN, :)==0));
-        if probSub(1)<50
-            probSubN = probTotalN+1-probNmerged;
-        else
-            probSubN = probNmerged;
+            slideSub = tempMeanP{paraN, probNmerged}(:, 1:maxIdxP);
+            cd(RsaveFolder)
+            csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+probTotalN-1)), '.csv'], slideSub)
         end
-        idxT = find(eyeTrialData.prob(subN, :)==probSub(probSubN) & eyeTrialData.errorStatus(subN, :)==0 ...
-            & eyeTrialData.trialType(subN, :)==0);
-        minLengthP(subN, 1) = length(idxT)-trialBin+1;
-    end
-    maxIdxP = min(minLengthP);
-    
-    slideSub = tempMeanP{paraN, probNmerged}(:, 1:maxIdxP);    
-    cd(RsaveFolder)
-    csvwrite(['slidingW_', pdfNames{paraN}, '_', num2str(probCons(probNmerged+probTotalN-1)), '.csv'], slideSub)
-end
-
+        
     end
 end

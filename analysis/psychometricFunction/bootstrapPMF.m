@@ -1,11 +1,13 @@
 % bootstrapping for the psychometric curve fitting. use the sorted CSV file
 % to keep the same with the ASP bootstrapping...
+% set a criterion for "valid" sampling
 clear all; close all; clc
 
-% load all CSVs...
+% % old procedure, generating samples in Python, then load all CSVs...
 samplingIdx = readmatrix('samplingIdx.csv');
 
 aspSampleValues = readmatrix('aspBootstrapValues.csv'); % each column is the mean asp of one simulation
+% load('aspBootstrapValuesNew.mat');
 dataAll = readtable('perceptualTrialsAllExps_AXP.csv');
 % aspSampleCons = readtable('aspBootstrapCons.csv'); % each row corresponds to the condition of one row in the value matrix
 % % first, figure out which conditions need to be flipped...
@@ -20,7 +22,7 @@ dataAll = readtable('perceptualTrialsAllExps_AXP.csv');
 load('aspSampleCons.mat') % need to multiply flip (1: not to be flipped, -1: flip)
 
 % after fitting once
-load('perceptionBootstrapValues.mat')
+load('perceptionBootstrapValuesLapseLimited.mat')
 
 %% fitting psychometric curves
 % % fitting settings
@@ -42,6 +44,7 @@ load('perceptionBootstrapValues.mat')
 % pseSampleValues = NaN(size(aspSampleValues));
 % slopeSampleValues = NaN(size(aspSampleValues));
 % 
+% figure
 % for conN = 1:size(aspSampleCons, 1)
 %     idx = find(dataAll.exp==aspSampleCons.exp(conN, 1) & dataAll.sub==aspSampleCons.sub(conN, 1) & dataAll.prob==aspSampleCons.prob(conN, 1));
 %     
@@ -58,15 +61,16 @@ load('perceptionBootstrapValues.mat')
 %         
 %         %Perform fit
 %         [paramsValues{sampleN, conN} LL{sampleN, conN} exitflag{sampleN, conN}] = PAL_PFML_Fit(cohLevels, numRight{conN}(sampleN, :)', ...
-%             outOfNum{conN}(sampleN, :)', searchGrid, paramsFree, PF);    
+%             outOfNum{conN}(sampleN, :)', searchGrid, paramsFree, PF, 'lapseLimits',[0 0.1]);    
 % 
-% % % plotting
-% %         ProportionCorrectObserved=numRight{conN}(sampleN, :)./outOfNum{conN}(sampleN, :);
-% %         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
-% %         ProportionCorrectModel = PF(paramsValues{sampleN, conN},StimLevelsFineGrain);
-% %         
-% %         plot(StimLevelsFineGrain, ProportionCorrectModel,'-', 'linewidth', 2);
-% %         plot(cohLevels, ProportionCorrectObserved,'.', 'markersize', 30);
+% % plotting
+%         ProportionCorrectObserved=numRight{conN}(sampleN, :)./outOfNum{conN}(sampleN, :);
+%         StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+%         ProportionCorrectModel = PF(paramsValues{sampleN, conN},StimLevelsFineGrain);
+%         hold on
+%         plot(StimLevelsFineGrain, ProportionCorrectModel,'-', 'linewidth', 2);
+%         plot(cohLevels, ProportionCorrectObserved,'.', 'markersize', 30);
+%         hold off
 %         
 %         pseSampleValues(conN, sampleN) = paramsValues{sampleN, conN}(1); % threshold, or PSE
 %         slopeSampleValues(conN, sampleN) = paramsValues{sampleN, conN}(2); % slope
@@ -74,10 +78,21 @@ load('perceptionBootstrapValues.mat')
 %         display(['conN: ', num2str(conN)])
 %         disp(['sampleN: ', num2str(sampleN)])
 %         disp([num2str(cputime-t), ' s'])
-%         save('perceptionBootstrapValues', 'pseSampleValues', 'slopeSampleValues')
+%         save('perceptionBootstrapValuesLapseLimited', 'pseSampleValues', 'slopeSampleValues')
 %         t = cputime;
 %     end
 % end
+
+%% redo asp sampling...
+% for conN = 1:size(aspSampleCons, 1)
+%     idx = find(dataAll.exp==aspSampleCons.exp(conN, 1) & dataAll.sub==aspSampleCons.sub(conN, 1) & dataAll.prob==aspSampleCons.prob(conN, 1));
+%     
+%     for sampleN = 1:size(samplingIdx, 1)
+%         dataT = dataAll(samplingIdx(sampleN, idx), :); 
+%         aspSampleValues(conN, sampleN) = nanmean(dataT.aspVelX); 
+%     end
+% end
+% save('aspBootstrapValuesNew', 'aspSampleValues')
 
 %% stats for ASP, PSE, or slope
 % flip first
@@ -98,8 +113,6 @@ for expN = 1:3
     probCons = unique(sampleCons.prob(expIdx, :));
     for probN = 1:length(probCons)
         dataIdx = find(sampleCons.exp==expN & sampleCons.prob==probCons(probN));
-        % exclude extreme values
-        
         
         aspT = nanmean(aspValues(dataIdx, :));
         pseT = nanmean(pseValues(dataIdx, :));
@@ -113,19 +126,19 @@ for expN = 1:3
         pseCI = 1.96/sqrt(subN)*std(pseT);
         slopeCI = 1.96/sqrt(subN)*std(slopeT);
         
-        figure
-        histogram(aspT)
-        figure
-        histogram(pseT)
-        figure
-        histogram(slopeT)
+%         figure
+%         histogram(aspT)
+%         figure
+%         histogram(pseT)
+%         figure
+%         histogram(slopeT)
 %         pause
 %         close all
         
-%         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', asp mean=', num2str(aspMean)])
-%         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', asp 95%CI=', num2str(aspCI)])
-%         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', pse mean=', num2str(pseMean)])
-%         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', pse 95CI=', num2str(pseCI)])
+        disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', asp mean=', num2str(aspMean)])
+        disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', asp 95%CI=', num2str(aspCI)])
+        disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', pse mean=', num2str(pseMean)])
+        disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', pse 95CI=', num2str(pseCI)])
 %         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', slope mean=', num2str(slopeMean)])
 %         disp(['exp', num2str(expN), ', prob', num2str(probCons(probN)), ', slope 95CI=', num2str(slopeCI)])
     end

@@ -1,8 +1,39 @@
-% to quickly check the evolution of perception
+% to quickly check the evolution of perception and asp
 % separate perceptual trials into two bins: early trials, and later trials
 % then fit the psychometric functions of the two bins of trials
 initializeParas;
 initializePSE;
+
+% only uncomment the experiment you want to look at
+% % Exp1, 10 people, main experiment
+% names = nameSets{1};
+% % slidingWFolder = [slidingWFolder '\Exp1'];
+% eyeTrialData = expAll{1}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp1'];
+% probTotalN = 3;
+% colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+% probNames{1} = {'10', '30', '50'};
+% probNames{2} = {'50', '70', '90'};
+% probCons = [10 30 50 70 90];
+% expN = 1;
+
+% % Exp2, 8 people, fixation control
+% expN = 2;
+% names = names2;
+% slidingWFolder = [slidingWFolder '\Exp2'];
+% eyeTrialData = expAll{2}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp2'];
+% probTotalN = 2;
+% expN = 2;
+
+% Exp3, 9 people, low-coh context trials
+expN = 3;
+names = nameSets{3};
+slidingWFolder = [slidingWFolder '\Exp3'];
+eyeTrialData = expAll{3}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp3'];
+probTotalN = 2;
+expN = 3;
 
 % flip every direction... to collapse left and right probability
 % blocks
@@ -38,11 +69,21 @@ for subN = 1:length(names)
         
         % then fit the psychometric curves for each bin
         for binN = 1:2
+            probN = find(probCons==probSub(probSubN));
+            if probSub(1)<50
+                probNmerged = probTotalN+1-probN;
+            else
+                probNmerged = probN-probTotalN+1;
+            end
+            
+            % calculate mean asp values
+            aspTemp = eyeTrialData.pursuit.APvelocityX(subN,idxT{binN});
+            dataASP{binN}(subN, probNmerged) = nanmean(aspTemp);
+            
+            % fit psychometric curves
             data.cohFit = eyeTrialData.coh(subN, idxT{binN})';
             data.choice = eyeTrialData.choice(subN, idxT{binN})';
-            
-            probN = find(probCons==probSub(probSubN));
-            
+                        
             % sort data to prepare for fitting--when there's no need to
             % calculate the weighted probabilities...
             cohLevels = unique(data.cohFit); % stimulus levels, negative is left
@@ -55,12 +96,12 @@ for subN = 1:length(names)
             
             %Perform fit
             [paramsValues{subN, probSubN}{binN} LL{subN, probSubN}{binN} exitflag{subN, probSubN}{binN}] = PAL_PFML_Fit(cohLevels, numRight{probN, binN}(subN, :)', ...
-                outOfNum{probN, binN}(subN, :)', searchGrid, paramsFree, PF);
+                outOfNum{probN, binN}(subN, :)', searchGrid, paramsFree, PF, 'lapseLimits',[0 0.1]);
             
-            % plotting
-            ProportionCorrectObserved=numRight{probN, binN}(subN, :)./outOfNum{probN, binN}(subN, :);
-            StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
-            ProportionCorrectModel = PF(paramsValues{subN, probSubN}{binN},StimLevelsFineGrain);
+%             % plotting
+%             ProportionCorrectObserved=numRight{probN, binN}(subN, :)./outOfNum{probN, binN}(subN, :);
+%             StimLevelsFineGrain=[min(cohLevels):max(cohLevels)./1000:max(cohLevels)];
+%             ProportionCorrectModel = PF(paramsValues{subN, probSubN}{binN},StimLevelsFineGrain);
 %             if binN==1
 %                 plot(StimLevelsFineGrain, ProportionCorrectModel,'--','color', colorProb(probN, :), 'linewidth', 2);
 %             else
@@ -69,11 +110,6 @@ for subN = 1:length(names)
 %             plot(cohLevels, ProportionCorrectObserved,'.', 'color', colorProb(probN, :), 'markersize', 30);
             
             % saving parameters
-            if probSub(1)<50
-                probNmerged = 4-probN;
-            else
-                probNmerged = probN-2;
-            end
             dataPercept.alpha{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(1); % threshold, or PSE
             dataPercept.beta{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(2); % slope
             dataPercept.gamma{binN}(subN, probNmerged) = paramsValues{subN, probSubN}{binN}(3); % guess rate, or baseline
@@ -91,7 +127,7 @@ for subN = 1:length(names)
 %         saveas(gcf, ['pf_timeBins_', names{subN}, '.pdf'])
     end
 end
-save('dataPercept_timeBins', 'dataPercept');
+save(['data_timeBins_exp' num2str(expN)], 'dataPercept', 'dataASP');
 
 %% plot bars of the difference between the two bins in each probability
 % diffMean = mean(dataPercept.alpha{2}-dataPercept.alpha{1});
@@ -114,18 +150,30 @@ save('dataPercept_timeBins', 'dataPercept');
 % saveas(gcf, ['PSE_timeBins_bar.pdf'])
 
 %% save csv for ANOVA
-cd(analysisFolder)
-cd ..
-cd ..
-cd('R')
+cd(RsaveFolder)
 
 data = table();
 count = 1;
 for subN = 1:length(names)
-    for probNmerged = 1:3
+    for probNmerged = 1:probTotalN
         for binN = 1:2
             data.sub(count, 1) = subN;
-            data.prob(count, 1) = probCons(probNmerged+2);
+            data.prob(count, 1) = probCons(probNmerged+probTotalN-1);
+            data.timeBin(count, 1) = binN;
+            data.aspVel(count, 1) = dataASP{binN}(subN, probNmerged);
+            count = count+1;
+        end
+    end
+end
+writetable(data, ['timeBinASP_exp' num2str(expN) '.csv'])
+
+data = table();
+count = 1;
+for subN = 1:length(names)
+    for probNmerged = 1:probTotalN
+        for binN = 1:2
+            data.sub(count, 1) = subN;
+            data.prob(count, 1) = probCons(probNmerged+probTotalN-1);
             data.timeBin(count, 1) = binN;
             data.PSE(count, 1) = dataPercept.alpha{binN}(subN, probNmerged);
             data.slope(count, 1) = dataPercept.beta{binN}(subN, probNmerged);
@@ -133,18 +181,18 @@ for subN = 1:length(names)
         end
     end
 end
-writetable(data, 'earlyLatePSE.csv')
+writetable(data, ['timeBinPSE_exp' num2str(expN) '.csv'])
 
-data = table();
-count = 1;
-for subN = 1:length(names)
-    for probNmerged = 1:3
-        for binN = 1:2
-            data.sub(count, 1) = subN;
-            data.prob(count, 1) = probCons(probNmerged+2);
-            data.PSEDiff(count, 1) = dataPercept.alpha{2}(subN, probNmerged)-dataPercept.alpha{1}(subN, probNmerged);
-            count = count+1;
-        end
-    end
-end
-writetable(data, 'earlyLatePSEDiff.csv')
+% data = table();
+% count = 1;
+% for subN = 1:length(names)
+%     for probNmerged = 1:3
+%         for binN = 1:2
+%             data.sub(count, 1) = subN;
+%             data.prob(count, 1) = probCons(probNmerged+2);
+%             data.PSEDiff(count, 1) = dataPercept.alpha{2}(subN, probNmerged)-dataPercept.alpha{1}(subN, probNmerged);
+%             count = count+1;
+%         end
+%     end
+% end
+% writetable(data, 'earlyLatePSEDiff.csv')

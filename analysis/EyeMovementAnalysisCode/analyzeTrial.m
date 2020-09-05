@@ -38,19 +38,19 @@ trial.timeWindow.excludeEndDuration = ms2frames(150); % exclude the last x ms of
 %% find saccades
 threshold = evalin('base', 'saccadeThreshold');
 onset = 1;
-offset = min(trial.stim_offset+ms2frames(200), size(trial.eyeDX_filt, 1)); % to be able to detect saccades at the end of display
+offset = min(trial.stim_offset+ms2frames(400), size(trial.eyeDX_filt, 1)); % to be able to detect saccades at the end of display
 if trial.log.coh==0
     stimulusVelocityX = 0;
 else
     stimulusVelocityX = 10*trial.log.coh; % deg/s, became slower with low coherence
 end
 stimulusVelocityY = 0;
-% % use acceleration to find saccades...
-% [saccades.X.onsets, saccades.X.offsets] = findSaccadesAcc(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold);
-% [saccades.Y.onsets, saccades.Y.offsets] = findSaccadesAcc(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold);
-% use combination of velocity, acceleration, and jerk to find saccades
-[saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold, stimulusVelocityX);
-[saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold, stimulusVelocityY);
+% use acceleration to find saccades...
+[saccades.X.onsets, saccades.X.offsets] = findSaccadesAcc(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold);
+[saccades.Y.onsets, saccades.Y.offsets] = findSaccadesAcc(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold);
+% % use combination of velocity, acceleration, and jerk to find saccades
+% [saccades.X.onsets, saccades.X.offsets] = findSaccades(onset, offset, trial.eyeDX_filt, trial.eyeDDX_filt, trial.eyeDDDX, threshold, stimulusVelocityX);
+% [saccades.Y.onsets, saccades.Y.offsets] = findSaccades(onset, offset, trial.eyeDY_filt, trial.eyeDDY_filt, trial.eyeDDDY, threshold, stimulusVelocityY);
 % remove saccades
 trial = removeSaccades(trial, saccades);
 clear saccades;
