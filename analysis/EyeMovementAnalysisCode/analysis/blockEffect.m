@@ -46,7 +46,7 @@ groupName = {'standardMerged', 'standardVisual', 'perceptualMerged', 'perceptual
     'perceptualVisualLperceived', 'perceptualVisualRperceived', 'wrongPerceptualPerceived', 'correctPerceptualPerceived', ...
     'perceptualConsistency'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [10]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [4]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will do one by one
 
 % some other settings
@@ -157,7 +157,7 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
                     count = count+1;
                 end
             end
-            writetable(data, ['data' pdfNames{paraN} '_exp' num2str(expN) '.csv'])
+            writetable(data, ['data_' pdfNames{paraN} '_exp' num2str(expN) '.csv'])
         else
             % generate csv file for R, group by trials not merged
             cd(RsaveFolder)
@@ -184,7 +184,7 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
                     end
                 end
             end
-            writetable(data, ['data' pdfNames{paraN} '_' groupName{groupN(ii)} '_exp' num2str(expN) '.csv'])
+            writetable(data, ['data_' pdfNames{paraN} '_' groupName{groupN(ii)} '_exp' num2str(expN) '.csv'])
         end
     end
     

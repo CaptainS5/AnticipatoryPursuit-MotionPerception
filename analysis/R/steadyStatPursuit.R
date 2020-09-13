@@ -6,6 +6,8 @@ library(psychReport)
 library(lsr)
 library(bayestestR)
 library(BayesFactor)
+library(lme4)
+library(lmerTest)
 
 #### clear environment
 rm(list = ls())
@@ -18,9 +20,9 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataclpMeanVelX_perceptualConsistency_no0coh_exp1.csv"
-# pdfFileName <- "clpMeanVelX_effectOfPerception_no0cohTrials_exp1.pdf"
-pdfInteractionFileName <- "clpMeanVelX_perceptualConsistency_no0coh_exp1.csv"
+dataFileName <- "data_clpMeanVelX_perceptualVisual_exp1.csv"
+# pdfFileName <- "clpGainX_perceivedVisualByPerceived_no0cohTrials_exp1.pdf"
+# pdfInteractionFileName <- "clpMeanVelX_perceptualVisual_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -37,9 +39,12 @@ dotSize <- 3
 # # # ASP gain
 # # ylimLow <- -0.1
 # # ylimHigh <- 0.4
-# clp velocity in context trials
-ylimLow <- -7
-ylimHigh <- 7
+# clp velocity in probe trials
+ylimLow <- -6
+ylimHigh <- 6
+# clp gain in probe trials
+ylimLow <- -0.5
+ylimHigh <- 1
 
 data <- read.csv(dataFileName)
 subs <- unique(data$sub)
@@ -49,93 +54,30 @@ subN <- length(subs)
 # # exclude bad fitting...
 # data <- subset(data[which(data$sub!=8),])
 
-## grouped by visual consistency
-sub <- data["sub"]
-prob <- data["prob"]
-consistency <- data["consistency"]
-measure <- data["measure"]
-dataAnova <- data.frame(sub, prob, consistency, measure)
-colnames(dataAnova)[4] <- "measure"
-dataAnova$prob <- as.factor(dataAnova$prob)
-dataAnova$sub <- as.factor(dataAnova$sub)
-dataAnova$consistency <- as.factor(dataAnova$consistency)
-
-anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-    within = .(prob, consistency), type = 3, return_aov = TRUE, detailed = TRUE)
-print(anovaData)
-aovEffectSize(anovaData, 'pes')
-
-## interaction plot
-dataPlot <- data.frame(sub, prob, consistency, measure)
-colnames(dataPlot)[4] <- "measure"
-dataPlot$sub <- as.factor(dataPlot$sub)
-# dataPlot$prob <- as.factor(dataPlot$prob)
-# is.numeric(dataPlot$timeBin)
-dataPlot$consistency <- as.factor(dataPlot$consistency)
-
-p <- ggplot(dataPlot, aes(x = prob, y = measure, color = consistency)) +
-        stat_summary(fun.y = mean, geom = "point", shape = 95, size = 17.5) +
-        stat_summary(fun.y = mean, geom = "line", width = 1) +
-        stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1) +
-        stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
-        # geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
-        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
-        # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
-        scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
-        # scale_y_continuous(name = "Anticipatory pursuit velocity gain", breaks = seq(ylimLow, ylimHigh, 0.1), expand = c(0, 0)) +
-        coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
-        # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
-        scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) +
-        # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
-        # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
-        theme(axis.text=element_text(colour="black"),
-                      axis.ticks=element_line(colour="black", size = axisLineWidth),
-                      panel.grid.major = element_blank(),
-                      panel.grid.minor = element_blank(),
-                      panel.border = element_blank(),
-                      panel.background = element_blank(),
-                      text = element_text(size = textSize, colour = "black"),
-                      legend.background = element_rect(fill="transparent"),
-                      legend.key = element_rect(colour = "transparent", fill = "white"))
-        # facet_wrap(~exp)
-print(p)
-ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
-
-
-# ## Exp1, plot, perceived direction x visual consistency
+# ## linear mixed effects model
 # sub <- data["sub"]
-# # visualDir <- data["visualDir"]
-# visualConsistency <- data["visualConsistency"]
-# perceivedDir <- data["dir"]
 # prob <- data["prob"]
+# visualDir <- data["visualDir"]
+# perceivedDir <- data["dir"]
 # measure <- data["measure"]
-# dataAnova <- data.frame(sub, prob, visualConsistency, perceivedDir, measure)
-# colnames(dataAnova)[4] <- "perceivedDir"
-# colnames(dataAnova)[5] <- "measure"
-# # dataAnova$prob <- as.factor(dataAnova$prob)
-# dataAnova$sub <- as.factor(dataAnova$sub)
-# dataAnova$visualConssitency <- as.factor(dataAnova$visualConsistency)
-# dataAnova$perceivedDir <- as.factor(dataAnova$perceivedDir)
+# dataCorr <- data.frame(sub, prob, visualDir, perceivedDir, measure)
+# colnames(dataCorr)[4] <- "perceivedDir"
+# # colnames(dataCorr)[5] <- "measure"
+# # dataCorr$prob <- as.factor(dataCorr$prob)
+# dataCorr$sub <- as.factor(dataCorr$sub)
+# dataCorr$visualDir <- as.factor(dataCorr$visualDir)
+# dataCorr$perceivedDir <- as.factor(dataCorr$perceivedDir)
+# fm1 <- lmer(measure ~ visualDir + perceivedDir + visualDir*perceivedDir + prob + (1 | sub), dataCorr, REML = F)
+# summary(fm1)
 
-# # anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-# #     within = .(prob, exp), type = 3, return_aov = TRUE, detailed = TRUE)
-# # # print(anovaData)
-# # aovEffectSize(anovaData, 'pes')
-
-# # # compute Bayes Factor inclusion...
-# # bf <- anovaBF(measure ~ prob + timeBin + prob*timeBin + sub, data = dataAnova, 
-# #              whichRandom="sub")
-# # bayesfactor_inclusion(bf, match_models = TRUE)
-# # show(dataAnova)
-
-# p <- ggplot(dataAnova, aes(x = prob, y = measure, color = interaction(visualConsistency, perceivedDir, c((1,-1), (-1, 1), (-1, -1), (1, 1))))) +
+# p <- ggplot(dataCorr, aes(x = prob, y = measure, color = interaction(visualDir, perceivedDir))) +
 #         stat_summary(fun= mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=15)) +
 #         stat_summary(fun.data = 'mean_sdl',
 #                fun.args = list(mult = 1.96/sqrt(subN)),
 #                geom = 'linerange', size = 1, position = position_dodge(width=15)) +
 #         geom_point(size = dotSize, shape = 1, position = position_jitterdodge(  jitter.width = NULL, jitter.height = 0, dodge.width = 15)) +
 #         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), xend = c(90, 40), y = c(ylimLow, ylimLow), yend = c(ylimLow, ylimHigh)), size = axisLineWidth) +
-#         scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
+#         scale_y_continuous(name = "Steady-state pursuit gain", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
 #         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
 #         scale_x_continuous(name = "Probability of rightward motion", limits = c(40, 100), breaks=c(50, 70, 90), expand = c(0, 0)) +
 #         # scale_colour_discrete(name = "Motion direction", labels = c("CCW", "CW")) +
@@ -151,6 +93,88 @@ ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
 #         # facet_wrap(~exp)
 # print(p)
 # ggsave(paste(plotFolder, pdfFileName, sep = ""))
+
+## ANOVA
+sub <- data["sub"]
+prob <- data["prob"]
+# consistency <- data["consistency"]
+dir <- data["dir"]
+measure <- data["measure"]
+measure <- measure
+dataAnova <- data.frame(sub, prob, dir, measure)
+colnames(dataAnova)[4] <- "measure"
+dataAnova$prob <- as.factor(dataAnova$prob)
+dataAnova$sub <- as.factor(dataAnova$sub)
+dataAnova$dir <- as.factor(dataAnova$dir)
+# dataAnova$consistency <- as.factor(dataAnova$consistency)
+
+anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
+    within = .(prob, dir), type = 3, return_aov = TRUE, detailed = TRUE)
+print(anovaData)
+aovEffectSize(anovaData, 'pes')
+
+# ## interaction plot
+# dataPlot <- data.frame(sub, prob, dir, measure)
+# colnames(dataPlot)[4] <- "measure"
+# dataPlot$sub <- as.factor(dataPlot$sub)
+# # dataPlot$prob <- as.factor(dataPlot$prob)
+# # is.numeric(dataPlot$timeBin)
+# dataPlot$dir <- as.factor(dataPlot$dir)
+
+# p <- ggplot(dataPlot, aes(x = prob, y = measure, color = dir)) +
+#         stat_summary(fun = mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=10)) +
+#         # stat_summary(fun.y = mean, geom = "line", width = 1) +
+#         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1, position = position_dodge(width=10)) +
+#         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+#         geom_point(size = dotSize, shape = 1, position = position_jitterdodge(  jitter.width = NULL, jitter.height = 0, dodge.width = 10)) +
+#         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), y = c(ylimLow, ylimLow), xend = c(100, 40), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
+#         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
+#         scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
+#         # scale_y_continuous(name = "Anticipatory pursuit velocity gain", breaks = seq(ylimLow, ylimHigh, 0.1), expand = c(0, 0)) +
+#         coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
+#         # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
+#         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(40, 100), expand = c(0, 0)) +
+#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
+#         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+#         theme(axis.text=element_text(colour="black"),
+#                       axis.ticks=element_line(colour="black", size = axisLineWidth),
+#                       panel.grid.major = element_blank(),
+#                       panel.grid.minor = element_blank(),
+#                       panel.border = element_blank(),
+#                       panel.background = element_blank(),
+#                       text = element_text(size = textSize, colour = "black"),
+#                       legend.background = element_rect(fill="transparent"),
+#                       legend.key = element_rect(colour = "transparent", fill = "white"))
+#         # facet_wrap(~exp)
+# print(p)
+# ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
+
+
+# ## Exp1, plot, perceived direction x visual consistency
+# sub <- data["sub"]
+# visualDir <- data["visualDir"]
+# # visualConsistency <- data["visualConsistency"]
+# perceivedDir <- data["dir"]
+# prob <- data["prob"]
+# measure <- data["measure"]
+# dataAnova <- data.frame(sub, prob, visualDir, perceivedDir, measure)
+# colnames(dataAnova)[4] <- "perceivedDir"
+# colnames(dataAnova)[5] <- "measure"
+# # # dataAnova$prob <- as.factor(dataAnova$prob)
+# # dataAnova$sub <- as.factor(dataAnova$sub)
+# # dataAnova$visualConssitency <- as.factor(dataAnova$visualConsistency)
+# # dataAnova$perceivedDir <- as.factor(dataAnova$perceivedDir)
+
+# # anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
+# #     within = .(prob, exp), type = 3, return_aov = TRUE, detailed = TRUE)
+# # # print(anovaData)
+# # aovEffectSize(anovaData, 'pes')
+
+# # # compute Bayes Factor inclusion...
+# # bf <- anovaBF(measure ~ prob + timeBin + prob*timeBin + sub, data = dataAnova, 
+# #              whichRandom="sub")
+# # bayesfactor_inclusion(bf, match_models = TRUE)
+# # show(dataAnova)
 
 
 # ## difference between consistent and inconsistent visual by perceived direction
