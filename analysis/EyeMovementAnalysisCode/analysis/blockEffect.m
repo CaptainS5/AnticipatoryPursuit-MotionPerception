@@ -46,11 +46,11 @@ groupName = {'standardMerged', 'standardVisual', 'perceptualMerged', 'perceptual
     'perceptualVisualLperceived', 'perceptualVisualRperceived', 'wrongPerceptualPerceived', 'correctPerceptualPerceived', ...
     'perceptualConsistency'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [4]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [9]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will do one by one
 
 % some other settings
-individualPlots = 1;
+individualPlots = 0;
 averagedPlots = 1;
 scatterPlots = 0;
 yLabels = {'AP horizontal velocity (deg/s)' 'AP interpolated horizontal velocity (deg/s)'...
@@ -318,10 +318,10 @@ for probSubN = 1:size(probSub, 2)
                 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
     end
     
-    if groupN==10 % flip all visual left trials
-        eval(['yValues.right(1:length(validILL), probSubN) = -eyeTrialData.' checkParas{paraN} '(subN, validILL);']) % consistent
+    if groupN==10 % flip all visual left trials--why flip though?... not flipping for gain
+        eval(['yValues.right(1:length(validILL), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validILL);']) % consistent
         eval(['yValues.right((length(validILL)+1):(length(validILL)+length(validIRR)), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIRR);']) % consistent
-        eval(['yValues.left(1:length(validILR), probSubN) = -eyeTrialData.' checkParas{paraN} '(subN, validILR);']) % inconsistent
+        eval(['yValues.left(1:length(validILR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validILR);']) % inconsistent
         eval(['yValues.left((length(validILR)+1):(length(validILR)+length(validIRL)), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIRL);']) % inconsistent
         trialSubN.right(1, probSubN) = length(validILL)+length(validIRR);
         trialSubN.left(1, probSubN) = length(validILR)+length(validIRL);
@@ -472,7 +472,7 @@ else % left and right separated
     if groupN<10
         legend({'leftward trials' 'rightward trials'})
     else
-        legend({'consistent trials' 'inconsistent trials'})
+        legend({'inconsistent trials' 'consistent trials'})
     end
     title([groupName{groupN}])
     ylabel(yLabels{paraN})

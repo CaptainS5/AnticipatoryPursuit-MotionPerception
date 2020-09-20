@@ -6,7 +6,7 @@ initializeParas;
 % cd(RFolder)
 % cd('Exp1')
 % % d{1} = readtable('dataAPvelX_exp1.csv');
-% d{1} = readtable('dataclpGainX_exp1.csv');
+% d{1} = readtable('data_clpGainX_exp1.csv');
 % d{1}(d{1}.prob==70, :) = [];
 % d{1}.exp = ones(size(d{1}.sub));
 % % cd ..
@@ -16,25 +16,25 @@ initializeParas;
 % cd ..
 % cd('Exp3')
 % % d{3} = readtable('dataAPvelX_exp3.csv');
-% d{3} = readtable('dataclpGainX_exp3.csv');
+% d{3} = readtable('data_clpGainX_exp3.csv');
 % d{3}.exp = 3*ones(size(d{3}.sub));
 % cd ..
 % 
-% % experiment 1 and 2
-% % % asp velocity
-% % % find the correct participants from exp1
-% % nanI = find(strcmp(nameSets{2}, 'nan'));
-% % tempD1 = d{1};
-% % for ii = 1:length(nanI)
-% %     tempD1(tempD1.sub==nanI(ii), :) = [];
-% % end
-% % for ii = 1:length(nanI)
-% %     tempD1.sub(tempD1.sub>nanI(ii)-ii+1, 1) = tempD1.sub(tempD1.sub>nanI(ii)-ii+1, 1)-1;
-% % end
+% % % experiment 1 and 2
+% % % % asp velocity
+% % % % find the correct participants from exp1
+% % % nanI = find(strcmp(nameSets{2}, 'nan'));
+% % % tempD1 = d{1};
+% % % for ii = 1:length(nanI)
+% % %     tempD1(tempD1.sub==nanI(ii), :) = [];
+% % % end
+% % % for ii = 1:length(nanI)
+% % %     tempD1.sub(tempD1.sub>nanI(ii)-ii+1, 1) = tempD1.sub(tempD1.sub>nanI(ii)-ii+1, 1)-1;
+% % % end
+% % % 
+% % % data = [tempD1; d{2}];
+% % % writetable(data, 'aspVel_exp1vs2.csv')
 % % 
-% % data = [tempD1; d{2}];
-% % writetable(data, 'aspVel_exp1vs2.csv')
-% 
 % % experiment 1 and 3
 % % asp velocity
 % % find the correct participants from exp1
@@ -47,11 +47,11 @@ cd(RFolder)
 cd('Exp1')
 probCons = [50 70 90];
 dir = [-1 1];
-
-% calculate gain from the velocity values...
-d = readtable('clpMeanVelX_perceptualVisualByPerceived_exp1.csv');
-d.measure = d.measure./10.*d.visualDir;
-writetable(d, 'clpGainX_perceptualVisualByPerceived_exp1.csv')
+% 
+% % calculate gain from the velocity values...
+% d = readtable('clpMeanVelX_perceptualVisualByPerceived_exp1.csv');
+% d.measure = d.measure./10.*d.visualDir;
+% writetable(d, 'clpGainX_perceptualVisualByPerceived_exp1.csv')
 
 % % first, organize the absolute values for each participant--to see if we need
 % % to exclude any
@@ -63,12 +63,12 @@ writetable(d, 'clpGainX_perceptualVisualByPerceived_exp1.csv')
 % writetable(dAbs, 'clpAbsMeanVelX_perceptualVisualByPerceived_exp1.csv')
 
 % then, organize the mean values
-% d = readtable('dataclpMeanVelX_perceptualVisualLperceived_exp1.csv');
-% d.visualDir = -ones(size(d.sub));
-% dT = readtable('dataclpMeanVelX_perceptualVisualRperceived_exp1.csv');
-% dT.visualDir = ones(size(dT.sub));
-% d = [d; dT]; % dir is perceived direction
-% % writetable(d, 'clpMeanVelX_perceptualVisualByPerceived_exp1.csv')
+d = readtable('data_clpMeanVelX_perceptualVisualLperceived_exp1.csv');
+d.visualDir = -ones(size(d.sub));
+dT = readtable('data_clpMeanVelX_perceptualVisualRperceived_exp1.csv');
+dT.visualDir = ones(size(dT.sub));
+d = [d; dT]; % dir is perceived direction
+writetable(d, 'clpMeanVelX_perceptualVisualByPerceived_exp1.csv')
 
 % d = readtable('dataclpMeanVelX_correctPerceptualPerceived_exp1.csv');
 % d.visualConsistency = ones(size(d.sub));

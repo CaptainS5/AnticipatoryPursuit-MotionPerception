@@ -29,9 +29,10 @@ probCons = [10 30 50 70 90];
 % probTotalN = 2;
 
 % choose the grouping you want to achieve
-groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLperceived', 'perceptualVisualRperceived', 'zeroPerceived', 'perceptualPerceived', 'wrongPerceptualPerceived'};
+groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLperceived', 'perceptualVisualRperceived', ...
+    'zeroPerceived', 'perceptualPerceived', 'wrongPerceptualPerceived_no0coh', 'correctPerceptualPerceived'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [5]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [8]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will plot each group rule in one figure
 
 % choose which plot to look at now
@@ -111,6 +112,8 @@ for ii = 1:length(groupN)
                 yRange = [-7 7];
             case 7
                 yRange = [-7 7];
+            case 8
+                yRange = [-7 7];
         end
 
         for subN = 1:size(names, 2)
@@ -166,6 +169,8 @@ for ii = 1:length(groupN)
             case 6
                 yRange = [-4 4];
             case 7
+                yRange = [-4 4];
+            case 8
                 yRange = [-4 4];
         end
 
@@ -266,11 +271,16 @@ for probNmerged = 1:probTotalN
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
-            case 7 % perceptual trials misperceived, include 0 coh, by perceived motion
+            case 7 % perceptual trials misperceived, not including 0 coh, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>=0);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<=0);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0);
+            case 8 % perceptual trials correctly perceived
+                leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+                    & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
+                rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+                    & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
         end
         
         % individual mean traces

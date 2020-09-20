@@ -10,8 +10,8 @@ rm(list = ls())
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "velocityTrace_zeroPerceived_exp1_prob"
-pdfFileName <- "velocityTrace_zeroPerceived_all_Exp1.pdf"
+dataFileName <- "velocityTrace_wrongPerceptualPerceived_no0coh_exp1_prob"
+pdfFileName <- "velocityTrace_wrongPerceptualPerceived_no0coh_all_Exp1.pdf"
 # dataFileName <- "slidingW_APvelX_"
 # pdfFileName <- "slidingW_APvelX_STE_all_Exp1.pdf"
 n <- 10 # number of participants
@@ -103,43 +103,43 @@ print(p)
 # dev.off()
 ggsave(paste(plotFolder, pdfFileName, sep = ""), width = vtPlotWidth)
 
-# plot individual traces of the last participant
-pdfFileIndiName <- "velTraceIndividual_Exp1.pdf"
-p <- ggplot(indiVelTrace[[1]], aes(x = timePoints, y = indiVelMean)) +
-        geom_line(aes(colour = "50%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
-        geom_line(data = indiVelTrace[[2]], aes(x = timePoints, y = indiVelMean, colour = "50%"), size = 1, linetype = "solid") + 
-        # geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
-        geom_line(data = indiVelTrace[[3]], aes(x = timePoints, y = indiVelMean, colour = "70%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
-        geom_line(data = indiVelTrace[[4]], aes(x = timePoints, y = indiVelMean, colour = "70%"), size = 1, linetype = "solid") + 
-        # geom_ribbon(data = velTrace[[4]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
-        geom_line(data = indiVelTrace[[5]], aes(x = timePoints, y = indiVelMean, colour = "90%"), size = 1, linetype = "twodash") + 
-        # geom_ribbon(data = velTrace[[5]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
-        geom_line(data = indiVelTrace[[6]], aes(x = timePoints, y = indiVelMean, colour = "90%"), size = 1, linetype = "solid") + 
-        # geom_ribbon(data = velTrace[[6]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
-        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-200, -250), xend = c(700, -250), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
-        scale_y_continuous(name = "Horinzontal eye velocity (°/s)",limits = c(ylimLow, ylimHigh), breaks=seq(ytickLow, ytickHigh, 2), expand = c(0, 0)) +
-        scale_x_continuous(name = "Time (ms)", limits = c(-250, 700), breaks=seq(-200, 700, 100), expand = c(0, 0)) +
-        # coord_cartesian(ylim=c(-4, 4)) +
-        scale_colour_manual("Probability of rightward motion",
-                            breaks = c("50%", "70%", "90%"),
-                            values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
-        # scale_fill_manual("Probability of rightward motion",
-        #                     breaks = c("50%", "70%", "90%"),
-        #                     values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
-        theme(axis.text=element_text(colour="black"),
-              axis.ticks=element_line(colour="black", size = axisLineWidth),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              panel.border = element_blank(),
-              panel.background = element_blank(),
-              text = element_text(size = textSize),
-              legend.background = element_rect(fill="transparent"),
-              legend.key = element_rect(colour = "transparent", fill = "white"))
-print(p)
-# dev.off()
-ggsave(paste(plotFolder, pdfFileIndiName, sep = ""), width = vtPlotWidth)
+# # plot individual traces of the last participant
+# pdfFileIndiName <- "velTraceIndividual_Exp1.pdf"
+# p <- ggplot(indiVelTrace[[1]], aes(x = timePoints, y = indiVelMean)) +
+#         geom_line(aes(colour = "50%"), size = 1, linetype = "twodash") + 
+#         # geom_ribbon(aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
+#         geom_line(data = indiVelTrace[[2]], aes(x = timePoints, y = indiVelMean, colour = "50%"), size = 1, linetype = "solid") + 
+#         # geom_ribbon(data = velTrace[[2]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "50%"), alpha = velAlpha) +
+#         geom_line(data = indiVelTrace[[3]], aes(x = timePoints, y = indiVelMean, colour = "70%"), size = 1, linetype = "twodash") + 
+#         # geom_ribbon(data = velTrace[[3]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
+#         geom_line(data = indiVelTrace[[4]], aes(x = timePoints, y = indiVelMean, colour = "70%"), size = 1, linetype = "solid") + 
+#         # geom_ribbon(data = velTrace[[4]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "70%"), alpha = velAlpha) +
+#         geom_line(data = indiVelTrace[[5]], aes(x = timePoints, y = indiVelMean, colour = "90%"), size = 1, linetype = "twodash") + 
+#         # geom_ribbon(data = velTrace[[5]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
+#         geom_line(data = indiVelTrace[[6]], aes(x = timePoints, y = indiVelMean, colour = "90%"), size = 1, linetype = "solid") + 
+#         # geom_ribbon(data = velTrace[[6]], aes(x = timePoints, ymin=velLower, ymax=velUpper, fill = "90%"), alpha = velAlpha) +
+#         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(-200, -250), xend = c(700, -250), y = c(ylimLow, ytickLow), yend = c(ylimLow, ytickHigh)), size = axisLineWidth) +
+#         scale_y_continuous(name = "Horinzontal eye velocity (°/s)",limits = c(ylimLow, ylimHigh), breaks=seq(ytickLow, ytickHigh, 2), expand = c(0, 0)) +
+#         scale_x_continuous(name = "Time (ms)", limits = c(-250, 700), breaks=seq(-200, 700, 100), expand = c(0, 0)) +
+#         # coord_cartesian(ylim=c(-4, 4)) +
+#         scale_colour_manual("Probability of rightward motion",
+#                             breaks = c("50%", "70%", "90%"),
+#                             values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
+#         # scale_fill_manual("Probability of rightward motion",
+#         #                     breaks = c("50%", "70%", "90%"),
+#         #                     values = c("50%" = colourCode[1], "70%" = colourCode[2], "90%" = colourCode[3])) +
+#         theme(axis.text=element_text(colour="black"),
+#               axis.ticks=element_line(colour="black", size = axisLineWidth),
+#               panel.grid.major = element_blank(),
+#               panel.grid.minor = element_blank(),
+#               panel.border = element_blank(),
+#               panel.background = element_blank(),
+#               text = element_text(size = textSize),
+#               legend.background = element_rect(fill="transparent"),
+#               legend.key = element_rect(colour = "transparent", fill = "white"))
+# print(p)
+# # dev.off()
+# ggsave(paste(plotFolder, pdfFileIndiName, sep = ""), width = vtPlotWidth)
 
 # # sliding window analysis
 # # mean velocity traces in different conditions
