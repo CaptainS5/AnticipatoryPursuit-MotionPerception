@@ -20,9 +20,9 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "data_clpGainX_perceptualConsistency_exp1.csv"
+dataFileName <- "data_clpMeanVelX_zeroPerceptualPerceived_exp1.csv"
 # pdfFileName <- "clpGainX_perceivedVisualByPerceived_no0cohTrials_exp1.pdf"
-pdfInteractionFileName <- "clpGainX_perceptualConsistency_exp1.pdf"
+pdfInteractionFileName <- "clpGainX_zeroPerceived_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -40,11 +40,11 @@ dotSize <- 3
 # # ylimLow <- -0.1
 # # ylimHigh <- 0.4
 # clp velocity in probe trials
-ylimLow <- -6
-ylimHigh <- 6
-# # clp gain in probe trials
-ylimLow <- -0.3
-ylimHigh <- 0.6
+ylimLow <- -4
+ylimHigh <- 4
+# # # clp gain in probe trials
+# ylimLow <- -0.3
+# ylimHigh <- 0.6
 
 data <- read.csv(dataFileName)
 subs <- unique(data$sub)
@@ -97,19 +97,19 @@ subN <- length(subs)
 ## ANOVA
 sub <- data["sub"]
 prob <- data["prob"]
-congruency <- data["consistency"]
-# dir <- data["dir"]
+# congruency <- data["consistency"]
+dir <- data["dir"]
 measure <- data["measure"]
-dataAnova <- data.frame(sub, prob, congruency, measure)
+dataAnova <- data.frame(sub, prob, dir, measure)
 colnames(dataAnova)[4] <- "measure"
-colnames(dataAnova)[3] <- "congruency"
+colnames(dataAnova)[3] <- "perceivedDirection"
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
-dataAnova$congruency <- as.factor(dataAnova$congruency)
 # dataAnova$congruency <- as.factor(dataAnova$congruency)
+dataAnova$perceivedDirection <- as.factor(dataAnova$perceivedDirection)
 
 anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-    within = .(prob, congruency), type = 3, return_aov = TRUE, detailed = TRUE)
+    within = .(prob, perceivedDirection), type = 3, return_aov = TRUE, detailed = TRUE)
 # print(anovaData)
 aovEffectSize(anovaData, 'pes')
 
@@ -118,15 +118,15 @@ aovEffectSize(anovaData, 'pes')
 # bayesfactor_inclusion(bf, match_models = TRUE)
 
 ## interaction plot
-dataPlot <- data.frame(sub, prob, congruency, measure)
+dataPlot <- data.frame(sub, prob, dir, measure)
 colnames(dataPlot)[4] <- "measure"
-colnames(dataPlot)[3] <- "congruency"
+colnames(dataPlot)[3] <- "perceivedDirection"
 dataPlot$sub <- as.factor(dataPlot$sub)
 # dataPlot$prob <- as.factor(dataPlot$prob)
 # is.numeric(dataPlot$timeBin)
-dataPlot$congruency <- as.factor(dataPlot$congruency)
+dataPlot$perceivedDirection <- as.factor(dataPlot$perceivedDirection)
 
-p <- ggplot(dataPlot, aes(x = prob, y = measure, color = congruency)) +
+p <- ggplot(dataPlot, aes(x = prob, y = measure, color = perceivedDirection)) +
         stat_summary(fun = mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=10)) +
         # stat_summary(fun.y = mean, geom = "line", width = 1) +
         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1, position = position_dodge(width=10)) +
@@ -134,8 +134,8 @@ p <- ggplot(dataPlot, aes(x = prob, y = measure, color = congruency)) +
         geom_point(size = dotSize, shape = 1, position = position_jitterdodge(  jitter.width = NULL, jitter.height = 0, dodge.width = 10)) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), y = c(ylimLow, ylimLow), xend = c(90, 40), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
-        # scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 6), expand = c(0, 0)) +
-        scale_y_continuous(name = "Steady-state pursuit gain", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
+        scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
+        # scale_y_continuous(name = "Steady-state pursuit gain", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
         coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
         # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(40, 100), expand = c(0, 0)) +
