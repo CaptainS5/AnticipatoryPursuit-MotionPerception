@@ -28,7 +28,7 @@ pursuitOff = trial.stim_offset-trial.timeWindow.excludeEndDuration; % may want t
 
 % just manually define...
 pursuit.onset = nan;
-pursuit.onsetSteadyState = trial.stim_onset+ms2frames(300); % 200ms after RDK onset
+pursuit.onsetSteadyState = trial.stim_onset+ms2frames(400); % 200ms after RDK onset
 %%calculated open-loop duration
 if ~isnan(pursuit.onset) && ~isnan(pursuit.onsetSteadyState)
     openLoopDuration = pursuit.onsetSteadyState - pursuit.onset;

@@ -43,12 +43,39 @@ for subN = 1:length(names)
         eyeTrialData.pursuit.closedLoopMeanVelX(subN, :) = -eyeTrialData.pursuit.closedLoopMeanVelX(subN, :);
     end
     
-    % binarize steady-state pursuit velocity
-    eyeTrialData.pursuit.closedLoopDir(subN, eyeTrialData.pursuit.closedLoopMeanVelX(subN, :)>0) = 1; % right
-    eyeTrialData.pursuit.closedLoopDir(subN, eyeTrialData.pursuit.closedLoopMeanVelX(subN, :)<0) = 0; % left
+%     % binarize steady-state pursuit velocity
+%     eyeTrialData.pursuit.closedLoopDir(subN, eyeTrialData.pursuit.closedLoopMeanVelX(subN, :)>0) = 1; % right
+%     eyeTrialData.pursuit.closedLoopDir(subN, eyeTrialData.pursuit.closedLoopMeanVelX(subN, :)<0) = 0; % left
 end
-
 cohLevels = unique(eyeTrialData.coh(1, eyeTrialData.trialType(1, :)==0))';
+
+% binarize steady-state pursuit velocity based on mean velocity
+for subN = 1:length(names)
+    % first, set up baseline based on 50% blocks
+    absCohLevels = unique(abs(cohLevels));
+    for absCohN = 1:length(absCohLevels)
+        idxTemp = find(eyeTrialData.errorStatus(subN, :)==0 & abs(eyeTrialData.coh(subN, :))==absCohLevels(absCohN) ...
+            & eyeTrialData.prob(subN, :)==50 & eyeTrialData.trialType(subN, :)==0);
+        meanTemp(subN, absCohN) = nanmean(eyeTrialData.pursuit.closedLoopMeanVelX(subN, idxTemp));
+    end
+    
+    for probN = 1:probTotalN
+        for cohN = 1:length(cohLevels)
+            idxTemp = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.coh(subN, :)==cohLevels(cohN) ...
+                & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0);
+%             if probN==1 % it doesn't make sense if in 50% we don't use zero... but, anyway...
+%                 idxR = find(eyeTrialData.pursuit.closedLoopMeanVelX(subN, idxTemp)>=0); 
+%                 idxL = find(eyeTrialData.pursuit.closedLoopMeanVelX(subN, idxTemp)<0);
+%             else
+                absCohN = find(absCohLevels==abs(cohLevels(cohN))); % locate the corresponding "middle line"
+                idxR = find(eyeTrialData.pursuit.closedLoopMeanVelX(subN, idxTemp)>=meanTemp(subN, absCohN));
+                idxL = find(eyeTrialData.pursuit.closedLoopMeanVelX(subN, idxTemp)<meanTemp(subN, absCohN));
+%             end
+            eyeTrialData.pursuit.closedLoopDir(subN, idxTemp(idxR)) = 1; % right
+            eyeTrialData.pursuit.closedLoopDir(subN, idxTemp(idxL)) = 0; % left
+        end
+    end
+end
 
 %% do the fitting for each bin
 for subN = 1:length(names)
@@ -95,23 +122,23 @@ for subN = 1:length(names)
     legend([f{:}], probNames, 'box', 'off', 'location', 'northwest')
     
     cd(pursuitFolder)
-%     saveas(gcf, ['oculometricFunction_exp', num2str(expN), '_', names{subN}, '.pdf'])
+%     saveas(gcf, ['relativeOculometricFunction_exp', num2str(expN), '_', names{subN}, '.pdf'])
 end
 cd(analysisFolder)
-save(['oculometricFunction_exp' num2str(expN)], 'dataFit');
+% save(['relativeOculometricFunction_exp' num2str(expN)], 'dataFit');
 
 %% save csv for ANOVA
-cd(RsaveFolder)
-% perceptual data
-data = table();
-count = 1;
-for subN = 1:length(names)
-    for probN = 1:probTotalN
-        data.sub(count, 1) = subN;
-        data.prob(count, 1) = probCons(probN);
-        data.OSE(count, 1) = dataFit.alpha(subN, probN);
-        data.slope(count, 1) = dataFit.beta(subN, probN);
-        count = count+1;
-    end
-end
-writetable(data, ['OSE_exp' num2str(expN) '.csv'])
+% cd(RsaveFolder)
+% % perceptual data
+% data = table();
+% count = 1;
+% for subN = 1:length(names)
+%     for probN = 1:probTotalN
+%         data.sub(count, 1) = subN;
+%         data.prob(count, 1) = probCons(probN);
+%         data.OSE(count, 1) = dataFit.alpha(subN, probN);
+%         data.slope(count, 1) = dataFit.beta(subN, probN);
+%         count = count+1;
+%     end
+% end
+% writetable(data, ['relativeOSE_4_exp' num2str(expN) '.csv'])

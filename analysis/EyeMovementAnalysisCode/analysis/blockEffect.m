@@ -44,9 +44,9 @@ paraEnd = 9; % which parameters to plot
 % choose the grouping you want to achieve
 groupName = {'standardMerged', 'standardVisual', 'perceptualMerged', 'perceptualVisual', 'perceptualPerceived', ...
     'perceptualVisualLperceived', 'perceptualVisualRperceived', 'wrongPerceptualPerceived', 'correctPerceptualPerceived', ...
-    'perceptualConsistency'};
+    'perceptualConsistency', 'zeroPerceptualPerceived'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [9]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [11]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will do one by one
 
 % some other settings
@@ -293,17 +293,17 @@ for probSubN = 1:size(probSub, 2)
                 & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)==1 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-        case 8
+        case 8 % wrong perceived, not including zero
             validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                & eyeTrialData.rdkDir(subN, :)>=0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+                & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                & eyeTrialData.rdkDir(subN, :)<=0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-        case 9
+                & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+        case 9 % correct perceived
             validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-        case 10
+        case 10 % congruency/consistency, not including zero
             % visual left, perceived left
             validILL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
@@ -316,29 +316,34 @@ for probSubN = 1:size(probSub, 2)
             % visual right, perceived left
             validIRL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+        case 11 % zero perceived
+            validIL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+                & eyeTrialData.rdkDir(subN, :)==0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
+            validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
+                & eyeTrialData.rdkDir(subN, :)==0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
     end
     
     if groupN==10 % flip all visual left trials--why flip though?... not flipping for gain
-        eval(['yValues.right(1:length(validILL), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validILL);']) % consistent
-        eval(['yValues.right((length(validILL)+1):(length(validILL)+length(validIRR)), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIRR);']) % consistent
-        eval(['yValues.left(1:length(validILR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validILR);']) % inconsistent
-        eval(['yValues.left((length(validILR)+1):(length(validILR)+length(validIRL)), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIRL);']) % inconsistent
+        eval(['yValues.right(1:length(validILL), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validILL);']); % consistent
+        eval(['yValues.right((length(validILL)+1):(length(validILL)+length(validIRR)), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validIRR);']); % consistent
+        eval(['yValues.left(1:length(validILR), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validILR);']); % inconsistent
+        eval(['yValues.left((length(validILR)+1):(length(validILR)+length(validIRL)), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validIRL);']); % inconsistent
         trialSubN.right(1, probSubN) = length(validILL)+length(validIRR);
         trialSubN.left(1, probSubN) = length(validILR)+length(validIRL);
     else
         if paraN==10 % needs to calculate absolute value
             if groupN==1 || groupN==3
-                eval(['yValues(1:length(validI), probSubN) = abs(eyeTrialData.' checkParas{paraN} '(subN, validI));'])
+                eval(['yValues(1:length(validI), probSubN) = abs(eyeTrialData.', checkParas{paraN}, '(subN, validI));']);
             else
-                eval(['yValues.left(1:length(validIL), probSubN) = abs(eyeTrialData.' checkParas{paraN} '(subN, validIL));'])
-                eval(['yValues.right(1:length(validIR), probSubN) = abs(eyeTrialData.' checkParas{paraN} '(subN, validIR));'])
+                eval(['yValues.left(1:length(validIL), probSubN) = abs(eyeTrialData.', checkParas{paraN}, '(subN, validIL));']);
+                eval(['yValues.right(1:length(validIR), probSubN) = abs(eyeTrialData.', checkParas{paraN}, '(subN, validIR));']);
             end
         else
             if groupN==1 || groupN==3
-                eval(['yValues(1:length(validI), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validI);'])
+                eval(['yValues(1:length(validI), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validI);']);
             else
-                eval(['yValues.left(1:length(validIL), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIL);'])
-                eval(['yValues.right(1:length(validIR), probSubN) = eyeTrialData.' checkParas{paraN} '(subN, validIR);'])
+                eval(['yValues.left(1:length(validIL), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validIL);']);
+                eval(['yValues.right(1:length(validIR), probSubN) = eyeTrialData.', checkParas{paraN}, '(subN, validIR);']);
             end
         end
         if groupN==1 || groupN==3
