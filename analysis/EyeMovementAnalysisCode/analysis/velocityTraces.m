@@ -30,9 +30,12 @@ probCons = [10 30 50 70 90];
 
 % choose the grouping you want to achieve
 groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLperceived', 'perceptualVisualRperceived', ...
-    'zeroPerceived', 'perceptualPerceived', 'wrongPerceptualPerceived_no0coh', 'correctPerceptualPerceived'};
+    'zeroPerceived', 'perceptualPerceived', 'incongruent', 'congruent'};
+% incongruent--perceived motion is not the same as visual motion, currently
+% not including 0-coh trials
+% congruent--perceived motion is the same as visual motion
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [8]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [7;8]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will plot each group rule in one figure
 
 % choose which plot to look at now
@@ -88,138 +91,143 @@ timePoints = [(1:minFrameLength)-minFrameLength+0.7*sampleRate]*framePerSec*1000
 % rdk onset is 0
 
 %% calculate mean traces
-for ii = 1:length(groupN)
-    [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
-end
-
-%% Draw velocity trace plots
-for ii = 1:length(groupN)
-    % plot mean traces in all probabilities for each participant
-    if individualPlots
-        cd([velTraceFolder, '\Exp', num2str(expN)])
-        switch groupN(ii)
-            case 1
-                yRange = [-12 12]; % individual standard trials
-            case 2
-                yRange = [-7 7]; % individual pereptual trials
-            case 3
-                yRange = [-7 7];
-            case 4
-                yRange = [-7 7];
-            case 5
-                yRange = [-4 4]; 
-            case 6
-                yRange = [-7 7];
-            case 7
-                yRange = [-7 7];
-            case 8
-                yRange = [-7 7];
+% for plotting each coh level separately...
+absCohLevels = [0.05; 0.1; 0.15];
+for cohN = 1:3 % this is to plot each coh level separately
+    
+    for ii = 1:length(groupN)
+%         [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
+        [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii), absCohLevels(cohN));
+    end
+    
+    %% Draw velocity trace plots
+    for ii = 1:length(groupN)
+        % plot mean traces in all probabilities for each participant
+        if individualPlots
+            cd([velTraceFolder, '\Exp', num2str(expN)])
+            switch groupN(ii)
+                case 1
+                    yRange = [-12 12]; % individual standard trials
+                case 2
+                    yRange = [-7 7]; % individual pereptual trials
+                case 3
+                    yRange = [-7 7];
+                case 4
+                    yRange = [-7 7];
+                case 5
+                    yRange = [-4 4];
+                case 6
+                    yRange = [-7 7];
+                case 7
+                    yRange = [-7 7];
+                case 8
+                    yRange = [-7 7];
+            end
+            
+            for subN = 1:size(names, 2)
+                probSub = unique(eyeTrialData.prob(subN, :));
+                if probSub(1)<50
+                    probNameI = 1;
+                else
+                    probNameI = 2;
+                end
+                
+                figure
+                for probSubN = 1:size(probSub, 2)
+                    probN = find(probCons==probSub(probSubN));
+                    if probSub(1)<50
+                        probNmerged = probTotalN+1-probN;
+                    else
+                        probNmerged = probN-(probTotalN-1);
+                    end
+                    plot(timePoints, indiMean{ii}{probNmerged}.left(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
+                    text(timePoints(end), indiMean{ii}{probNmerged}.left(subN, end), num2str(trialNumber{ii}{probNmerged}.left(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
+                    hold on
+                    p{probSubN} = plot(timePoints, indiMean{ii}{probNmerged}.right(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
+                    text(timePoints(end), indiMean{ii}{probNmerged}.right(subN, end), num2str(trialNumber{ii}{probNmerged}.right(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
+                end
+                line([-300 -300], [min(yRange) max(yRange)],'Color','k','LineStyle','--')
+                line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
+                line([50 50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
+                legend([p{:}], probNames{probNameI}, 'Location', 'NorthWest')
+                title(groupName{groupN(ii)})
+                xlabel('Time (ms)')
+                ylabel('Horizontal eye velocity (deg/s)')
+                xlim([-500 700])
+                ylim(yRange)
+                box off
+                saveas(gcf, ['velTrace_' groupName{groupN(ii)} '_AllProbs_Exp' num2str(expN) '_' names{subN} '.pdf'])
+            end
         end
-
-        for subN = 1:size(names, 2)
-            probSub = unique(eyeTrialData.prob(subN, :));
-            if probSub(1)<50
-                probNameI = 1;
-            else
-                probNameI = 2;
+        
+        % plot mean traces of all participants in all probabilities
+        if averagedPlots
+            cd(velTraceFolder)
+            switch groupN(ii)
+                case 1
+                    yRange = [-10 10]; % average standard trials
+                case 2
+                    yRange = [-4 4]; % average pereptual trials
+                case 3
+                    yRange = [-4 4];
+                case 4
+                    yRange = [-4 4];
+                case 5
+                    yRange = [-4 4];
+                case 6
+                    yRange = [-4 4];
+                case 7
+                    yRange = [-4 4];
+                case 8
+                    yRange = [-4 4];
             end
             
             figure
-            for probSubN = 1:size(probSub, 2)
-                probN = find(probCons==probSub(probSubN));
-                if probSub(1)<50
-                    probNmerged = probTotalN+1-probN;
-                else
-                    probNmerged = probN-(probTotalN-1);
-                end
-                plot(timePoints, indiMean{ii}{probNmerged}.left(subN, (maxFrameLength-minFrameLength+1):end), '--', 'color', colorProb(probN, :)); %, 'LineWidth', 1)
-                text(timePoints(end), indiMean{ii}{probNmerged}.left(subN, end), num2str(trialNumber{ii}{probNmerged}.left(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
+            for probNmerged = 1:probTotalN
+                plot(timePoints, allMean{ii}{probNmerged}.left, '--', 'color', colorProb(probNmerged+probTotalN-1, :)); %, 'LineWidth', 1)
                 hold on
-                p{probSubN} = plot(timePoints, indiMean{ii}{probNmerged}.right(subN, (maxFrameLength-minFrameLength+1):end), 'color', colorProb(probN, :)); %, 'LineWidth', 1);
-                text(timePoints(end), indiMean{ii}{probNmerged}.right(subN, end), num2str(trialNumber{ii}{probNmerged}.right(subN, 1)), 'color', colorProb(probN, :), 'FontSize',textFontSize)
+                p{probNmerged} = plot(timePoints, allMean{ii}{probNmerged}.right, 'color', colorProb(probNmerged+probTotalN-1, :)); %, 'LineWidth', 1);
             end
             line([-300 -300], [min(yRange) max(yRange)],'Color','k','LineStyle','--')
             line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
             line([50 50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
-            legend([p{:}], probNames{probNameI}, 'Location', 'NorthWest')
-            title(groupName{groupN(ii)})
+            legend([p{:}], probNames{2}, 'Location', 'NorthWest')
+            title(['coh ', num2str(absCohLevels(cohN)), ',', groupName{groupN(ii)}])
             xlabel('Time (ms)')
             ylabel('Horizontal eye velocity (deg/s)')
             xlim([-500 700])
             ylim(yRange)
             box off
-            saveas(gcf, ['velTrace_' groupName{groupN(ii)} '_AllProbs_Exp' num2str(expN) '_' names{subN} '.pdf'])
+            saveas(gcf, ['velTrace_coh' num2str(absCohLevels(cohN)) '_' groupName{groupN(ii)} '_all_exp' num2str(expN) '.pdf'])
         end
     end
-    
-    % plot mean traces of all participants in all probabilities
-    if averagedPlots
-        cd(velTraceFolder)
-        switch groupN(ii)
-            case 1
-                yRange = [-10 10]; % average standard trials
-            case 2
-                yRange = [-4 4]; % average pereptual trials
-            case 3
-                yRange = [-4 4];
-            case 4
-                yRange = [-4 4];
-            case 5
-                yRange = [-4 4];
-            case 6
-                yRange = [-4 4];
-            case 7
-                yRange = [-4 4];
-            case 8
-                yRange = [-4 4];
-        end
-
-        figure
-        for probNmerged = 1:probTotalN
-            plot(timePoints, allMean{ii}{probNmerged}.left, '--', 'color', colorProb(probNmerged+probTotalN-1, :)); %, 'LineWidth', 1)
-            hold on
-            p{probNmerged} = plot(timePoints, allMean{ii}{probNmerged}.right, 'color', colorProb(probNmerged+probTotalN-1, :)); %, 'LineWidth', 1);
-        end
-        line([-300 -300], [min(yRange) max(yRange)],'Color','k','LineStyle','--')
-        line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
-        line([50 50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
-        legend([p{:}], probNames{2}, 'Location', 'NorthWest')
-        title(groupName{groupN(ii)})
-        xlabel('Time (ms)')
-        ylabel('Horizontal eye velocity (deg/s)')
-        xlim([-500 700])
-        ylim(yRange)
-        box off
-        saveas(gcf, ['velTrace_' groupName{groupN(ii)} '_all_exp' num2str(expN) '.pdf'])
-    end
-    
 end
 
 %% generate csv files, each file for one probability condition
-% each row is the mean velocity trace of one participant
-% use the min frame length--the lengeth where all participants have
-% valid data points
-cd(RsaveFolder)
-% averaged traces
-for ii = 1:length(groupN)
-    for probNmerged = 1:probTotalN
-        velTAverageSub = [];
-        for binN = 1:2
-            if binN==1
-                dataTemp = indiMean{ii}{probNmerged}.left(:, (maxFrameLength-minFrameLength+1):end);
-            else
-                dataTemp = indiMean{ii}{probNmerged}.right(:, (maxFrameLength-minFrameLength+1):end);
-            end
-            for subN = 1:size(names, 2)
-                velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
-            end
-        end
-        csvwrite(['velocityTrace_' groupName{groupN(ii)} '_exp' num2str(expN) '_prob' num2str(probCons(probNmerged+probTotalN-1)), '.csv'], velTAverageSub)
-    end
-end
+% % each row is the mean velocity trace of one participant
+% % use the min frame length--the lengeth where all participants have
+% % valid data points
+% % cd(RsaveFolder)
+% % averaged traces
+% for ii = 1:length(groupN)
+%     for probNmerged = 1:probTotalN
+%         velTAverageSub = [];
+%         for binN = 1:2
+%             if binN==1
+%                 dataTemp = indiMean{ii}{probNmerged}.left(:, (maxFrameLength-minFrameLength+1):end);
+%             else
+%                 dataTemp = indiMean{ii}{probNmerged}.right(:, (maxFrameLength-minFrameLength+1):end);
+%             end
+%             for subN = 1:size(names, 2)
+%                 velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
+%             end
+%         end
+%         csvwrite(['velocityTrace_' groupName{groupN(ii)} '_exp' num2str(expN) '_prob' num2str(probCons(probNmerged+probTotalN-1)), '.csv'], velTAverageSub)
+%     end
+% end
 
 %%
-function [indiMean, allMean, trialNumber] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN)
+function [indiMean, allMean, trialNumber] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN, coh)
 % calculate mean traces
 % indiMean: each row is one participant
 % allMean: averaged across participants
@@ -273,14 +281,14 @@ for probNmerged = 1:probTotalN
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
             case 7 % perceptual trials misperceived, not including 0 coh, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0  & abs(eyeTrialData.coh(subN, :))==coh);
             case 8 % perceptual trials correctly perceived
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));
+                    & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));
+                    & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==coh);
         end
         
         % individual mean traces

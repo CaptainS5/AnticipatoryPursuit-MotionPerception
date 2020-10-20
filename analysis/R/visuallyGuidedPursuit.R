@@ -20,9 +20,9 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "data_clpMeanVelX_zeroPerceptualPerceived_exp1.csv"
+dataFileName <- "data_clpGainX_perceptualVisual_exp1.csv"
 # pdfFileName <- "clpGainX_perceivedVisualByPerceived_no0cohTrials_exp1.pdf"
-pdfInteractionFileName <- "clpGainX_zeroPerceived_exp1.pdf"
+pdfInteractionFileName <- "clpGainX_perceptualVisual_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -42,9 +42,9 @@ dotSize <- 3
 # clp velocity in probe trials
 ylimLow <- -4
 ylimHigh <- 4
-# # # clp gain in probe trials
-# ylimLow <- -0.3
-# ylimHigh <- 0.6
+# # clp gain in probe trials
+ylimLow <- -0.1
+ylimHigh <- 0.6
 
 data <- read.csv(dataFileName)
 subs <- unique(data$sub)
@@ -102,14 +102,14 @@ dir <- data["dir"]
 measure <- data["measure"]
 dataAnova <- data.frame(sub, prob, dir, measure)
 colnames(dataAnova)[4] <- "measure"
-colnames(dataAnova)[3] <- "perceivedDirection"
+colnames(dataAnova)[3] <- "visualDirection"
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$congruency <- as.factor(dataAnova$congruency)
-dataAnova$perceivedDirection <- as.factor(dataAnova$perceivedDirection)
+dataAnova$visualDirection <- as.factor(dataAnova$visualDirection)
 
 anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-    within = .(prob, perceivedDirection), type = 3, return_aov = TRUE, detailed = TRUE)
+    within = .(prob, visualDirection), type = 3, return_aov = TRUE, detailed = TRUE)
 # print(anovaData)
 aovEffectSize(anovaData, 'pes')
 
@@ -120,13 +120,13 @@ aovEffectSize(anovaData, 'pes')
 ## interaction plot
 dataPlot <- data.frame(sub, prob, dir, measure)
 colnames(dataPlot)[4] <- "measure"
-colnames(dataPlot)[3] <- "perceivedDirection"
+colnames(dataPlot)[3] <- "visualDirection"
 dataPlot$sub <- as.factor(dataPlot$sub)
 # dataPlot$prob <- as.factor(dataPlot$prob)
 # is.numeric(dataPlot$timeBin)
-dataPlot$perceivedDirection <- as.factor(dataPlot$perceivedDirection)
+dataPlot$visualDirection <- as.factor(dataPlot$visualDirection)
 
-p <- ggplot(dataPlot, aes(x = prob, y = measure, color = perceivedDirection)) +
+p <- ggplot(dataPlot, aes(x = prob, y = measure, color = visualDirection)) +
         stat_summary(fun = mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=10)) +
         # stat_summary(fun.y = mean, geom = "line", width = 1) +
         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1, position = position_dodge(width=10)) +
@@ -134,13 +134,14 @@ p <- ggplot(dataPlot, aes(x = prob, y = measure, color = perceivedDirection)) +
         geom_point(size = dotSize, shape = 1, position = position_jitterdodge(  jitter.width = NULL, jitter.height = 0, dodge.width = 10)) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), y = c(ylimLow, ylimLow), xend = c(90, 40), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
-        scale_y_continuous(name = "Steady-state pursuit velocity (°/s)", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
-        # scale_y_continuous(name = "Steady-state pursuit gain", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
+        # scale_y_continuous(name = "Visually-guided pursuit velocity (°/s)", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
+        scale_y_continuous(name = "Visually-guided pursuit gain", breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) +
         coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
         # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(40, 100), expand = c(0, 0)) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+        scale_color_manual(name = "Visual\ndirection"， values=c("#C3D7A4", "#52854C")) +
         theme(axis.text=element_text(colour="black"),
                       axis.ticks=element_line(colour="black", size = axisLineWidth),
                       panel.grid.major = element_blank(),
@@ -154,6 +155,45 @@ p <- ggplot(dataPlot, aes(x = prob, y = measure, color = perceivedDirection)) +
 print(p)
 ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
 
+# ## plot trial number...
+# sub <- data["sub"]
+# prob <- data["prob"]
+# measure <- data["trialNumber"]
+# congruency <- data["consistency"]
+# dataTN <- data.frame(sub, prob, congruency, measure)
+# colnames(dataTN)[4] <- "measure"
+# colnames(dataTN)[3] <- "congruency"
+# # dataTN$prob <- as.factor(dataTN$prob)
+# dataTN$sub <- as.factor(dataTN$sub)
+# dataTN$congruency <- as.factor(dataTN$congruency)
+
+# ylimLow <- 0
+# ylimHigh <- 160
+
+# p <- ggplot(dataTN, aes(x = prob, y = measure, color = congruency)) +
+#         stat_summary(fun = mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=10)) +
+#         # stat_summary(fun.y = mean, geom = "line", width = 1) +
+#         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1, position = position_dodge(width=10)) +
+#         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
+#         geom_point(size = dotSize, shape = 1, position = position_jitterdodge(  jitter.width = NULL, jitter.height = 0, dodge.width = 10)) +
+#         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 40), y = c(ylimLow, ylimLow), xend = c(90, 40), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
+#         scale_y_continuous(name = "Trial number", breaks = seq(ylimLow, ylimHigh, 20), expand = c(0, 0)) +
+#         coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
+#         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(40, 100), expand = c(0, 0)) +
+#         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
+#         scale_colour_discrete(name = "Congruency", labels = c("incongruent", "congruent")) +
+#         theme(axis.text=element_text(colour="black"),
+#                       axis.ticks=element_line(colour="black", size = axisLineWidth),
+#                       panel.grid.major = element_blank(),
+#                       panel.grid.minor = element_blank(),
+#                       panel.border = element_blank(),
+#                       panel.background = element_blank(),
+#                       text = element_text(size = textSize, colour = "black"),
+#                       legend.background = element_rect(fill="transparent"),
+#                       legend.key = element_rect(colour = "transparent", fill = "white"))
+#         # facet_wrap(~exp)
+# print(p)
+# ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
 
 # ## Exp1, plot, perceived direction x visual consistency
 # sub <- data["sub"]

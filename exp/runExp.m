@@ -91,7 +91,7 @@ try
         
         %% Initializes the connection with Eyelink
         if info.eyeTracker==1
-            if EyelinkInit()~= 1; %
+            if EyelinkInit()~= 1 %
                 error('Problems with Eyelink connection!');
                 return;
             end

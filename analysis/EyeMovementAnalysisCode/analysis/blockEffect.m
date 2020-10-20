@@ -38,8 +38,8 @@ pdfNames = {'APvelX' 'APvelXInterpolated'...
     'clpGainX' 'clpGainXInterpolated' 'clpMeanVelX' 'clpAbsMeanVelX'...
     'sacNumX' 'sacMeanAmpX' 'sacSumAmpX'}; % name for saving the pdf
 sacStart = 11; % from the n_th parameter is saccade
-paraStart = 9;
-paraEnd = 9; % which parameters to plot
+paraStart = 7;
+paraEnd = 7; % which parameters to plot
 
 % choose the grouping you want to achieve
 groupName = {'standardMerged', 'standardVisual', 'perceptualMerged', 'perceptualVisual', 'perceptualPerceived', ...

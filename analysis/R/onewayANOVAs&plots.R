@@ -14,8 +14,8 @@ source("pairwise.t.test.with.t.and.df.R")
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "OSE_exp1.csv"
-pdfFileName <- "OSE_exp1.pdf"
+dataFileName <- "dataAPvelX_exp1_excludingOutlier.csv"
+# pdfFileName <- "OSE_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -54,7 +54,7 @@ sub <- data["sub"]
 prob <- data["prob"]
 # preDir <- data["precededPerception"]
 # timeBin <- data["timeBin"]
-measure <- data["OSE"]
+measure <- data["measure"]
 # dataAnova <- data.frame(sub, preDir, measure)
 dataAnova <- data.frame(sub, prob, measure)
 # colnames(dataAnova)[2] <- "prePercept"
