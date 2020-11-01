@@ -17,12 +17,11 @@ rm(list = ls())
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
-source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "data_clpGainX_perceptualVisual_exp1.csv"
+dataFileName <- "data_clpGainX_perceptualConsistency_exp1.csv"
 # pdfFileName <- "clpGainX_perceivedVisualByPerceived_no0cohTrials_exp1.pdf"
-pdfInteractionFileName <- "clpGainX_perceptualVisual_exp1.pdf"
+# pdfInteractionFileName <- "clpGainX_perceptualVisual_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -97,19 +96,19 @@ subN <- length(subs)
 ## ANOVA
 sub <- data["sub"]
 prob <- data["prob"]
-# congruency <- data["consistency"]
-dir <- data["dir"]
+congruency <- data["consistency"]
+# dir <- data["dir"]
 measure <- data["measure"]
-dataAnova <- data.frame(sub, prob, dir, measure)
+dataAnova <- data.frame(sub, prob, congruency, measure)
 colnames(dataAnova)[4] <- "measure"
-colnames(dataAnova)[3] <- "visualDirection"
+# colnames(dataAnova)[3] <- "visualDirection"
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$congruency <- as.factor(dataAnova$congruency)
 dataAnova$visualDirection <- as.factor(dataAnova$visualDirection)
 
 anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-    within = .(prob, visualDirection), type = 3, return_aov = TRUE, detailed = TRUE)
+    within = .(prob, congruency), type = 3, return_aov = TRUE, detailed = TRUE)
 # print(anovaData)
 aovEffectSize(anovaData, 'pes')
 

@@ -195,7 +195,7 @@ for setN = 1:length(subStartI)
             end
         end
         cd([analysisPath '\analysis'])
-        save(['eyeTrialDataExp' num2str(expN) '_Sub_' names{subN} '.mat'], 'eyeTrialDataSub');
+        save(['eyeTrialDataSubExp' num2str(expN) '_' names{subN} '.mat'], 'eyeTrialDataSub');
     end
     save(['eyeTrialData_all_exp' num2str(expN) '.mat'], 'eyeTrialData');
 end

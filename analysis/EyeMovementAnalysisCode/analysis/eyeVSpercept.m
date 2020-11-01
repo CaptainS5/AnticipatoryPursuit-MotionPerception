@@ -9,10 +9,10 @@ cd('Exp1')
 aspData{1} = readtable(['dataAPvelX_exp1.csv']);
 pseData{1} = readtable(['dataPercept_exp1.csv']);
 cd ..
-aspData{2} = readtable(['aspVel_exp1vs2.csv']);
-pseData{2} = readtable(['PSE_exp1vs2.csv']);
-aspData{3} = readtable(['aspVel_exp1vs3.csv']);
-pseData{3} = readtable(['PSE_exp1vs3.csv']);
+% aspData{2} = readtable(['aspVel_exp1vs2.csv']);
+% pseData{2} = readtable(['PSE_exp1vs2.csv']);
+% aspData{3} = readtable(['aspVel_exp1vs3.csv']);
+% pseData{3} = readtable(['PSE_exp1vs3.csv']);
 cd(analysisFolder)
 
 %% correlation of asp and PSE
@@ -22,24 +22,37 @@ cd(analysisFolder)
 correlationData = table();
 count = 1;
 for subN = 1:10
-    for probN = 2:3
+    for probN = 1:3
         correlationData.sub(count, 1) = subN;
         correlationData.prob(count, 1) = probCon{1}(probN);
         
-        idxB = find(aspData{1}.sub==subN & aspData{1}.prob==probCon{1}(1));
         idxT = find(aspData{1}.sub==subN & aspData{1}.prob==probCon{1}(probN));
-        correlationData.asp(count, 1) = aspData{1}.measure(idxT, 1)-aspData{1}.measure(idxB, 1);
+        correlationData.asp(count, 1) = aspData{1}.measure(idxT, 1);
         
-        idxB = find(pseData{1}.sub==subN & pseData{1}.prob==probCon{1}(1));
         idxT = find(pseData{1}.sub==subN & pseData{1}.prob==probCon{1}(probN));
-        correlationData.PSE(count, 1) = pseData{1}.PSE(idxT, 1)-pseData{1}.PSE(idxB, 1);
+        correlationData.PSE(count, 1) = pseData{1}.PSE(idxT, 1);
         count = count+1;
     end
+%     % diff
+%     for probN = 2:3
+%         correlationData.sub(count, 1) = subN;
+%         correlationData.prob(count, 1) = probCon{1}(probN);
+%         
+%         idxB = find(aspData{1}.sub==subN & aspData{1}.prob==probCon{1}(1));
+%         idxT = find(aspData{1}.sub==subN & aspData{1}.prob==probCon{1}(probN));
+%         correlationData.asp(count, 1) = aspData{1}.measure(idxT, 1)-aspData{1}.measure(idxB, 1);
+%         
+%         idxB = find(pseData{1}.sub==subN & pseData{1}.prob==probCon{1}(1));
+%         idxT = find(pseData{1}.sub==subN & pseData{1}.prob==probCon{1}(probN));
+%         correlationData.PSE(count, 1) = pseData{1}.PSE(idxT, 1)-pseData{1}.PSE(idxB, 1);
+%         count = count+1;
+%     end
 end
 
 % save in csv for analysis in R
 cd(RFolder)
-writetable(correlationData, ['eyeVSperceptDiff_exp1.csv'])
+writetable(correlationData, ['eyeVSpercept_exp1.csv'])
+% writetable(correlationData, ['eyeVSperceptDiff_exp1.csv'])
 
 % % reorganize the data for plotting
 % for subN = 1:10
@@ -133,6 +146,3 @@ writetable(correlationData, ['eyeVSperceptDiff_exp1.csv'])
 % % legend(ah1, [fS{:, 1}], names2, 'box', 'off', 'location', 'northeast')
 % cd(correlationFolder)
 % saveas(gcf, ['PSEvsASP_diff_exp1vs3_all.pdf'])
-
-%% correlation of steady-state pursuit and PSE... discuss
-

@@ -45,9 +45,6 @@ dots.diameterX = dots.diameterX*2;
 % Postion dots in a circular aperture using distanceToCenter and
 % positionTheta
 dots.distanceToCenterX{1} = apertureRadiusX * sqrt((rand(prm.rdk.dotNumber, 1))); % distance of dots from center
-% dots.distanceToCenterX{1, trialN}(dots.distanceToCenterX{1, trialN}-dots.diameterX/2>=0, :) = dots.distanceToCenterX{1, trialN}-dots.diameterX/2; % make sure that dots do not overlap outer border
-% previously was dots.distanceToCenterX{1, trialN} = max(dots.distanceToCenterX{1, trialN}-dots.diameterX/2, 0);
-% just use the aperture...
 theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
 dots.positionTheta{1} = [cos(theta) sin(theta)];  % values between -1 and 1
 dots.position{1} = dots.positionTheta{1} .* [dots.distanceToCenterX{1} dots.distanceToCenterX{1}*prm.screen.pixelRatioWidthPerHeight];

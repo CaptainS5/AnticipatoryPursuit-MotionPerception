@@ -17,9 +17,9 @@ source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
 # dataFileName <- "timeBinPSE_exp1.csv"
-dataFileName <- "clpGain_exp1vs3.csv"
+dataFileName <- "PSE_exp1vs2.csv"
 # pdfFileName <- "timeBinPSE_exp1.pdf"
-pdfInteractionFileName <- "clpGain_exp1vs3_interaction.pdf"
+pdfInteractionFileName <- "PSE_exp1vs2_interaction.pdf"
 # pdfFileNameD <- "slopeDiff_exp1vs3.pdf"
 # for plotting
 textSize <- 25
@@ -31,15 +31,15 @@ ylimHigh <- 50
 # PSE
 ylimLow <- -0.15
 ylimHigh <- 0.15
-# ASP
-ylimLow <- -1
-ylimHigh <- 5
-# # ASP gain
-# ylimLow <- -0.1
-# ylimHigh <- 0.4
-# clp gain in context trials
-ylimLow <- 0
-ylimHigh <- 1
+# # ASP
+# ylimLow <- -1
+# ylimHigh <- 5
+# # # ASP gain
+# # ylimLow <- -0.1
+# # ylimHigh <- 0.4
+# # clp gain in context trials
+# ylimLow <- 0
+# ylimHigh <- 1
 
 data <- read.csv(dataFileName)
 subs <- unique(data$sub)
@@ -55,7 +55,7 @@ sub <- data["sub"]
 exp <- data["exp"]
 # timeBin <- data["timeBin"]
 prob <- data["prob"]
-measure <- data["measure"]
+measure <- data["PSE"]
 dataAnova <- data.frame(sub, prob, exp, measure)
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
@@ -138,10 +138,9 @@ p <- ggplot(dataPlot, aes(x = prob, y = measure, color = exp)) +
         # geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
-        scale_y_continuous(name = "Steady-state pursuit gain", breaks = seq(ylimLow, ylimHigh, 1), expand = c(0, 0)) +
         # scale_y_continuous(name = "Anticipatory pursuit velocity gain", breaks = seq(ylimLow, ylimHigh, 0.1), expand = c(0, 0)) +
-        coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
-        # scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
+        # coord_cartesian(ylim=c(ylimLow, ylimHigh)) +
+        scale_y_continuous(name = "PSE", limits = c(ylimLow, ylimHigh), breaks = c(ylimLow, 0, ylimHigh), expand = c(0, 0)) + 
         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +

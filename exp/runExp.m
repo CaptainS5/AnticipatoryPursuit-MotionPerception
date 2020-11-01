@@ -3,12 +3,10 @@ function runExp()
 % initialize exp info here: (subID--longest 4 letters--can be set in getInfo.m, or enter in GUI when you run the experiment)
 % info.block: now it runs one block at a time; use 1-3 for experimental blocks, 0 for practice block
 % currentTrial: can start with any trial number you like (in case being terminated before finishing the whole block), from 1-682
-% prob: 50, 70, or 90 for experiment; enter 0 for the practice block (use practiceList), -1 for testList
+% prob: 50, 70, or 90 for experiment 1; enter 0 for the practice block (use practiceList), -1 for testList
 % eyeTracker: 1-yes, 0-no
 % eyeType: 1-pursuit, 0-fixation (fixation condition not implemented yet)
-% info.block=3; info.currentTrial = 1; info.prob = 70; info.eyeTracker=1; info.eyeType = 1; 
 
-% to use transparent/brownian motion, change line 332-339 in runTrial.m
 % change other parameters in setParameters.m
 % may need to change screen id in line 12 in openScreen.m
 try
@@ -176,8 +174,6 @@ try
                 resp.choice(trialN, 1) = 1;
             elseif strcmp(key, prm.stopKey) % quit
                 break
-            elseif strcmp(key, 'std') % standard trials, no response
-                resp.choice(trialN, 1) = 999;
             end
             resp.RTms(trialN, 1) = rt*1000; % in ms
             resp.prob(trialN, 1) = info.prob;

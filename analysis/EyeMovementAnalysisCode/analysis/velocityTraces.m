@@ -1,5 +1,5 @@
-% plot velocity traces, just have a glance of the mean traces
-% generate csv file for further plotting in R
+% plot velocity traces, just have a glance
+% also generate csv file for further plotting in R
 initializeParas;
 
 % only uncomment the experiment you want to look at
@@ -29,8 +29,8 @@ probCons = [10 30 50 70 90];
 % probTotalN = 2;
 
 % choose the grouping you want to achieve
-groupName = {'standardVisual', 'perceptualVisual', 'perceptualVisualLperceived', 'perceptualVisualRperceived', ...
-    'zeroPerceived', 'perceptualPerceived', 'incongruent', 'congruent'};
+groupName = {'contextVisual', 'probeVisual', 'probeVisualLperceived', 'probeVisualRperceived', ...
+    'zeroPerceived', 'probePerceived', 'incongruent', 'congruent'};
 % incongruent--perceived motion is not the same as visual motion, currently
 % not including 0-coh trials
 % congruent--perceived motion is the same as visual motion
@@ -107,7 +107,7 @@ for cohN = 1:3 % this is to plot each coh level separately
             cd([velTraceFolder, '\Exp', num2str(expN)])
             switch groupN(ii)
                 case 1
-                    yRange = [-12 12]; % individual standard trials
+                    yRange = [-12 12]; % individual context trials
                 case 2
                     yRange = [-7 7]; % individual pereptual trials
                 case 3
@@ -165,7 +165,7 @@ for cohN = 1:3 % this is to plot each coh level separately
             cd(velTraceFolder)
             switch groupN(ii)
                 case 1
-                    yRange = [-10 10]; % average standard trials
+                    yRange = [-10 10]; % average context trials
                 case 2
                     yRange = [-4 4]; % average pereptual trials
                 case 3
@@ -253,18 +253,18 @@ for probNmerged = 1:probTotalN
         
         tempStartI = maxFrameLength-frameLength(subN)+1;
         switch groupN
-            case 1 % standard trials by visual motion
+            case 1 % context trials by visual motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==1);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==1);
-            case 2 % perceptual trials by visual motion
+            case 2 % probe trials by visual motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0);
-            case 3 % perceptual trials with left visual motion, by perceived motion
+            case 3 % probe trials with left visual motion, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.choice(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)<0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.choice(subN, :)==1);
-            case 4 % perceptual trials with right visual motion, by perceived motion
+            case 4 % probe trials with right visual motion, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.trialType(subN, :)==0 & eyeTrialData.choice(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 ...
@@ -274,17 +274,17 @@ for probNmerged = 1:probTotalN
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.rdkDir(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
-            case 6 % perceptual trials, by perceived motion
+            case 6 % probe trials, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
-            case 7 % perceptual trials misperceived, not including 0 coh, by perceived motion
+            case 7 % probe trials misperceived, not including 0 coh, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0  & abs(eyeTrialData.coh(subN, :))==coh);
-            case 8 % perceptual trials correctly perceived
+            case 8 % probe trials correctly perceived
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                     & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...

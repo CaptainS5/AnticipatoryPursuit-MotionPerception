@@ -14,7 +14,7 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
 dataFileName <- "eyeVSpercept_exp1.csv"
-pdfFileName <- "corrASPvsPSE_exp1.pdf"
+# pdfFileName <- "corrASPvsPSE_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5

@@ -11,11 +11,11 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp3")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataAPvelX_exp1_excludingOutlier.csv"
-# pdfFileName <- "OSE_exp1.pdf"
+dataFileName <- "dataPercept_exp3.csv"
+pdfFileName <- "PSE_exp3.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -26,12 +26,12 @@ ylimHigh <- 50
 # PSE 
 ylimLow <- -0.15
 ylimHigh <- 0.15
-# PSE by preceding perception
-ylimLow <- -0.2
-ylimHigh <- 0.1
-# OSE
-ylimLow <- -0.15
-ylimHigh <- 0.15
+# # PSE by preceding perception
+# ylimLow <- -0.2
+# ylimHigh <- 0.1
+# # OSE
+# ylimLow <- -0.15
+# ylimHigh <- 0.15
 # # ASP
 # ylimLow <- -1
 # ylimHigh <- 5 #for all probability blocks
@@ -54,11 +54,11 @@ sub <- data["sub"]
 prob <- data["prob"]
 # preDir <- data["precededPerception"]
 # timeBin <- data["timeBin"]
-measure <- data["measure"]
+measure <- data["PSE"]
 # dataAnova <- data.frame(sub, preDir, measure)
 dataAnova <- data.frame(sub, prob, measure)
 # colnames(dataAnova)[2] <- "prePercept"
-# dataAnova$prob <- as.factor(dataAnova$prob)
+dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
 # dataAnova$prePercept <- as.factor(dataAnova$prePercept)
 # dataAnova$timeBin <- as.factor(dataAnova$timeBin)
@@ -66,9 +66,9 @@ colnames(dataAnova)[3] <- "measure"
 # dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
 #     data = dataTemp, FUN = "mean")
 
-anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-    within = .(prob), type = 3)
-print(anovaData)
+# anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
+#     within = .(prob), type = 3)
+# print(anovaData)
 
 # # compute Bayes factor
 # bf10 = anovaBF(measure ~ prob + sub, data = dataAnova, 
@@ -104,11 +104,11 @@ print(anovaData)
 # show(cohensd)
 
 # to do the plot, do not turn prob into factor, check the values and data type!
-# show(dataAnova$prob)
-# is.numeric(dataAnova$prob)
-# data=subset(dataAnova, prob!=70)
+dataPlot <- data.frame(sub, prob, measure)
+colnames(dataPlot)[3] <- "measure"
+dataPlot$sub <- as.factor(dataPlot$sub)
 
-p <- ggplot(data=dataAnova, aes(x = prob, y = measure)) +
+p <- ggplot(data=dataPlot, aes(x = prob, y = measure)) +
         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 17.5) +
         stat_summary(fun.data = 'mean_sdl',
                fun.args = list(mult = 1.96/sqrt(subN)),
@@ -117,11 +117,11 @@ p <- ggplot(data=dataAnova, aes(x = prob, y = measure)) +
         geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth) +
         # scale_y_continuous(name = "Anticipatory pursuit velocity (°/s)", breaks = seq(ylimLow, ylimHigh, 0.5), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
-        scale_y_continuous(name = "OSE", breaks = c(ylimLow, 0, ylimHigh), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
+        scale_y_continuous(name = "PSE", breaks = c(ylimLow, 0, ylimHigh), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
         # scale_y_continuous(name = "Slope", breaks = seq(ylimLow, ylimHigh， 10), limits = c(ylimLow, ylimHigh), expand = c(0, 0)) +
         # scale_x_continuous(name = "Preceded perceived direction", breaks=c(0, 1), limits = c(-0.5, 1.5), expand = c(0, 0)) + # preceded perception
-        # scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp2&3
-        scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp1
+        scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp2&3
+        # scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(45, 95), expand = c(0, 0)) + # Exp1
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "70", "90")) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
         theme(axis.text=element_text(colour="black"),

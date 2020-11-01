@@ -39,7 +39,7 @@ cd('R')
 RFolder = pwd;
 cd(analysisFolder)
 expAll{1} = load(['eyeTrialData_all_exp1.mat']);
-% expAll{2} = load(['eyeTrialData_all_exp2.mat']);
+expAll{2} = load(['eyeTrialData_all_exp2.mat']);
 expAll{3} = load(['eyeTrialData_all_exp3.mat']);
 % expCleanedUp{1} = load(['eyeTrialData_all_cleaned_exp1.mat']);
 % expCleanedUp{2} = load(['eyeTrialData_all_cleaned_exp2.mat']);
