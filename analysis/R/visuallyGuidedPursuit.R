@@ -96,7 +96,7 @@ subN <- length(subs)
 ## ANOVA
 sub <- data["sub"]
 prob <- data["prob"]
-congruency <- data["consistency"]
+congruency <- data["congruency"]
 # dir <- data["dir"]
 measure <- data["measure"]
 dataAnova <- data.frame(sub, prob, congruency, measure)
@@ -104,8 +104,8 @@ colnames(dataAnova)[4] <- "measure"
 # colnames(dataAnova)[3] <- "visualDirection"
 dataAnova$prob <- as.factor(dataAnova$prob)
 dataAnova$sub <- as.factor(dataAnova$sub)
-# dataAnova$congruency <- as.factor(dataAnova$congruency)
-dataAnova$visualDirection <- as.factor(dataAnova$visualDirection)
+dataAnova$congruency <- as.factor(dataAnova$congruency)
+# dataAnova$visualDirection <- as.factor(dataAnova$visualDirection)
 
 anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
     within = .(prob, congruency), type = 3, return_aov = TRUE, detailed = TRUE)
