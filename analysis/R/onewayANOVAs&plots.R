@@ -11,11 +11,11 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp3")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "dataPercept_exp3.csv"
-pdfFileName <- "PSE_exp3.pdf"
+dataFileName <- "data_clpGainX_contextMerged_exp1.csv"
+pdfFileName <- "clpGain_contextTrials_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -54,7 +54,8 @@ sub <- data["sub"]
 prob <- data["prob"]
 # preDir <- data["precededPerception"]
 # timeBin <- data["timeBin"]
-measure <- data["PSE"]
+# measure <- data["PSE"]
+measure <- data["measure"]
 # dataAnova <- data.frame(sub, preDir, measure)
 dataAnova <- data.frame(sub, prob, measure)
 # colnames(dataAnova)[2] <- "prePercept"
@@ -66,9 +67,9 @@ colnames(dataAnova)[3] <- "measure"
 # dataAnova <- aggregate(perceptualErrorMean ~ sub * rotationSpeed * exp,
 #     data = dataTemp, FUN = "mean")
 
-# anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
-#     within = .(prob), type = 3)
-# print(anovaData)
+anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
+    within = .(prob), type = 3)
+print(anovaData)
 
 # # compute Bayes factor
 # bf10 = anovaBF(measure ~ prob + sub, data = dataAnova, 

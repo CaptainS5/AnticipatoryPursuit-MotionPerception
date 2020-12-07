@@ -3,16 +3,16 @@
 % can also check with quick matlab plots
 
 initializeParas;
-% Exp1, 10 people, main experiment
-expN = 1;
-names = nameSets{1};
-eyeTrialData = expAll{1}.eyeTrialData;
-RsaveFolder = [RFolder '\Exp1'];
-probTotalN = 3;
-colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
-probNames{1} = {'10', '30', '50'};
-probNames{2} = {'50', '70', '90'};
-probCons = [10 30 50 70 90];
+% % Exp1, 10 people, main experiment
+% expN = 1;
+% names = nameSets{1};
+% eyeTrialData = expAll{1}.eyeTrialData;
+% RsaveFolder = [RFolder '\Exp1'];
+% probTotalN = 3;
+% colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+% probNames{1} = {'10', '30', '50'};
+% probNames{2} = {'50', '70', '90'};
+% probCons = [10 30 50 70 90];
 
 % % Exp2, 8 people, fixation control
 % expN = 2;
@@ -21,12 +21,12 @@ probCons = [10 30 50 70 90];
 % RsaveFolder = [RFolder '\Exp2'];
 % probTotalN = 2;
 
-% % Exp3, 9 people, low-coh context trials
-% expN = 3;
-% names = nameSets{3};
-% eyeTrialData = expAll{3}.eyeTrialData;
-% RsaveFolder = [RFolder '\Exp3'];
-% probTotalN = 2;
+% Exp3, 9 people, low-coh context trials
+expN = 3;
+names = nameSets{3};
+eyeTrialData = expAll{3}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp3'];
+probTotalN = 2;
 
 % different parameters to look at
 checkParas = {'pursuit.APvelocityX' 'pursuit.APvelocityX_interpol' ...
@@ -42,11 +42,11 @@ paraStart = 7;
 paraEnd = 7; % which parameters to plot
 
 % choose the grouping you want to achieve
-groupName = {'standardMerged', 'standardVisual', 'perceptualMerged', 'perceptualVisual', 'perceptualPerceived', ...
+groupName = {'contextMerged', 'standardVisual', 'perceptualMerged', 'perceptualVisual', 'perceptualPerceived', ...
     'perceptualVisualLperceived', 'perceptualVisualRperceived', 'wrongPerceptualPerceived', 'correctPerceptualPerceived', ...
-    'perceptualConsistency', 'zeroPerceptualPerceived'};
+    'probeCongruency', 'zeroPerceptualPerceived'};
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [11]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [10]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will do one by one
 
 % some other settings
@@ -157,7 +157,7 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
                     count = count+1;
                 end
             end
-            writetable(data, ['data_' pdfNames{paraN} '_exp' num2str(expN) '.csv'])
+            writetable(data, ['data_' pdfNames{paraN} '_'  groupName{groupN(ii)} '_exp' num2str(expN) '.csv'])
         else
             % generate csv file for R, group by trials not merged
             cd(RsaveFolder)
@@ -174,7 +174,7 @@ for paraN = paraStart:paraEnd%size(checkParas, 2)
                         data.sub(count, 1) = subN;
                         data.prob(count, 1) = probCons(probN+probTotalN-1);
                         if groupN==10
-                            data.consistency(count, 1) = dir;
+                            data.congruency(count, 1) = dir;
                         else
                             data.dir(count, 1) = dir;
                         end
@@ -303,7 +303,7 @@ for probSubN = 1:size(probSub, 2)
                 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));
             validIR = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probSub(probSubN));
-        case 10 % congruency/consistency, not including zero
+        case 10 % congruency/congruency, not including zero
             % visual left, perceived left
             validILL = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
                 & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probSub(probSubN));

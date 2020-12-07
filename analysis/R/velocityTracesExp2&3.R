@@ -7,11 +7,11 @@ rm(list = ls())
 
 #### load data
 # on Inspiron 13
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp2")
-plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp3")
+plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "velocityTrace_perceptualVisual_exp2_prob"
-pdfFileName <- "velocityTrace_perceptualVisual_all_Exp2.pdf"
+dataFileName <- "velocityTrace_congruent_exp3_prob"
+pdfFileName <- "velocityTrace_congruent_all_Exp3.pdf"
 # dataFileName <- "slidingW_perception_"
 # pdfFileName <- "slidingW_perception_STE_all_Exp3.pdf"
 n <- 8 # number of participants

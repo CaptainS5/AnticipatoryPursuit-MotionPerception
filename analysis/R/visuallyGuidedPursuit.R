@@ -16,12 +16,11 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp2")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "data_clpGainX_perceptualConsistency_exp1.csv"
-# pdfFileName <- "clpGainX_perceivedVisualByPerceived_no0cohTrials_exp1.pdf"
-# pdfInteractionFileName <- "clpGainX_perceptualVisual_exp1.pdf"
+dataFileName <- "data_clpGainX_probeConsistency_exp2.csv"
+pdfInteractionFileName <- "clpGainX_probeConsistency_exp2.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -42,8 +41,8 @@ dotSize <- 3
 ylimLow <- -4
 ylimHigh <- 4
 # # clp gain in probe trials
-ylimLow <- -0.1
-ylimHigh <- 0.6
+ylimLow <- -0.4
+ylimHigh <- 0.7
 
 data <- read.csv(dataFileName)
 subs <- unique(data$sub)
@@ -116,16 +115,25 @@ aovEffectSize(anovaData, 'pes')
 #              whichRandom="sub")
 # bayesfactor_inclusion(bf, match_models = TRUE)
 
+# # one sample t-test to zero
+# res <- t.test(dataAnova[which(dataAnova$prob==90 & dataAnova$congruency==-1),]$measure, mu=0, alternative = 'less')
+# show(res)
+# p.adjust(res[[3]], method = "bonferroni", n = 3) # 
+# cohensd <- cohensD(subset(dataAnova, prob==90 & congruency==-1)$measure, mu = 0)
+# show(cohensd)
+
 ## interaction plot
-dataPlot <- data.frame(sub, prob, dir, measure)
+dataPlot <- data.frame(sub, prob, congruency, measure)
 colnames(dataPlot)[4] <- "measure"
-colnames(dataPlot)[3] <- "visualDirection"
+# colnames(dataPlot)[3] <- "visualDirection"
 dataPlot$sub <- as.factor(dataPlot$sub)
 # dataPlot$prob <- as.factor(dataPlot$prob)
 # is.numeric(dataPlot$timeBin)
-dataPlot$visualDirection <- as.factor(dataPlot$visualDirection)
+dataPlot$congruency <- as.factor(dataPlot$congruency)
+# dataPlot$visualDirection <- as.factor(dataPlot$visualDirection)
+show(dataPlot[which(dataPlot$congruency==-1),]$measure)
 
-p <- ggplot(dataPlot, aes(x = prob, y = measure, color = visualDirection)) +
+p <- ggplot(dataPlot, aes(x = prob, y = measure, color = congruency)) +
         stat_summary(fun = mean, geom = "point", shape = 95, size = 17.5, position = position_dodge(width=10)) +
         # stat_summary(fun.y = mean, geom = "line", width = 1) +
         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1, position = position_dodge(width=10)) +
@@ -140,7 +148,7 @@ p <- ggplot(dataPlot, aes(x = prob, y = measure, color = visualDirection)) +
         scale_x_continuous(name = "Probability of rightward motion", breaks=c(50, 70, 90), limits = c(40, 100), expand = c(0, 0)) +
         # scale_x_discrete(name = "Probability of rightward motion", breaks=c("50", "90")) +
         # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
-        scale_color_manual(name = "Visual\ndirection"， values=c("#C3D7A4", "#52854C")) +
+        scale_color_manual(name = "Motion\ncongruency"， values=c("#293352", "#4e84c4")) +
         theme(axis.text=element_text(colour="black"),
                       axis.ticks=element_line(colour="black", size = axisLineWidth),
                       panel.grid.major = element_blank(),

@@ -14,7 +14,7 @@ setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/Anticipa
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
 dataFileName <- "eyeVSpercept_exp1.csv"
-# pdfFileName <- "corrASPvsPSE_exp1.pdf"
+pdfFileName <- "corrSlopeASPvsPSE_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -56,6 +56,42 @@ dataCorr$sub <- as.factor(dataCorr$sub)
 # using lme4
 fm1 <- lmer(measure2 ~ measure1 + prob + (1 | sub), dataCorr, REML = F)
 summary(fm1)
+
+# fitting the probability-induced slopes of asp/PSE for each observer
+subAll <- unique(data["sub"])
+slopeData <- data.frame(matrix(ncol=3,nrow=dim(subAll[1]), dimnames=list(NULL, c("sub", "asp", "PSE"))))
+for (subN in 1:dim(subAll[1])) {
+	dataTemp <- subset(data, sub==subAll[subN, 1])
+	aspLM <- lm(asp ~ prob, dataTemp)
+	pseLM <- lm(PSE ~ prob, dataTemp)
+	slopeData["sub"][subN, 1] <- subN
+	slopeData["asp"][subN, 1] <- coef(aspLM)["prob"]
+	slopeData["PSE"][subN, 1] <- coef(pseLM)["prob"]
+}
+show(slopeData)
+
+ylimLow <- .0005
+ylimHigh <-.003
+
+ p <- ggplot(data=slopeData, aes(x = asp, y = PSE)) +
+        geom_point(size = dotSize) +
+        geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(.01, .005), y = c(ylimLow, ylimLow), xend = c(.06, .005), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = F) +
+        scale_y_continuous(name = "Slope of PSE", breaks = c(ylimLow, 0, ylimHigh), limits = c(ylimLow, ylimHigh+.0005), expand = c(0, 0)) +
+        scale_x_continuous(name = "Slope of anticipatory pursuit velocity", breaks = seq(0.01, .06, .01), limits = c(.005, .065), expand = c(0, 0)) +
+        # scale_colour_discrete(name = "After reversal\ndirection", labels = c("CCW", "CW")) +
+        theme(axis.text=element_text(colour="black"),
+              axis.ticks=element_line(colour="black", size = axisLineWidth),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank(),
+              panel.background = element_blank(),
+              text = element_text(size = textSize, colour = "black"),
+              legend.background = element_rect(fill="transparent"),
+              legend.key = element_rect(colour = "transparent", fill = "white"),
+              aspect.ratio=1)
+        # facet_wrap(~prob)
+print(p)
+ggsave(paste(plotFolder, pdfFileName, sep = ""))
 
 # p <- ggplot(data=dataCorr, aes(x = measure1, y = measure2, group = prob)) +
 #         geom_point(aes(shape = prob, color = sub), size = dotSize) +

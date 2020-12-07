@@ -10,8 +10,8 @@ rm(list = ls())
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "velocityTrace_wrongPerceptualPerceived_no0coh_exp1_prob"
-pdfFileName <- "velocityTrace_wrongPerceptualPerceived_no0coh_all_Exp1.pdf"
+dataFileName <- "velocityTrace_contextVisual_exp1_prob"
+pdfFileName <- "velocityTrace_contextVisual_all_Exp1.pdf"
 # dataFileName <- "slidingW_APvelX_"
 # pdfFileName <- "slidingW_APvelX_STE_all_Exp1.pdf"
 n <- 10 # number of participants
@@ -25,11 +25,11 @@ ylimLow <- -4.2 # range for y axis line; if no individual, 4.2
 ylimHigh <- 4.2
 ytickLow <- -4 # range of y axis line; if no individual, 4
 ytickHigh <- 4
-# # # standard trials
-# ylimLow <- -11 # range for y axis line
-# ylimHigh <- 11
-# ytickLow <- -10 # range of y axis line
-# ytickHigh <- 10
+# # context trials
+ylimLow <- -11 # range for y axis line
+ylimHigh <- 11
+ytickLow <- -10 # range of y axis line
+ytickHigh <- 10
 
 # load and process data
 # mean velocity traces in different conditions

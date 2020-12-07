@@ -3,29 +3,32 @@
 initializeParas;
 
 % only uncomment the experiment you want to look at
-% Exp1, 10 people, main experiment
-expN = 1;
-names = nameSets{1}; 
-eyeTrialData = expAll{1}.eyeTrialData;
-RsaveFolder = [RFolder '\Exp1'];
-probTotalN = 3;
-colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
-probNames{1} = {'10', '30', '50'};
-probNames{2} = {'50', '70', '90'};
-probCons = [10 30 50 70 90];
+% % Exp1, 10 people, main experiment
+% expN = 1;
+% names = nameSets{1}; 
+% eyeTrialData = expAll{1}.eyeTrialData;
+% dataFolder = [analysisFolder, '\Exp1'];
+% RsaveFolder = [RFolder '\Exp1'];
+% probTotalN = 3;
+% colorProb = [8,48,107;66,146,198;198,219,239;66,146,198;8,48,107]/255; % all blue hues
+% probNames{1} = {'10', '30', '50'};
+% probNames{2} = {'50', '70', '90'};
+% probCons = [10 30 50 70 90];
 
-% % Exp2, 8 people, fixation control
-% expN = 2;
-% names = names2; 
-% eyeTrialData = expAll{2}.eyeTrialData;
-% RsaveFolder = [RFolder '\Exp2'];
-% probTotalN = 2;
+% Exp2, 8 people, fixation control
+expN = 2;
+names = names2; 
+eyeTrialData = expAll{2}.eyeTrialData;
+RsaveFolder = [RFolder '\Exp2'];
+dataFolder = [analysisFolder, '\Exp2'];
+probTotalN = 2;
 
 % % Exp3, 9 people, low-coh context trials
 % expN = 3;
 % names = nameSets{3}; 
 % eyeTrialData = expAll{3}.eyeTrialData;
 % RsaveFolder = [RFolder '\Exp3'];
+% dataFolder = [analysisFolder, '\Exp3'];
 % probTotalN = 2;
 
 % choose the grouping you want to achieve
@@ -35,12 +38,12 @@ groupName = {'contextVisual', 'probeVisual', 'probeVisualLperceived', 'probeVisu
 % not including 0-coh trials
 % congruent--perceived motion is the same as visual motion
 % naming by trial type (could include grouping rules) + group based on which direction (visual or perceived)
-groupN = [7;8]; % corresponds to the listed rules... can choose multiple, just list as a vector
+groupN = [7]; % corresponds to the listed rules... can choose multiple, just list as a vector
 % when choosing multiple groupN, will plot each group rule in one figure
 
 % choose which plot to look at now
-individualPlots = 0;
-averagedPlots = 1;
+individualPlots = 1;
+averagedPlots = 0;
 textFontSize = 8;
 
 % flip every direction... to collapse left and right probability blocks
@@ -55,8 +58,7 @@ end
 
 %% align rdk offset, frame data for all trials
 for subN = 1:size(names, 2)
-    cd(analysisFolder)
-    load(['eyeTrialDataExp' num2str(expN) '_Sub_' names{subN} '.mat']);
+    load([dataFolder, '\eyeTrialDataSubExp' num2str(expN) '_' names{subN} '.mat']);
     frameLength(subN) = min(max(eyeTrialData.frameLog.rdkOff(subN, :)), (900+300+700)/1000*sampleRate); % only plot until 600ms
     lengthT = size(eyeTrialDataSub.trial, 2);
     frames{subN} = NaN(lengthT, frameLength(subN));
@@ -92,12 +94,12 @@ timePoints = [(1:minFrameLength)-minFrameLength+0.7*sampleRate]*framePerSec*1000
 
 %% calculate mean traces
 % for plotting each coh level separately...
-absCohLevels = [0.05; 0.1; 0.15];
-for cohN = 1:3 % this is to plot each coh level separately
+% absCohLevels = [0.05; 0.1; 0.15];
+% for cohN = 1:3 % this is to plot each coh level separately
     
     for ii = 1:length(groupN)
-%         [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
-        [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii), absCohLevels(cohN));
+        [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii));
+%         [indiMean{ii}, allMean{ii}, trialNumber{ii}] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN(ii), absCohLevels(cohN));
     end
     
     %% Draw velocity trace plots
@@ -192,22 +194,23 @@ for cohN = 1:3 % this is to plot each coh level separately
             line([-50 -50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
             line([50 50], [min(yRange) max(yRange)],'Color','r','LineStyle','--')
             legend([p{:}], probNames{2}, 'Location', 'NorthWest')
-            title(['coh ', num2str(absCohLevels(cohN)), ',', groupName{groupN(ii)}])
+            title(groupName{groupN(ii)})
+%             title(['coh ', num2str(absCohLevels(cohN)), ',', groupName{groupN(ii)}])
             xlabel('Time (ms)')
             ylabel('Horizontal eye velocity (deg/s)')
             xlim([-500 700])
             ylim(yRange)
             box off
-            saveas(gcf, ['velTrace_coh' num2str(absCohLevels(cohN)) '_' groupName{groupN(ii)} '_all_exp' num2str(expN) '.pdf'])
+            saveas(gcf, ['velTrace_' groupName{groupN(ii)} '_all_exp' num2str(expN) '.pdf'])
+%             saveas(gcf, ['velTrace_coh' num2str(absCohLevels(cohN)) '_' groupName{groupN(ii)} '_all_exp' num2str(expN) '.pdf'])
         end
     end
-end
+% end
 
 %% generate csv files, each file for one probability condition
 % % each row is the mean velocity trace of one participant
 % % use the min frame length--the lengeth where all participants have
 % % valid data points
-% % cd(RsaveFolder)
 % % averaged traces
 % for ii = 1:length(groupN)
 %     for probNmerged = 1:probTotalN
@@ -222,12 +225,12 @@ end
 %                 velTAverageSub((binN-1)*length(names)+subN, :) = dataTemp(subN, :);
 %             end
 %         end
-%         csvwrite(['velocityTrace_' groupName{groupN(ii)} '_exp' num2str(expN) '_prob' num2str(probCons(probNmerged+probTotalN-1)), '.csv'], velTAverageSub)
+%         csvwrite([RsaveFolder, '\velocityTrace_' groupName{groupN(ii)} '_exp' num2str(expN) '_prob' num2str(probCons(probNmerged+probTotalN-1)), '.csv'], velTAverageSub)
 %     end
 % end
 
 %%
-function [indiMean, allMean, trialNumber] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN, coh)
+function [indiMean, allMean, trialNumber] = getMeanTraces(eyeTrialData, frames, frameLength, names, probCons, probTotalN, groupN)
 % calculate mean traces
 % indiMean: each row is one participant
 % allMean: averaged across participants
@@ -281,14 +284,14 @@ for probNmerged = 1:probTotalN
                     & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1);
             case 7 % probe trials misperceived, not including 0 coh, by perceived motion
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0 & abs(eyeTrialData.coh(subN, :))==coh);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==0 & eyeTrialData.rdkDir(subN, :)>0);% & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0  & abs(eyeTrialData.coh(subN, :))==coh);
+                    & eyeTrialData.prob(subN, :)==probCons(probN) & eyeTrialData.choice(subN, :)==1  & eyeTrialData.rdkDir(subN, :)<0);%  & abs(eyeTrialData.coh(subN, :))==coh);
             case 8 % probe trials correctly perceived
                 leftIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==coh);
+                    & eyeTrialData.rdkDir(subN, :)<0 & eyeTrialData.choice(subN, :)==0 & eyeTrialData.prob(subN, :)==probCons(probN));% & abs(eyeTrialData.coh(subN, :))==coh);
                 rightIdx = find(eyeTrialData.errorStatus(subN, :)==0 & eyeTrialData.trialType(subN, :)==0 ...
-                    & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN) & abs(eyeTrialData.coh(subN, :))==coh);
+                    & eyeTrialData.rdkDir(subN, :)>0 & eyeTrialData.choice(subN, :)==1 & eyeTrialData.prob(subN, :)==probCons(probN));% & abs(eyeTrialData.coh(subN, :))==coh);
         end
         
         % individual mean traces
