@@ -6,6 +6,7 @@ library(psychReport)
 library(lsr)
 library(bayestestR)
 library(BayesFactor)
+library(TOSTER)
 
 #### clear environment
 rm(list = ls())
@@ -17,9 +18,9 @@ source("pairwise.t.test.with.t.and.df.R")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
 # dataFileName <- "timeBinPSE_exp1.csv"
-dataFileName <- "PSE_exp1vs2.csv"
+dataFileName <- "PSE_exp1vs3.csv"
 # pdfFileName <- "timeBinPSE_exp1.pdf"
-pdfInteractionFileName <- "PSE_exp1vs2_interaction.pdf"
+pdfInteractionFileName <- "PSE_exp1vs3_interaction.pdf"
 # pdfFileNameD <- "slopeDiff_exp1vs3.pdf"
 # for plotting
 textSize <- 25
@@ -42,8 +43,8 @@ ylimHigh <- 0.15
 # ylimHigh <- 1
 
 data <- read.csv(dataFileName)
-subs <- unique(data$sub)
-subN <- length(subs)
+subAll <- unique(data["sub"])
+subTotalN <- dim(subAll)[1]
 # dataD <- read.csv(dataDFileName)
 # data <- data[data.exp==3]
 # # exclude bad fitting...
@@ -70,6 +71,21 @@ anovaData <- ezANOVA(dataAnova, dv = .(measure), wid = .(sub),
 # print(anovaData)
 aovEffectSize(anovaData, 'pes')
 
+# Equivalence test for the differences of PSE between experiments
+dataE <- data.frame(matrix(ncol=3,nrow=dim(subAll)[1], dimnames=list(NULL, c("sub", "exp1", "exp2"))))
+for (subN in 1:subTotalN) {
+  data150 <- dataAnova[which(sub==subAll[subN, 1] & exp==1 & prob==50), ]$measure
+  data190 <- dataAnova[which(sub==subAll[subN, 1] & exp==1 & prob==90), ]$measure
+  data250 <- dataAnova[which(sub==subAll[subN, 1] & exp!=1 & prob==50), ]$measure
+  data290 <- dataAnova[which(sub==subAll[subN, 1] & exp!=1 & prob==90), ]$measure 
+  dataE["sub"][subN, 1] <- subN
+  dataE["exp1"][subN, 1] <- data190-data150
+  dataE["exp2"][subN, 1] <- data290-data250
+}
+show(dataE)
+
+dataTOSTpaired(data = dataE, pairs = list((c(i1="exp1",i2="exp2"))), low_eqbound = -0.36, high_eqbound = 0.36, eqbound_type = "d", alpha = 0.05, desc = TRUE, plots = TRUE)
+
 # # compute Bayes Factor inclusion...
 # bf <- anovaBF(measure ~ prob + timeBin + prob*timeBin + sub, data = dataAnova, 
 #              whichRandom="sub")
@@ -78,7 +94,7 @@ aovEffectSize(anovaData, 'pes')
 # p <- ggplot(dataAnova, aes(x = prob, y = measure, color = exp)) +
 #         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
 #         stat_summary(fun.data = 'mean_sdl',
-#                fun.args = list(mult = 1.96/sqrt(subN)),
+#                fun.args = list(mult = 1.96/sqrt(subTotalN)),
 #                geom = 'errorbar', width = .1) +
 # # geom = 'smooth', se = 'TRUE') +
 #         # stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
@@ -128,12 +144,12 @@ dataPlot$exp <- as.factor(dataPlot$exp)
 # p <- ggplot(dataPlot, aes(x = timeBin, y = measure, color = prob)) +
 #         stat_summary(fun.y = mean, geom = "point", shape = 95, size = 17.5) +
 #         stat_summary(fun.y = mean, geom = "line", width = 1) +
-#         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1) +
+#         stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subTotalN)), geom = 'errorbar', width = 1.5, size = 1) +
 #         scale_x_continuous(name = "time bin of trials", breaks=c(1, 2), limits = c(0.5, 2.5), expand = c(0, 0)) +
 p <- ggplot(dataPlot, aes(x = prob, y = measure, color = exp)) +
         stat_summary(fun.y = mean, geom = "point", shape = 95, size = 17.5) +
         stat_summary(fun.y = mean, geom = "line", width = 1) +
-        stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subN)), geom = 'errorbar', width = 1.5, size = 1) +
+        stat_summary(fun.data = 'mean_sdl', fun.args = list(mult = 1.96/sqrt(subTotalN)), geom = 'errorbar', width = 1.5, size = 1) +
         stat_summary(aes(y = measure), fun.data = mean_se, geom = "errorbar", width = 0.1) +
         # geom_point(aes(x = prob, y = measure), size = dotSize, shape = 1) +
         geom_segment(aes_all(c('x', 'y', 'xend', 'yend')), data = data.frame(x = c(50, 45), y = c(ylimLow, ylimLow), xend = c(90, 45), yend = c(ylimLow, ylimHigh)), size = axisLineWidth, inherit.aes = FALSE) +
@@ -187,7 +203,7 @@ ggsave(paste(plotFolder, pdfInteractionFileName, sep = ""))
 # p <- ggplot(dataDtemp, aes(x = exp, y = measure)) +
 #         stat_summary(aes(y = measure), fun.y = mean, geom = "point", shape = 95, size = 15) +
 #         stat_summary(fun.data = 'mean_sdl',
-#                fun.args = list(mult = 1.96/sqrt(subN)),
+#                fun.args = list(mult = 1.96/sqrt(subTotalN)),
 #                geom = 'linerange', size = 1) +
 #         geom_line(aes(x = exp, y = measure, group = sub), size = 0.5, linetype = "dashed") +
 #         geom_point(aes(x = exp, y = measure), size = dotSize, shape = 1) +

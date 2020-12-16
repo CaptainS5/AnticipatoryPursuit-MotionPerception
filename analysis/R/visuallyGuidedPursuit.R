@@ -16,11 +16,11 @@ rm(list = ls())
 # on Inspiron 13
 setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R")
 source("pairwise.t.test.with.t.and.df.R")
-setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp2")
+setwd("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/analysis/R/Exp1")
 plotFolder <- ("C:/Users/wuxiu/Documents/PhD@UBC/Lab/2ndYear/AnticipatoryPursuit/AnticipatoryPursuitMotionPerception/results/manuscript/figures/rawPlots/")
 ### modify these parameters to plot different conditions
-dataFileName <- "data_clpGainX_probeConsistency_exp2.csv"
-pdfInteractionFileName <- "clpGainX_probeConsistency_exp2.pdf"
+dataFileName <- "data_clpGainX_probeConsistency_exp1.csv"
+pdfInteractionFileName <- "clpGainX_probeConsistency_exp1.pdf"
 # for plotting
 textSize <- 25
 axisLineWidth <- 0.5
@@ -116,10 +116,10 @@ aovEffectSize(anovaData, 'pes')
 # bayesfactor_inclusion(bf, match_models = TRUE)
 
 # # one sample t-test to zero
-# res <- t.test(dataAnova[which(dataAnova$prob==90 & dataAnova$congruency==-1),]$measure, mu=0, alternative = 'less')
+# res <- t.test(dataAnova[which(dataAnova$prob==50 & dataAnova$congruency==-1),]$measure, mu=0, alternative = 'less')
 # show(res)
-# p.adjust(res[[3]], method = "bonferroni", n = 3) # 
-# cohensd <- cohensD(subset(dataAnova, prob==90 & congruency==-1)$measure, mu = 0)
+# # p.adjust(res[[3]], method = "bonferroni", n = 3) # 
+# cohensd <- cohensD(subset(dataAnova, prob==50 & congruency==-1)$measure, mu = 0)
 # show(cohensd)
 
 ## interaction plot
