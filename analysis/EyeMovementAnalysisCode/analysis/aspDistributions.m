@@ -50,15 +50,26 @@ for expN = 1:3
             trialIdx{subN, probSubN} = idxP;
             aspAll{subN, probSubN} = eyeTrialData.pursuit.APvelocityX(subN, idxP);
             
-            % calculate the proportion of right in 90% blocks
+            %% calculate the proportion of right in 90% blocks
+%             % simply subtracting the baseline proportion of right in the
+%             % 70% and 90% blocks
+%             if probSubN==1 % baseline, 50% block
+%                 baselineProportion{expN}(subN, 1) = length(find(aspAll{subN, probSubN}>0))/length(aspAll{subN, probSubN});
+%             elseif probSubN==length(probSub)
+%                 proportionRight{expN}(subN, 1) = length(find(aspAll{subN, probSubN}>0))/length(aspAll{subN, probSubN})-baselineProportion{expN}(subN, 1);
+%             end
+%           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % binarizing asp direction based on the mean velocity in the 50% block
             if probSubN==1 % baseline, 50% block
                 baselineASP{expN}(subN, 1) = nanmean(aspAll{subN, probSubN});
+                baselineProportion{expN}(subN, 1) = length(find(aspAll{subN, probSubN}>baselineASP{expN}(subN, 1)))/length(aspAll{subN, probSubN});
             elseif probSubN==length(probSub)
                 aspTemp = aspAll{subN, probSubN}-baselineASP{expN}(subN, 1);
                 rightN = length(find(aspTemp>0));
                 proportionRight{expN}(subN, 1) = rightN/length(aspTemp);
             end
-            
+%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %             % plot the distributions
 %             p{subN, probSubN} = histogram(aspAll{subN, probSubN}, 'Normalization', 'probability', 'DisplayStyle', 'stairs', 'EdgeColor', colorProb(probSubN, :), 'lineWidth', 2);
 %             line([nanmean(aspAll{subN, probSubN}) nanmean(aspAll{subN, probSubN})], yRange, 'linestyle', '--', 'color', colorProb(probSubN, :), 'lineWidth', 2)
@@ -70,6 +81,19 @@ for expN = 1:3
 %         legend([p{subN, :}], probNames{probNameI})
 %         saveas(gcf, [pursuitFolder, '\aspDistribution_exp_', num2str(expN), '_', names{subN}, '.pdf'])
     end
+    
+%     % plot individual proportions in each experiment
+%     figure
+%     hold on
+%     for subN = 1:size(names, 2)
+%         plot([50 90], [baselineProportion{expN}(subN, 1) proportionRight{expN}(subN, 1)], 'k--')
+%     end
+%     xlim([45, 95])
+%     ylim([0.2, 1])
+%     xlabel('Probability of right (block condition)')
+%     ylabel('Proportion of asp larger than baseline')
+%     title(['exp ', num2str(expN)])
+%     saveas(gcf, [pursuitFolder, '\aspProportionsLargerThanBaseline_exp_', num2str(expN), '.pdf'])    
 end
 
 % some descriptive stats
@@ -84,10 +108,12 @@ idx = [3;9];
 exp1Temp(idx) = [];
 exp2Temp = proportionRight{2};
 [h,p,ci,stats] = ttest(exp1Temp, exp2Temp);
-disp(['Exp1 vs 2: t=', num2str(stats.tstat), ', p=', num2str(p)])
+cohensd = mean(exp2Temp-exp1Temp)/std(exp2Temp-exp1Temp);
+disp(['Exp1 vs 2: t=', num2str(stats.tstat), ', p=', num2str(p), ', Cohen''s d=', num2str(cohensd)])
 % exp1 vs. 3
 exp1Temp = proportionRight{1};
 exp1Temp(end) = [];
 exp3Temp = proportionRight{3};
 [h,p,ci,stats] = ttest(exp1Temp, exp3Temp);
-disp(['Exp1 vs 3: t=', num2str(stats.tstat), ', p=', num2str(p)])
+cohensd = mean(exp3Temp-exp1Temp)/std(exp3Temp-exp1Temp);
+disp(['Exp1 vs 3: t=', num2str(stats.tstat), ', p=', num2str(p), ', Cohen''s d=', num2str(cohensd)])

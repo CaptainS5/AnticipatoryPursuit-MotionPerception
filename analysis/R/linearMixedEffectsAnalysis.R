@@ -60,7 +60,7 @@ summary(fm1)
 # fitting the probability-induced slopes of asp/PSE for each observer
 subAll <- unique(data["sub"])
 slopeData <- data.frame(matrix(ncol=3,nrow=dim(subAll[1]), dimnames=list(NULL, c("sub", "asp", "PSE"))))
-for (subN in 1:dim(subAll[1])) {
+for (subN in 1:dim(subAll)[1]) {
 	dataTemp <- subset(data, sub==subAll[subN, 1])
 	aspLM <- lm(asp ~ prob, dataTemp)
 	pseLM <- lm(PSE ~ prob, dataTemp)
