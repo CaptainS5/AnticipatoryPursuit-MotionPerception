@@ -84,7 +84,7 @@ for frameN = 1:rdkFrames-1
     
     % first initialize the new parameters to use for next frame
     dots.distanceToCenterX{frameN+1} = dots.distanceToCenterX{frameN}; % for new random positions
-    dots.movementNextFrame{frameN+1} = dots.movementNextFrame{frameN}; % for new moving directions
+    dots.movementNextFrame{frameN+1} = dots.movementNextFrame{frameN}; % for new moving directions--note that new direction will only be assigned it renew labels, or dot expired
     dots.label{frameN+1} = dots.label{frameN};
     % new random position angle
     theta = 2 * pi * rand(prm.rdk.dotNumber,1); % values between 0 and 2pi (2pi ~ 6.28)
