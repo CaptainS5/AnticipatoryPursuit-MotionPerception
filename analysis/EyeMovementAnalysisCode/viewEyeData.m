@@ -21,7 +21,7 @@ close all;
 fig = figure('Position', [25 50 screenSize(3)-100, screenSize(4)-150],'Name',name);
 
 %% Define some experimental parameters
-currentTrial = 368; % 1 for fhF 
+currentTrial = 31; % 1 for fhF 
 % chose trial you want to look at here; default = 1; 
 c = 1; % counter
 % monitor and setup specific parameters
